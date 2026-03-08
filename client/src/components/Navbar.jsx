@@ -1,19 +1,22 @@
 import React from "react";
-import logo from "../assets/images/campus-logo.png";
+import { Link } from "react-router-dom";
 
-function Navbar() {
+function Navbar({ logo, title }) {
   return (
     <div className="navbar">
-      <div className="logo-section">
-        <img src={logo} alt="Campus Logo" className="logo" />
+      <div className="navbar-left">
+        <img src={logo} alt="logo" className="navbar-logo" />
+        <div className="navbar-title">
+          {title}
+        </div>
       </div>
 
-      <div className="nav-links">
-        <a href="/">Home</a>
-        <a href="/about">About</a>
-        <a href="/calendar">Academic Calendar</a>
-        <a href="/signin">SignIn</a>
-        <a href="/signup">SignUp</a>
+      <div className="navbar-links">
+        <Link to="/">Home</Link>
+        <Link to="/about">About</Link>
+        <Link to="/calendar">Academic Calendar</Link>
+        <Link to="/signin">SignIn</Link>
+        <Link to="/signup">SignUp</Link>
       </div>
     </div>
   );

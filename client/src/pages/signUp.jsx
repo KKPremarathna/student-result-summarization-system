@@ -1,129 +1,82 @@
-import { useState } from "react";
-//import { requestOtp, signupUser } from "../services/authService";
+import React, { useState } from "react";
+import signupImage from "../assets/images/signup-image.png";
+import "../styles/signup.css" ;
+import InnerNavbar from "../components/InnerNavbar";
 
 function Signup() {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    dob: "",
-    password: "",
-    otp: "",
-  });
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
 
-  const [otpRequested, setOtpRequested] = useState(false);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleRequestOtp = async () => {
-    try {
-      setError("");
-      setMessage("");
-
-      const res = await requestOtp(formData.email);
-      setMessage(res.data.message);
-      setOtpRequested(true);
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to request OTP");
-    }
-  };
-
-  const handleSignup = async (e) => {
-    e.preventDefault();
-
-    try {
-      setError("");
-      setMessage("");
-
-      const res = await signupUser(formData);
-      setMessage("Signup successful!");
-      console.log(res.data);
-    } catch (err) {
-      setError(err.response?.data?.message || "Signup failed");
-    }
+  const handleOtpChange = (index, value) => {
+    if (value.length > 1) return;
+    const updatedOtp = [...otp];
+    updatedOtp[index] = value;
+    setOtp(updatedOtp);
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "30px auto" }}>
-      <h2>Signup</h2>
+    <div className="signup-page">
+      <InnerNavbar />
 
-      {message && <p style={{ color: "green" }}>{message}</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      <div className="signup-main">
+        <div className="signup-left">
+          <img
+            src={signupImage}
+            alt="Signup illustration"
+            className="signup-image"
+          />
+        </div>
 
-      <div>
-        <input
-          type="email"
-          name="email"
-          placeholder="Enter allowed email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-        <button onClick={handleRequestOtp}>Request OTP</button>
+        <div className="signup-right">
+          <form className="signup-form">
+            <input type="text" placeholder="First name" />
+            <input type="text" placeholder="Last name" />
+            <input type="email" placeholder="Email" />
+            <input type="text" placeholder="Birth date" />
+            <input type="text" placeholder="Phone number" />
+
+            <div className="password-wrapper">
+              <input type="password" placeholder="Password" />
+              <span className="eye-icon">👁</span>
+            </div>
+
+            <div className="password-wrapper">
+              <input type="password" placeholder="Confirm password" />
+              <span className="eye-icon">👁</span>
+            </div>
+
+            <div className="otp-row">
+              <div className="otp-boxes">
+                {otp.map((digit, index) => (
+                  <input
+                    key={index}
+                    type="text"
+                    maxLength="1"
+                    value={digit}
+                    onChange={(e) => handleOtpChange(index, e.target.value)}
+                    className="otp-input"
+                  />
+                ))}
+              </div>
+
+              <button type="button" className="send-otp-btn">
+                send OTP
+              </button>
+            </div>
+
+            <button type="button" className="verify-btn">
+              Verify
+            </button>
+
+            <button type="submit" className="signup-btn">
+              SignUp
+            </button>
+
+            <p className="signin-text">
+              Already have an Account ? <span>Sign In</span>
+            </p>
+          </form>
+        </div>
       </div>
-
-      {otpRequested && (
-        <form onSubmit={handleSignup}>
-          <input
-            type="text"
-            name="firstName"
-            placeholder="First Name"
-            value={formData.firstName}
-            onChange={handleChange}
-          />
-          <br />
-
-          <input
-            type="text"
-            name="lastName"
-            placeholder="Last Name"
-            value={formData.lastName}
-            onChange={handleChange}
-          />
-          <br />
-
-          <input
-            type="text"
-            name="phone"
-            placeholder="Phone"
-            value={formData.phone}
-            onChange={handleChange}
-          />
-          <br />
-
-          <input
-            type="date"
-            name="dob"
-            value={formData.dob}
-            onChange={handleChange}
-          />
-          <br />
-
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-          />
-          <br />
-
-          <input
-            type="text"
-            name="otp"
-            placeholder="Enter OTP"
-            value={formData.otp}
-            onChange={handleChange}
-          />
-          <br />
-
-          <button type="submit">Sign Up</button>
-        </form>
-      )}
     </div>
   );
 }
