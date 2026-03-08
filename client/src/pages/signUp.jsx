@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import signupImage from "../assets/images/signup-image.png";
-import "../styles/signup.css" ;
+import "../styles/signup.css";
 import InnerNavbar from "../components/InnerNavbar";
+import { Link } from "react-router-dom";
 
 function Signup() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -72,7 +73,10 @@ function Signup() {
             </button>
 
             <p className="signin-text">
-              Already have an Account ? <span>Sign In</span>
+              Already have an Account ? 
+              <Link to="/signin">
+                <span>Sign In</span>
+              </Link>
             </p>
           </form>
         </div>
