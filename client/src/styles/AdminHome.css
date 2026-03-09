@@ -63,7 +63,7 @@
 .admin-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(95, 120, 135, 0.6);
+  background: rgba(95, 120, 135, 0.8);
 }
 
 /* content above overlay */

@@ -1,15 +1,15 @@
-.studentlist-page {
+.lecturelist-page {
   min-height: 100vh;
   background: #c8ddea;
 }
 
-.studentlist-content {
+.lecturelist-content {
   display: flex;
   min-height: calc(100vh - 80px);
 }
 
-.studentlist-sidebar {
-  width: 260px;
+.lecturelist-sidebar {
+  width: 280px;
   background: #c8ddea;
   padding: 30px 20px;
   box-sizing: border-box;
@@ -51,7 +51,7 @@
   font-weight: 700;
 }
 
-.studentlist-main {
+.lecturelist-main {
   flex: 1;
   position: relative;
   margin: 20px 20px 20px 0;
@@ -61,97 +61,110 @@
   overflow: hidden;
 }
 
-.studentlist-overlay {
+.lecturelist-overlay {
   position: absolute;
   inset: 0;
   background: rgba(95, 120, 135, 0.8);
 }
 
-.studentlist-main-content {
+.lecturelist-main-content {
   position: relative;
   z-index: 2;
-  padding: 30px 40px;
-  color: white;
+  padding: 35px 45px;
+  color: rgb(23, 22, 22);
 }
 
-.studentlist-main-content h1 {
+.lecturelist-main-content h1 {
   text-align: center;
-  font-size: 20px;
-  margin-bottom: 30px;
+  font-size: 30px;
+  margin-bottom: 40px;
   text-decoration: underline;
-
 }
 
-.filter-row {
+.lecture-filter-row {
   display: flex;
   justify-content: center;
-  gap: 80px;
-  flex-wrap: wrap;
-  margin-bottom: 40px;
-}
-
-.filter-group {
-  display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+  margin-bottom: 55px;
 }
 
-.filter-group label {
+.lecture-filter-row label {
   font-size: 18px;
-  font-weight: 500;
 }
 
-.filter-group select {
-  width: 140px;
+.lecture-filter-row select {
+  width: 150px;
   height: 30px;
   border: none;
   outline: none;
   padding: 4px 8px;
 }
 
-.table-wrapper {
+.view-btn {
+  background: #374a50;
+  color: white;
+  border: none;
+  padding: 6px 18px;
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.lecture-table-wrapper {
   display: flex;
   justify-content: center;
 }
 
-.student-table {
-  width: 75%;
+.lecture-table {
+  width: 82%;
   border-collapse: collapse;
-  background: rgba(248, 249, 249, 0.25);
+  background: rgba(255, 255, 255, 0.2);
   color: #111;
 }
 
-.student-table th,
-.student-table td {
+.lecture-table th,
+.lecture-table td {
   border: 1px solid #555;
-  padding: 10px 12px;
+  padding: 8px 10px;
   text-align: left;
+  font-size: 18px;
 }
 
-.student-table th {
+.lecture-table th {
   background: #b7c9e9;
 }
 
 .delete-btn {
-  background: #e58f8f;
-  color: black;
+  background: #e79a9a;
+  color: #000;
   border: none;
-  padding: 6px 14px;
+  padding: 5px 12px;
   border-radius: 14px;
   font-weight: 600;
   cursor: pointer;
 }
 
+.no-data {
+  text-align: center;
+  color: white;
+  font-weight: 500;
+}
+
 @media (max-width: 900px) {
-  .studentlist-content {
+  .lecturelist-content {
     flex-direction: column;
   }
 
-  .studentlist-sidebar {
+  .lecturelist-sidebar {
     width: 100%;
   }
 
-  .student-table {
+  .lecture-filter-row {
+    flex-direction: column;
+  }
+
+  .lecture-table {
     width: 100%;
   }
 }

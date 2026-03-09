@@ -4,7 +4,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px 40px;
+  padding: 20px 50px;
 }
 
 .inner-navbar__brand {
@@ -44,7 +44,7 @@
   opacity: 0.8;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 700px) {
   .inner-navbar {
     flex-direction: column;
     gap: 15px;
