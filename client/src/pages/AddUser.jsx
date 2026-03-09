@@ -20,13 +20,13 @@ function AddUser() {
               <Link to="/adduser">Add User</Link>
             </li>
             <li>
-              <Link to="/complaint">Complaint</Link>
+              <Link to="/admincomplaint">Complaint</Link>
             </li>
             <li>
-              <Link to="/results">Results</Link>
+              <Link to="/adminresults">Results</Link>
             </li>
             <li>
-              <Link to="/resetpassword">Reset Password</Link>
+              <Link to="/adminresetpassword">Reset Password</Link>
             </li>
           </ul>
         </aside>
