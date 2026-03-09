@@ -1,0 +1,141 @@
+.complaint-page {
+  min-height: 100vh;
+  background: #c8ddea;
+}
+
+.complaint-content {
+  display: flex;
+  min-height: calc(100vh - 80px);
+}
+
+.complaint-sidebar {
+  width: 260px;
+  background: #c8ddea;
+  padding: 30px 20px;
+  box-sizing: border-box;
+}
+
+.menu-btn {
+  background: white;
+  border: 1px solid #999;
+  font-size: 28px;
+  padding: 4px 10px;
+  cursor: pointer;
+  margin-bottom: 30px;
+}
+
+.sidebar-title {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 30px;
+  color: #111;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-menu li {
+  margin-bottom: 28px;
+}
+
+.sidebar-menu li a {
+  text-decoration: none;
+  color: #111;
+  font-size: 18px;
+}
+
+.sidebar-menu li.active a {
+  font-weight: 700;
+}
+
+.complaint-main {
+  flex: 1;
+  position: relative;
+  margin: 20px 20px 20px 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+.complaint-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(110, 120, 130, 0.6);
+}
+
+.complaint-main-content {
+  position: relative;
+  z-index: 2;
+  padding: 30px 40px;
+  color: white;
+}
+
+.complaint-main-content h1 {
+  text-align: center;
+  font-size: 22px;
+  margin-bottom: 35px;
+}
+
+.complaint-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+}
+
+.complaint-card {
+  width: 70%;
+  background: #b9dccd;
+  border-radius: 4px;
+  padding: 16px 18px;
+  box-sizing: border-box;
+  color: #111;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.complaint-card.read {
+  opacity: 0.75;
+}
+
+.complaint-text p {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+}
+
+.complaint-read {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #9b0000;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.complaint-read input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .complaint-content {
+    flex-direction: column;
+  }
+
+  .complaint-sidebar {
+    width: 100%;
+  }
+
+  .complaint-card {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
