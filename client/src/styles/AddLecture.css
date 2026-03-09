@@ -1,27 +1,32 @@
-.lecture-container{
+.addlecture-container{
 display:flex;
-min-height:calc(100vh - 80px);
 background:#c8ddea;
+min-height:calc(100vh - 80px);
 }
 
 /* sidebar */
 
-.lecture-sidebar{
-width:260px;
+.sidebar{
+width:270px;
 padding:30px;
 }
 
-.lecture-sidebar ul{
+.sidebar ul{
 list-style:none;
 padding:0;
 }
 
-.lecture-sidebar li{
+.sidebar li{
 margin:20px 0;
 font-size:18px;
 }
 
-/* main section */
+.menu-btn{
+font-size:24px;
+margin-bottom:30px;
+}
+
+/* main */
 
 .lecture-main{
 flex:1;
@@ -31,60 +36,68 @@ background-size:cover;
 background-position:center;
 }
 
-.lecture-overlay{
+.overlay{
 position:absolute;
 width:100%;
 height:100%;
-background:rgba(90,100,110,0.6);
+background: rgb(180, 206, 222,1.0);
 }
+
+/* content */
 
 .lecture-content{
 position:relative;
 z-index:2;
-color:white;
-padding:60px 120px;
+color:rgb(12, 8, 8);
+padding:60px;
+text-align:center;
+
 }
 
 .lecture-content h2{
-text-align:center;
 margin-bottom:40px;
-border-bottom:2px solid white;
-display:inline-block;
-padding-bottom:5px;
+text-decoration: underline;
+
+
 }
 
 .form-row{
 display:flex;
+justify-content:center;
 align-items:center;
 gap:20px;
-margin-bottom:25px;
+margin-bottom:20px;
 }
 
-.form-row input{
-width:250px;
+.form-row input,
+.form-row select{
+width:220px;
 height:30px;
 border:none;
+padding:4px;
 }
 
 .button-row{
-margin-top:30px;
+margin-top:40px;
 display:flex;
-gap:20px;
+justify-content:center;
+gap:60px;
 }
 
 .add-btn{
-background:#3F5B4E;
+background:#0e6089f9;
 color:white;
 border:none;
-padding:8px 20px;
-border-radius:20px;
+padding:10px 40px;
+font-size:14px;
+border-radius:18px;
 cursor:pointer;
 }
 
 .view-btn{
-background:#4b7f58;
+background:#395963;
 color:white;
-padding:8px 20px;
+padding:10px 25px;
 border-radius:20px;
 text-decoration:none;
 }
