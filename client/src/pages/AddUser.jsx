@@ -12,10 +12,10 @@ function AddUser() {
       <div className="adduser-content">
         {/* Left sidebar */}
         <aside className="adduser-sidebar">
-
-          <h2 className ="sidebar-title">Admin Home page</h2>
-
           <ul className="sidebar-menu">
+              <li>
+              <Link to="/adminhome"> Admin Home</Link>
+              </li>
             <li className="active">
               <Link to="/adduser">Add User</Link>
             </li>
@@ -40,8 +40,12 @@ function AddUser() {
 
           <div className="adduser-main-content">
             <div className="action-buttons">
-              <button className="action-btn">Add Student</button>
-              <button className="action-btn">Add lecture</button>
+              <Link to="/addstudent" className="action-btn-link">
+                <button className="action-btn">Add Student</button>
+              </Link>
+              <Link to="/addlecture" className="action-btn-link">
+              Add lecture
+             </Link>
             </div>
           </div>
         </main>

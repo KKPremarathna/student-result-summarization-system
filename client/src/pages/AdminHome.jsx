@@ -2,20 +2,20 @@ import React from "react";
 import "../styles/AdminHome.css";
 import Navbar from "../components/InnerNavbar";
 import bgImage from "../assets/images/admin.jpg";
-import InnerNavbar from "../components/InnerNavbar";
+import { Link } from "react-router-dom";
 
 function AdminHome() {
   return (
     <div className="admin-page">
-      <InnerNavbar/>
+      <Navbar/>
 
       <div className="admin-content">
         {/* Left sidebar */}
         <aside className="admin-sidebar">
-
-          <h2 className="sidebar-title">Admin Home page</h2>
-
           <ul className="sidebar-menu">
+            <li className="active">
+            <Link to="/adminhome"> Admin Home</Link>
+            </li>
             <li>
             <Link to="/adduser">Add User</Link>
             </li>

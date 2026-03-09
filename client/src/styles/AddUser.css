@@ -18,14 +18,14 @@
 .menu-btn {
   background: white;
   border: 1px solid #999;
-  font-size: 28px;
+  font-size: 30px;
   padding: 6px 12px;
   cursor: pointer;
   margin-bottom: 35px;
 }
 
 .sidebar-title {
-  font-size: 18px;
+  font-size: px;
   font-weight: 500;
   color: #111;
   margin-bottom: 28px;
@@ -97,6 +97,22 @@
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 4px 0 rgba(0, 0, 0, 0.25);
+}
+.action-btn-link {
+  width: 185px;
+  height: 90px;
+  border: 2px solid #222;
+  border-radius: 28px;
+  background: #8cc9f5;
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.25);
+  text-decoration: none;
+  color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .action-btn:hover {
