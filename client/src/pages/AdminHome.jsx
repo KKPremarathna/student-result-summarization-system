@@ -11,19 +11,25 @@ function AdminHome() {
 
       <div className="admin-content">
         {/* Left sidebar */}
-        <aside className="admin-sidebar">
-          <ul className="sidebar-menu">
-            <li className="active">
-            <Link to="/adminhome"> Admin Home</Link>
-            </li>
-            <li>
-            <Link to="/adduser">Add User</Link>
-            </li>
-            <li>Complaint</li>
-            <li>Results</li>
-            <li>Reset Password</li>
-          </ul>
-        </aside>
+        <aside className="adduser-sidebar">
+                                  <ul className="sidebar-menu">
+                                      <li className="active">
+                                      <Link to="/adminhome"> Admin Home</Link>
+                                      </li>
+                                    <li>
+                                      <Link to="/adduser">Add User</Link>
+                                    </li>
+                                    <li>
+                                      <Link to="/complaint">Complaint</Link>
+                                    </li>
+                                    <li >
+                                      <Link to="/AdminResults">Results</Link>
+                                    </li>
+                                    <li>
+                                      <Link to="/resetpassword">Reset Password</Link>
+                                    </li>
+                                  </ul>
+                                </aside>
 
         {/* Right main section */}
         <main
