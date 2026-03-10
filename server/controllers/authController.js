@@ -4,6 +4,7 @@ const OTP = require('../models/OTP');
 const sendEmail = require('../utils/email');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 
 // @desc    Request OTP for Signup
 // @route   POST /api/auth/request-otp
@@ -100,6 +101,50 @@ exports.signup = async (req, res) => {
         if (error.code === 11000) {
             return res.status(400).json({ message: 'Email already exists.' });
         }
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// @desc    Login a user
+// @route   POST /api/auth/login
+// @access  Public
+exports.login = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        // 1. Check if user exists
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid credentials.' });
+        }
+
+        // 2. Check password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Invalid credentials.' });
+        }
+
+        // 3. Generate JWT
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '1d' }
+        );
+
+        res.status(200).json({
+            success: true,
+            token,
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                role: user.role
+            }
+        });
+
+    } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
     }
