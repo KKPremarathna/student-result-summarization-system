@@ -1,0 +1,135 @@
+.signup-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.signup-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 40px 60px;
+  gap: 40px;
+}
+
+.signup-left {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.signup-image {
+  width: 100%;
+  max-width: 500px;
+  object-fit: contain;
+}
+
+.signup-right {
+  width: 380px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.signup-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.signup-form input {
+  width: 100%;
+  height: 50px;
+  border: 1px solid #d8d8d8;
+  border-radius: 4px;
+  padding: 0 14px;
+  font-size: 15px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.signup-form input::placeholder {
+  color: #666;
+}
+
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper input {
+  padding-right: 40px;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #777;
+  cursor: pointer;
+}
+
+.otp-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.otp-boxes {
+  display: flex;
+  gap: 6px;
+}
+
+.otp-input {
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  text-align: center;
+  border: 1px solid #5d74d6 !important;
+  border-radius: 4px !important;
+  font-size: 14px;
+}
+
+.send-otp-btn {
+  border: none;
+  background: #75b4ef;
+  color: #000;
+  padding: 10px 18px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.verify-btn {
+  width: 120px;
+  height: 38px;
+  border: 1px solid #444;
+  border-radius: 25px;
+  background: #b7afa3;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.signup-btn {
+  width: 100%;
+  height: 56px;
+  border: none;
+  background: #4ea0f0;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.signin-text {
+  margin: 0;
+  font-size: 15px;
+  color: #111;
+  text-align: left;
+}
+
+.signin-text span {
+  color: #4b8ef7;
+  cursor: pointer;
+  margin-left: 10px;
+}
