@@ -1,9 +1,9 @@
 const AllowedEmail = require('../models/AllowedEmail');
-const { convertRegNumToEmail, generateEmailsFromRange } = require('../utils/regUtils');
+const { convertRegNumToEmail, generateEmailsFromRange, isValidEmail } = require('../utils/regUtils');
 
 // Add a single allowed email from reg num
 
-exports.addAllowedEmail = async(req, res) => {
+exports.addAllowedEmail = async (req, res) => {
     try {
         if (!req.body) {
             return res.status(400).json({ message: 'Request body is missing. Please ensure you are sending JSON data with Content-Type: application/json' });
@@ -41,7 +41,7 @@ exports.addAllowedEmail = async(req, res) => {
 };
 
 // Add bulk allowed emails from reg num range
-exports.addBulkAllowedEmails = async(req, res) => {
+exports.addBulkAllowedEmails = async (req, res) => {
     try {
         if (!req.body) {
             return res.status(400).json({ message: 'Request body is missing. Please ensure you are sending JSON data with Content-Type: application/json' });
@@ -88,7 +88,7 @@ exports.addBulkAllowedEmails = async(req, res) => {
 };
 
 // Add a lecturer allowed email directly
-exports.addLecturerEmail = async(req, res) => {
+exports.addLecturerEmail = async (req, res) => {
     try {
         if (!req.body) {
             return res.status(400).json({ message: 'Request body is missing' });
@@ -97,6 +97,11 @@ exports.addLecturerEmail = async(req, res) => {
 
         if (!email || !department) {
             return res.status(400).json({ message: 'Please provide email and department' });
+        }
+
+        // Email format validation
+        if (!isValidEmail(email)) {
+            return res.status(400).json({ message: 'Invalid email address format' });
         }
 
         const existingEmail = await AllowedEmail.findOne({ email });
