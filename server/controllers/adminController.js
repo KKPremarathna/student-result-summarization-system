@@ -86,3 +86,35 @@ exports.addBulkAllowedEmails = async(req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// Add a lecturer allowed email directly
+exports.addLecturerEmail = async(req, res) => {
+    try {
+        if (!req.body) {
+            return res.status(400).json({ message: 'Request body is missing' });
+        }
+        const { email, department } = req.body;
+
+        if (!email || !department) {
+            return res.status(400).json({ message: 'Please provide email and department' });
+        }
+
+        const existingEmail = await AllowedEmail.findOne({ email });
+        if (existingEmail) {
+            return res.status(400).json({ message: 'Email already exists in allowed list' });
+        }
+
+        const allowedEmail = await AllowedEmail.create({
+            email,
+            role: 'lecturer',
+            department,
+        });
+
+        res.status(201).json({
+            message: 'Lecturer email added successfully',
+            data: allowedEmail,
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
