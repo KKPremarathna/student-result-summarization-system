@@ -72,9 +72,35 @@ exports.getSubjects = async (req, res) => {
   try {
     const filter = { createdBy: req.user._id };
     if (req.query.batch) filter.batch = req.query.batch;
+    if (req.query.courseCode) filter.courseCode = req.query.courseCode.toUpperCase();
 
     const subjects = await Subject.find(filter).sort({ createdAt: -1 });
     return res.json(subjects);
+  } catch (e) {
+    return res.status(500).json({ message: e.message });
+  }
+};
+
+// GET /api/subjects/my-course-codes (lecturer only)
+// Returns distinct course codes for dropdown
+exports.getMyCourseCodes = async (req, res) => {
+  try {
+    const codes = await Subject.distinct("courseCode", { createdBy: req.user._id });
+    return res.json(codes);
+  } catch (e) {
+    return res.status(500).json({ message: e.message });
+  }
+};
+
+// GET /api/subjects/my-batches?courseCode=CS3042 (lecturer only)
+// Returns distinct batches for a given course code
+exports.getMyBatches = async (req, res) => {
+  try {
+    const filter = { createdBy: req.user._id };
+    if (req.query.courseCode) filter.courseCode = req.query.courseCode.toUpperCase();
+
+    const batches = await Subject.distinct("batch", filter);
+    return res.json(batches);
   } catch (e) {
     return res.status(500).json({ message: e.message });
   }

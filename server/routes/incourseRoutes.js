@@ -5,8 +5,10 @@ const authMiddleware = require("../middleware/authMiddleware");
 const requireRole = require("../middleware/requireRole");
 
 const {
-  addResult,
+  saveResult,
   getResults,
+  getResultByENo,
+  getStudentENos,
   getResultById,
   updateResult,
   deleteResult
@@ -18,7 +20,14 @@ router.use(authMiddleware);
 // Lecturer-only for all routes
 router.use(requireRole("lecturer"));
 
-router.post("/", addResult);
+// Save (upsert — creates or updates)
+router.post("/save", saveResult);
+
+// Search helpers (must be BEFORE /:id)
+router.get("/by-eno", getResultByENo);
+router.get("/enos", getStudentENos);
+
+// Standard CRUD
 router.get("/", getResults);
 router.get("/:id", getResultById);
 router.put("/:id", updateResult);

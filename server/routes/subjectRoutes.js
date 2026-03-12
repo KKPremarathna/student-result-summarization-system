@@ -9,14 +9,20 @@ const {
   getSubjects,
   getSubjectById,
   updateSubject,
-  deleteSubject
+  deleteSubject,
+  getMyCourseCodes,
+  getMyBatches
 } = require("../controllers/subjectController");
 
-// ✅ must be logged in
+//must be logged in
 router.use(authMiddleware);
 
-// ✅ lecturer-only for ALL routes (since you said only show to lecturer)
+// lecturer-only for ALL routes (only show to lecturer)
 router.use(requireRole("lecturer"));
+
+// Dropdown helpers (must be BEFORE /:id routes)
+router.get("/my-course-codes", getMyCourseCodes);
+router.get("/my-batches", getMyBatches);
 
 router.post("/", createSubject);
 router.get("/", getSubjects);
