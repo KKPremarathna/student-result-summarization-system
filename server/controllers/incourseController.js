@@ -1,8 +1,6 @@
 const Subject = require("../models/Subject");
 const IncourseResult = require("../models/IncourseResult");
 
-/* ── helpers ─────────────────────────────────────────────── */
-
 function avg(arr) {
   if (!arr || arr.length === 0) return 0;
   return arr.reduce((s, v) => s + v, 0) / arr.length;
@@ -18,7 +16,6 @@ function calcIncourseTotal(marks, assessments) {
 }
 
 function validateMarks(marks, assessments) {
-  // Array lengths must not exceed subject config (but can be less for partial entry)
   if ((marks.assignments || []).length > (assessments.assignmentCount || 0)) {
     return `Too many assignment marks: max ${assessments.assignmentCount || 0}, got ${(marks.assignments || []).length}`;
   }
@@ -29,7 +26,6 @@ function validateMarks(marks, assessments) {
     return `Too many lab marks: max ${assessments.labCount || 0}, got ${(marks.labs || []).length}`;
   }
 
-  // All marks must be 0–100
   const all = [
     ...(marks.assignments || []),
     ...(marks.quizzes || []),
@@ -46,10 +42,7 @@ function validateMarks(marks, assessments) {
   return null;
 }
 
-/* ── controllers ─────────────────────────────────────────── */
-
-// POST /api/incourse/save  (UPSERT — "Save" button)
-// Creates a new result if it doesn't exist, updates if it does
+// POST /api/incourse/save (upsert)
 exports.saveResult = async (req, res) => {
   try {
     const { subject: subjectId, studentENo, assignments, quizzes, labs, mid } = req.body;
@@ -58,13 +51,11 @@ exports.saveResult = async (req, res) => {
       return res.status(400).json({ message: "subject and studentENo are required" });
     }
 
-    // Verify subject exists and belongs to this lecturer
     const subject = await Subject.findOne({ _id: subjectId, createdBy: req.user._id });
     if (!subject) {
       return res.status(404).json({ message: "Subject not found or not yours" });
     }
 
-    // Check if result already exists for this student + subject
     const existing = await IncourseResult.findOne({ subject: subjectId, studentENo: studentENo.toUpperCase() });
 
     const marks = {
@@ -74,15 +65,12 @@ exports.saveResult = async (req, res) => {
       mid: mid ?? (existing ? existing.mid : null)
     };
 
-    // Validate mark counts and ranges
     const err = validateMarks(marks, subject.assessments);
     if (err) return res.status(400).json({ message: err });
 
-    // Calculate incourse total
     const incourseTotal = calcIncourseTotal(marks, subject.assessments);
 
     if (existing) {
-      // UPDATE existing result
       const updated = await IncourseResult.findByIdAndUpdate(
         existing._id,
         { ...marks, incourseTotal },
@@ -90,7 +78,6 @@ exports.saveResult = async (req, res) => {
       );
       return res.json({ message: "Updated", result: updated });
     } else {
-      // CREATE new result
       const result = await IncourseResult.create({
         subject: subjectId,
         createdBy: req.user._id,
@@ -106,7 +93,6 @@ exports.saveResult = async (req, res) => {
 };
 
 // GET /api/incourse?subject=<subjectId>
-// Get all incourse results for a subject
 exports.getResults = async (req, res) => {
   try {
     const { subject: subjectId } = req.query;
@@ -114,7 +100,6 @@ exports.getResults = async (req, res) => {
       return res.status(400).json({ message: "subject query param is required" });
     }
 
-    // Verify subject belongs to this lecturer
     const subject = await Subject.findOne({ _id: subjectId, createdBy: req.user._id });
     if (!subject) {
       return res.status(404).json({ message: "Subject not found or not yours" });
@@ -130,15 +115,13 @@ exports.getResults = async (req, res) => {
 };
 
 // GET /api/incourse/by-eno?subject=<subjectId>&studentENo=2022E050
-// Find a specific student's result by E No
 exports.getResultByENo = async (req, res) => {
   try {
     const { subject: subjectId, studentENo } = req.query;
     if (!subjectId || !studentENo) {
-      return res.status(400).json({ message: "subject and studentENo query params are required" });
+      return res.status(400).json({ message: "subject and studentENo are required" });
     }
 
-    // Verify subject belongs to this lecturer
     const subject = await Subject.findOne({ _id: subjectId, createdBy: req.user._id });
     if (!subject) {
       return res.status(404).json({ message: "Subject not found or not yours" });
@@ -158,7 +141,6 @@ exports.getResultByENo = async (req, res) => {
 };
 
 // GET /api/incourse/enos?subject=<subjectId>
-// Get list of all student E Nos that have results for a subject (for dropdown)
 exports.getStudentENos = async (req, res) => {
   try {
     const { subject: subjectId } = req.query;
@@ -201,7 +183,6 @@ exports.updateResult = async (req, res) => {
     });
     if (!existing) return res.status(404).json({ message: "Result not found" });
 
-    // Get the subject for validation
     const subject = await Subject.findById(existing.subject);
     if (!subject) return res.status(404).json({ message: "Subject not found" });
 
@@ -212,11 +193,9 @@ exports.updateResult = async (req, res) => {
       mid: req.body.mid ?? existing.mid
     };
 
-    // Validate
     const err = validateMarks(marks, subject.assessments);
     if (err) return res.status(400).json({ message: err });
 
-    // Recalculate total
     const incourseTotal = calcIncourseTotal(marks, subject.assessments);
 
     const updated = await IncourseResult.findByIdAndUpdate(

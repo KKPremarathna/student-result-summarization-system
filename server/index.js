@@ -20,6 +20,9 @@ app.use("/api/subjects", subjectRoutes);
 const incourseRoutes = require("./routes/incourseRoutes");
 app.use("/api/incourse", incourseRoutes);
 
+const finalResultRoutes = require("./routes/finalResultRoutes");
+app.use("/api/final-results", finalResultRoutes);
+
 app.get("/", (req, res) => {
   res.send("Student Result Summarization System API");
 });
