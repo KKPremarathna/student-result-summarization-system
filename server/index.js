@@ -17,6 +17,9 @@ app.use("/api/auth", authRoutes);
 const subjectRoutes = require("./routes/subjectRoutes");
 app.use("/api/subjects", subjectRoutes);
 
+const incourseRoutes = require("./routes/incourseRoutes");
+app.use("/api/incourse", incourseRoutes);
+
 app.get("/", (req, res) => {
   res.send("Student Result Summarization System API");
 });
