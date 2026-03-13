@@ -86,3 +86,43 @@ exports.updateResult = async(req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+//Delete a single student result by ID
+exports.deleteResult = async(req, res) => {
+    try {
+        const { id } = req.params;
+
+        const deleted = await AdminFinalResult.findByIdAndDelete(id);
+
+        if (!deleted) {
+            return res.status(404).json({ message: 'Result not found' });
+        }
+
+        res.status(200).json({ message: 'Result deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Delete all results for a specific subject/batch/semester
+exports.deleteSubjectResults = async(req, res) => {
+    try {
+        const { courseCode, batch, semester } = req.body;
+
+        if (!courseCode || !batch || !semester) {
+            return res.status(400).json({ message: 'Please provide courseCode, batch, and semester' });
+        }
+
+        const result = await AdminFinalResult.deleteMany({
+            courseCode: courseCode.toUpperCase(),
+            batch,
+            semester
+        });
+
+        res.status(200).json({
+            message: `${result.deletedCount} results deleted successfully`
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
