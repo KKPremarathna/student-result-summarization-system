@@ -27,6 +27,9 @@ app.use("/api/final-results", finalResultRoutes);
 const adminRoutes = require("./routes/adminRoutes");
 app.use("/api/admin", adminRoutes);
 
+const userRoutes = require("./routes/userRoutes");
+app.use("/api/user", userRoutes);
+
 
 app.get("/", (req, res) => {
     res.send("Student Result Summarization System API");

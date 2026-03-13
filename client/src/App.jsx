@@ -11,6 +11,7 @@ import LectureList from "./pages/LectureList";
 import Complaint from "./pages/AdminComplaint";
 import Results from "./pages/AdminResults";
 import ResetPassword from "./pages/AdminResetpassword";
+import Setting from "./pages/Setting";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
         <Route path="/AdminComplaint" element={<Complaint />} />
         <Route path="/AdminResults" element={<Results />} />
         <Route path="/adminresetpassword" element={<ResetPassword />} />
+        <Route path="/setting" element={<Setting />} />
       </Routes>
     </BrowserRouter>
   );
