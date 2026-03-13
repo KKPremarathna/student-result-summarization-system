@@ -30,6 +30,9 @@ app.use("/api/admin", adminRoutes);
 const userRoutes = require("./routes/userRoutes");
 app.use("/api/user", userRoutes);
 
+const complaintRoutes = require("./routes/complaintRoutes");
+app.use("/api/complaints", complaintRoutes);
+
 
 app.get("/", (req, res) => {
     res.send("Student Result Summarization System API");
