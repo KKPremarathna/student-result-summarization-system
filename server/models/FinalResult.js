@@ -1,14 +1,38 @@
 const mongoose = require("mongoose");
 
-const FinalResultSchema = new mongoose.Schema({
-    courseCode: { type: String, required: true, trim: true, uppercase: true },
-    semester: { type: String, required: true, trim: true },
-    batch: { type: String, required: true, trim: true },
-    lectureId: { type: String, required: true, trim: true },
-    studentRegNum: { type: String, required: true, trim: true, uppercase: true },
-    grade: { type: String, required: true, trim: true, uppercase: true },
-}, { timestamps: true });
+const FinalResultSchema = new mongoose.Schema(
+  {
+    subject: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Subject",
+      required: true
+    },
+    incourseResult: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "IncourseResult",
+      required: true
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
 
-FinalResultSchema.index({ courseCode: 1, batch: 1, semester: 1, studentRegNum: 1 }, { unique: true });
+    studentENo:    { type: String, required: true, trim: true, uppercase: true },
+    incourseTotal: { type: Number, required: true },
+    endExamMark:   { type: Number, required: true, min: 0, max: 100 },
+    finalMark:     { type: Number, required: true },
+    grade:         { type: String, required: true },
+    
+    // Admin editable fields (after senate approval)
+    afterSenateMark:  { type: Number, min: 0, max: 100 },
+    afterSenateGrade: { type: String },
+    senateApproved:   { type: Boolean, default: false }
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model("FinalResult", FinalResultSchema, "admin_final_results");
+// One final result per student per subject
+FinalResultSchema.index({ subject: 1, studentENo: 1 }, { unique: true });
+
+module.exports = mongoose.model("FinalResult", FinalResultSchema);
