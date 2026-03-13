@@ -67,8 +67,14 @@ const isValidEmail = (email) => {
     return emailRegex.test(email);
 };
 
+const isValidRegNum = (regNum) => {
+    const regExp = /^20\d{2}\/E\/\d{3}$/;
+    return regExp.test(regNum);
+};
+
 module.exports = {
     convertRegNumToEmail,
     generateEmailsFromRange,
     isValidEmail,
+    isValidRegNum,
 };

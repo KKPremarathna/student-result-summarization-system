@@ -1,4 +1,5 @@
-const FinalResult = require('../models/FinalResult');
+const AdminFinalResult = require('../models/FinalResult');
+const { isValidRegNum } = require('../utils/regUtils');
 
 /**
  * Add final results in batch
@@ -10,6 +11,13 @@ exports.addBatchResults = async(req, res) => {
 
         if (!courseCode || !semester || !batch || !lectureId || !results || !Array.isArray(results)) {
             return res.status(400).json({ message: 'Missing required fields or results array' });
+        }
+
+        // Validate all registration numbers first
+        for (const item of results) {
+            if (!isValidRegNum(item.regNum)) {
+                return res.status(400).json({ message: `Invalid registration number format: ${item.regNum}. Expected 20XX/E/xxx` });
+            }
         }
 
         const formattedResults = results.map(item => ({
@@ -34,7 +42,7 @@ exports.addBatchResults = async(req, res) => {
             }
         }));
 
-        const result = await FinalResult.bulkWrite(bulkOps);
+        const result = await AdminFinalResult.bulkWrite(bulkOps);
 
         res.status(201).json({
             message: 'Results added/updated successfully',

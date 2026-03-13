@@ -11,4 +11,4 @@ const FinalResultSchema = new mongoose.Schema({
 
 FinalResultSchema.index({ courseCode: 1, batch: 1, semester: 1, studentRegNum: 1 }, { unique: true });
 
-module.exports = mongoose.model("FinalResult", FinalResultSchema);
+module.exports = mongoose.model("FinalResult", FinalResultSchema, "admin_final_results");
