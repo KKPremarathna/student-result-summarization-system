@@ -17,8 +17,16 @@ app.use("/api/auth", authRoutes);
 const subjectRoutes = require("./routes/subjectRoutes");
 app.use("/api/subjects", subjectRoutes);
 
+
+const incourseRoutes = require("./routes/incourseRoutes");
+app.use("/api/incourse", incourseRoutes);
+
+const finalResultRoutes = require("./routes/finalResultRoutes");
+app.use("/api/final-results", finalResultRoutes);
+
 const adminRoutes = require("./routes/adminRoutes");
 app.use("/api/admin", adminRoutes);
+
 
 app.get("/", (req, res) => {
     res.send("Student Result Summarization System API");
