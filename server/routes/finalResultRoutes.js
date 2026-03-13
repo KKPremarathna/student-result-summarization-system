@@ -9,6 +9,8 @@ const {
   saveResult,
   getResults,
   getResultByENo,
+  getSummary,
+  downloadPdf,
   updateResult,
   deleteResult
 } = require("../controllers/finalResultController");
@@ -22,6 +24,8 @@ router.use(requireRole("lecturer"));
 // Named routes (must be BEFORE /:id)
 router.get("/incourse-list", getIncourseList);
 router.post("/save", saveResult);
+router.get("/summary", getSummary);
+router.get("/download-pdf", downloadPdf);
 router.get("/by-eno", getResultByENo);
 
 // Standard CRUD

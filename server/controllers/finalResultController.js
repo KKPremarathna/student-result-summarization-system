@@ -1,6 +1,7 @@
 const Subject = require("../models/Subject");
 const IncourseResult = require("../models/IncourseResult");
 const FinalResult = require("../models/FinalResult");
+const PDFDocument = require("pdfkit-table");
 
 function calcGrade(mark) {
   if (mark >= 85) return "A+";
@@ -28,15 +29,17 @@ exports.getIncourseList = async (req, res) => {
       return res.status(404).json({ message: "Subject not found or not yours" });
     }
 
-    const incourseResults = await IncourseResult.find({
-      subject: subjectId,
-      createdBy: req.user._id
-    }).sort({ studentENo: 1 });
+    const incourseFilter = { subject: subjectId, createdBy: req.user._id };
+    const finalFilter = { subject: subjectId, createdBy: req.user._id };
 
-    const finalResults = await FinalResult.find({
-      subject: subjectId,
-      createdBy: req.user._id
-    });
+    if (req.query.studentENo) {
+      const eno = req.query.studentENo.toUpperCase();
+      incourseFilter.studentENo = eno;
+      finalFilter.studentENo = eno;
+    }
+
+    const incourseResults = await IncourseResult.find(incourseFilter).sort({ studentENo: 1 });
+    const finalResults = await FinalResult.find(finalFilter);
 
     const finalMap = {};
     for (const fr of finalResults) {
@@ -206,6 +209,192 @@ exports.updateResult = async (req, res) => {
     return res.json(updated);
   } catch (e) {
     return res.status(500).json({ message: e.message });
+  }
+};
+
+// GET /api/final-results/summary?courseCode=<CS3042>&batch=<Y3S1>
+exports.getSummary = async (req, res) => {
+  try {
+    const { courseCode, batch } = req.query;
+    if (!courseCode || !batch) {
+      return res.status(400).json({ message: "courseCode and batch query params are required" });
+    }
+
+    const subject = await Subject.findOne({ 
+      courseCode: courseCode.toUpperCase(), 
+      batch, 
+      createdBy: req.user._id 
+    });
+    
+    if (!subject) {
+      return res.status(404).json({ message: "Subject not found or not yours" });
+    }
+
+    const subjectId = subject._id;
+
+    const incourseFilter = { subject: subjectId, createdBy: req.user._id };
+    const finalFilter = { subject: subjectId, createdBy: req.user._id };
+
+    if (req.query.studentENo) {
+      const eno = req.query.studentENo.toUpperCase();
+      incourseFilter.studentENo = eno;
+      finalFilter.studentENo = eno;
+    }
+
+    const incourseResults = await IncourseResult.find(incourseFilter);
+    const finalResults = await FinalResult.find(finalFilter);
+
+    const enrolled = incourseResults.length;
+    let passed = 0;
+    let failed = 0;
+
+    for (const fr of finalResults) {
+      // Pass condition: Grade is not E, AND incourse is > 35
+      if (fr.grade !== "E" && fr.incourseTotal > 35) {
+        passed++;
+      } else {
+        failed++;
+      }
+    }
+    
+    // Students who have incourse marks but no final exam marks are also failed/incomplete
+    const studentsWithFinals = finalResults.length;
+    failed += (enrolled - studentsWithFinals);
+
+    return res.json({
+      enrolled,
+      passed,
+      failed
+    });
+  } catch (e) {
+    return res.status(500).json({ message: e.message });
+  }
+};
+
+// GET /api/final-results/download-pdf?courseCode=<CS3042>&batch=<Y3S1>
+exports.downloadPdf = async (req, res) => {
+  try {
+    const { courseCode, batch } = req.query;
+    if (!courseCode || !batch) {
+      return res.status(400).json({ message: "courseCode and batch query params are required" });
+    }
+
+    const subject = await Subject.findOne({ 
+      courseCode: courseCode.toUpperCase(), 
+      batch, 
+      createdBy: req.user._id 
+    });
+
+    if (!subject) {
+      return res.status(404).json({ message: "Subject not found or not yours" });
+    }
+
+    const subjectId = subject._id;
+
+    const incourseFilter = { subject: subjectId, createdBy: req.user._id };
+    const finalFilter = { subject: subjectId, createdBy: req.user._id };
+
+    if (req.query.studentENo) {
+      const eno = req.query.studentENo.toUpperCase();
+      incourseFilter.studentENo = eno;
+      finalFilter.studentENo = eno;
+    }
+
+    const incourseResults = await IncourseResult.find(incourseFilter).sort({ studentENo: 1 });
+    const finalResults = await FinalResult.find(finalFilter);
+
+    const finalMap = {};
+    for (const fr of finalResults) {
+      finalMap[fr.studentENo] = fr;
+    }
+
+    // Prepare Document
+    const doc = new PDFDocument({ margin: 30, size: 'A4' });
+    
+    // Set response headers for PDF download
+    res.setHeader('Content-disposition', `attachment; filename=results_${subject.courseCode}_${subject.batch}.pdf`);
+    res.setHeader('Content-type', 'application/pdf');
+    doc.pipe(res);
+
+    // Title
+    doc.fontSize(20).text(`Results for ${subject.courseCode} - ${subject.courseName}`, { align: 'center' });
+    doc.fontSize(14).text(`Batch: ${subject.batch}`, { align: 'center' });
+    doc.moveDown(2);
+
+    // Prepare table data
+    const tableRows = incourseResults.map(ir => {
+      const fr = finalMap[ir.studentENo];
+      const incourseStatus = ir.incourseTotal > 35 ? "Pass" : "Fail";
+      
+      const beforeSenateBase = fr ? fr.finalMark : "-";
+      const beforeSenateGrade = fr ? fr.grade : "-";
+      const beforeSenateStr = fr ? `${beforeSenateBase} (${beforeSenateGrade})` : "-";
+      
+      const afterSenateStr = (fr && fr.afterSenateMark !== undefined) 
+          ? `${fr.afterSenateMark} (${fr.afterSenateGrade || '-'})` 
+          : "-";
+
+      return [
+        ir.studentENo,
+        // Calculate averages for the table based on arrays, or '-' if empty
+        ir.assignments.length > 0 ? (ir.assignments.reduce((a,b)=>a+b,0)/ir.assignments.length).toFixed(1) : "-",
+        ir.quizzes.length > 0 ? (ir.quizzes.reduce((a,b)=>a+b,0)/ir.quizzes.length).toFixed(1) : "-",
+        ir.labs.length > 0 ? (ir.labs.reduce((a,b)=>a+b,0)/ir.labs.length).toFixed(1) : "-",
+        ir.mid !== null ? ir.mid : "-",
+        ir.incourseTotal.toFixed(1),
+        incourseStatus,
+        fr ? fr.endExamMark : "-",
+        beforeSenateStr,
+        afterSenateStr
+      ];
+    });
+
+    const table = {
+      title: "Student Results",
+      headers: [
+        { label: "E No.", property: "eno", width: 60 },
+        { label: "Assignment", property: "assignment", width: 55 },
+        { label: "Quiz", property: "quiz", width: 40 },
+        { label: "Lab", property: "lab", width: 40 },
+        { label: "Mid", property: "mid", width: 40 },
+        { label: "Incourse", property: "incourse", width: 50 },
+        { label: "Status", property: "status", width: 45 },
+        { label: "End Marks", property: "endmarks", width: 55 },
+        { label: "Before Senate", property: "beforesenate", width: 55 },
+        { label: "After Senate", property: "aftersenate", width: 55 }
+      ],
+      rows: tableRows
+    };
+
+    // Draw the table
+    await doc.table(table, {
+      prepareHeader: () => doc.font("Helvetica-Bold").fontSize(8),
+      prepareRow: (row, i) => doc.font("Helvetica").fontSize(8)
+    });
+
+    // Summary Statistics calculation to show at the bottom of PDF
+    const enrolled = incourseResults.length;
+    let passed = 0;
+    
+    for (const fr of finalResults) {
+      if (fr.grade !== "E" && fr.incourseTotal > 35) {
+        passed++;
+      }
+    }
+
+    doc.moveDown(2);
+    doc.fontSize(12).text(`No of Enrolled Students : ${enrolled}`);
+    doc.text(`Passed Students : ${passed}`);
+    doc.text(`Failed Students : ${enrolled - passed}`);
+
+    doc.end();
+
+  } catch (e) {
+    if (!res.headersSent) {
+      return res.status(500).json({ message: e.message });
+    }
+    // If headers are sent, ending response gracefully
+    res.end();
   }
 };
 

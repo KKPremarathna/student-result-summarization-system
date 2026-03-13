@@ -22,7 +22,12 @@ const FinalResultSchema = new mongoose.Schema(
     incourseTotal: { type: Number, required: true },
     endExamMark:   { type: Number, required: true, min: 0, max: 100 },
     finalMark:     { type: Number, required: true },
-    grade:         { type: String, required: true }
+    grade:         { type: String, required: true },
+    
+    // Admin editable fields (after senate approval)
+    afterSenateMark:  { type: Number, min: 0, max: 100 },
+    afterSenateGrade: { type: String },
+    senateApproved:   { type: Boolean, default: false }
   },
   { timestamps: true }
 );
