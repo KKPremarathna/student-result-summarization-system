@@ -1,4 +1,4 @@
-const AdminFinalResult = require('../models/FinalResult');
+const AdminResult = require('../models/AdminResult');
 const { isValidRegNum } = require('../utils/regUtils');
 
 /**
@@ -42,7 +42,7 @@ exports.addBatchResults = async(req, res) => {
             }
         }));
 
-        const result = await AdminFinalResult.bulkWrite(bulkOps);
+        const result = await AdminResult.bulkWrite(bulkOps);
 
         res.status(201).json({
             message: 'Results added/updated successfully',
@@ -70,7 +70,7 @@ exports.updateResult = async(req, res) => {
         if (semester) updateData.semester = semester;
         if (batch) updateData.batch = batch;
 
-        const updated = await AdminFinalResult.findByIdAndUpdate(
+        const updated = await AdminResult.findByIdAndUpdate(
             id, { $set: updateData }, { new: true, runValidators: true }
         );
 
@@ -92,7 +92,7 @@ exports.deleteResult = async(req, res) => {
     try {
         const { id } = req.params;
 
-        const deleted = await AdminFinalResult.findByIdAndDelete(id);
+        const deleted = await AdminResult.findByIdAndDelete(id);
 
         if (!deleted) {
             return res.status(404).json({ message: 'Result not found' });
@@ -113,7 +113,7 @@ exports.deleteSubjectResults = async(req, res) => {
             return res.status(400).json({ message: 'Please provide courseCode, batch, and semester' });
         }
 
-        const result = await AdminFinalResult.deleteMany({
+        const result = await AdminResult.deleteMany({
             courseCode: courseCode.toUpperCase(),
             batch,
             semester
