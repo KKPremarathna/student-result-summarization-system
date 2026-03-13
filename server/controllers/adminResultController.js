@@ -56,3 +56,33 @@ exports.addBatchResults = async(req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+//Update a single final result
+exports.updateResult = async(req, res) => {
+    try {
+        const { id } = req.params;
+        const { grade, lectureId, courseCode, semester, batch } = req.body;
+
+        const updateData = {};
+        if (grade) updateData.grade = grade.toUpperCase();
+        if (lectureId) updateData.lectureId = lectureId;
+        if (courseCode) updateData.courseCode = courseCode.toUpperCase();
+        if (semester) updateData.semester = semester;
+        if (batch) updateData.batch = batch;
+
+        const updated = await AdminFinalResult.findByIdAndUpdate(
+            id, { $set: updateData }, { new: true, runValidators: true }
+        );
+
+        if (!updated) {
+            return res.status(404).json({ message: 'Result not found' });
+        }
+
+        res.status(200).json({
+            message: 'Result updated successfully',
+            data: updated
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
