@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 
+const Subject = require('../models/Subject');
+
 // @desc    Get user details
 // @route   GET /api/user/details
 // @access  Private
@@ -10,7 +12,11 @@ exports.getUserDetails = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        res.status(200).json({ success: true, data: user });
+        
+        // Fetch subjects assigned to this user
+        const subjects = await Subject.find({ createdBy: req.user.id });
+
+        res.status(200).json({ success: true, data: user, subjects });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
@@ -21,7 +27,7 @@ exports.getUserDetails = async (req, res) => {
 // @route   PUT /api/user/update-profile
 // @access  Private
 exports.updateProfile = async (req, res) => {
-    const { profilePicture, oldPassword, newPassword } = req.body;
+    const { profilePicture, oldPassword, newPassword, title, position, faculty, university, department } = req.body;
 
     try {
         const user = await User.findById(req.user.id);
@@ -31,10 +37,13 @@ exports.updateProfile = async (req, res) => {
 
         let updatedFields = {};
         
-        // 1. Update Profile Picture if provided
-        if (profilePicture) {
-            updatedFields.profilePicture = profilePicture;
-        }
+        // 1. Update Profile Fields if provided
+        if (profilePicture !== undefined) updatedFields.profilePicture = profilePicture;
+        if (title !== undefined) updatedFields.title = title;
+        if (position !== undefined) updatedFields.position = position;
+        if (faculty !== undefined) updatedFields.faculty = faculty;
+        if (university !== undefined) updatedFields.university = university;
+        if (department !== undefined) updatedFields.department = department;
 
         // 2. Update Password if both old & new are provided
         if (oldPassword && newPassword) {
