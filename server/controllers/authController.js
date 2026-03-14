@@ -254,6 +254,10 @@ exports.changePassword = async(req, res) => {
     const { oldPassword, newPassword } = req.body;
 
     try {
+        if (oldPassword === newPassword) {
+            return res.status(400).json({ message: 'New password cannot be the same as the current password.' });
+        }
+
         const user = await User.findById(req.user._id);
         if (!user) {
             return res.status(404).json({ message: 'User not found.' });
