@@ -1,0 +1,130 @@
+/* Page Container */
+
+.add-incourse-container {
+    width: 100%;
+    max-width: 1300px;
+    margin: auto;
+}
+
+/* Title */
+
+.add-incourse-container h2 {
+    color: var(--text-heading);
+    font-family: var(--font-serif);
+    font-size: 34px;
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: normal;
+}
+
+/* Base View-Result-Container reuse */
+.view-result-container {
+  padding: 20px;
+  min-height: 100%;
+}
+
+.view-result-container h2 {
+  color: var(--text-heading);
+  font-family: var(--font-serif);
+  font-size: 34px;
+  text-align: center;
+  margin-bottom: 30px;
+  font-weight: normal;
+}
+
+/* Table */
+
+.results-table{
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 30px;
+    background-color: #ffffff;
+    box-shadow: var(--shadow-lg);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.results-table tbody tr {
+    background-color: #ffffff;
+}
+
+/* Header */
+
+.results-table thead,
+.results-table thead tr,
+.results-table th {
+    background-color: #4F7C82 !important; /* Teal */
+    color: #ffffff !important;
+    font-weight: 600;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 14px 10px;
+    text-align: center;
+}
+
+/* Table Cells */
+
+.results-table td{
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    border-right: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 14px 10px;
+    text-align: center;
+}
+
+/* Fix last borders */
+.results-table th:last-child, .results-table td:last-child {
+  border-right: none;
+}
+.results-table tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* Input fields */
+
+.results-table input {
+    width: 60px;
+    padding: 8px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-color);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    transition: all 0.2s ease;
+}
+
+.results-table input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: var(--surface-solid);
+    box-shadow: 0 0 0 2px rgba(79, 124, 130, 0.2);
+}
+
+/* Hover effect */
+
+.results-table tbody tr:hover{
+    background-color: #cfe3e6;
+    transition: background-color 0.2s;
+}
+
+/* Status text */
+
+.results-table td:nth-last-child(2),
+.results-table td:nth-last-child(1){
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+/* Responsive */
+
+@media (max-width: 900px){
+    .results-table{
+        min-width: 1000px;
+    }
+}

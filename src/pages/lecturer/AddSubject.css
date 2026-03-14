@@ -1,0 +1,101 @@
+.add-subject-container {
+    max-width: 800px;
+    margin: 40px auto;
+    background: var(--surface);
+    padding: 60px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    border: 1px solid var(--border-color);
+}
+
+.add-subject-container h2 {
+    text-align: center;
+    font-size: 36px;
+    color: var(--color-dark);
+    margin-bottom: 50px;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.add-subject-form {
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form-group label {
+    font-weight: 700;
+    color: var(--color-dark);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.form-group input {
+    padding: 15px 20px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: #fdfdfd;
+    font-size: 16px;
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: white;
+    box-shadow: 0 4px 20px rgba(79, 124, 130, 0.1);
+    transform: translateY(-2px);
+}
+
+.form-group input::placeholder {
+    color: var(--color-muted);
+    opacity: 0.6;
+}
+
+.form-submit {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.form-submit button {
+    padding: 18px 60px;
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
+    font-size: 16px;
+    font-weight: 800;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(11, 46, 51, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.form-submit button:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(11, 46, 51, 0.3);
+}
+
+@media (max-width: 768px) {
+    .add-subject-container { padding: 40px 20px; margin: 20px; }
+    .form-row { grid-template-columns: 1fr; }
+}

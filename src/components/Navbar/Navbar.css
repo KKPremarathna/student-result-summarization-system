@@ -1,0 +1,75 @@
+/* Top navigation bar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #0B2E33 !important; /* User specified dark teal */
+  padding: 10px 40px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  height: 80px;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.navbar-logo-img {
+  width: 50px; /* Small logo as requested */
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.navbar-logo-text {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 30px;
+  margin: 0;
+}
+
+.nav-links li {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: var(--font-sans);
+}
+
+.nav-links li:hover {
+  color: var(--color-light);
+  transform: translateY(-1px);
+}
+
+/* Link specific styling */
+.nav-links li a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.nav-links li:hover,
+.nav-links li a:hover {
+  color: var(--primary);
+  /* Sage green on hover */
+}

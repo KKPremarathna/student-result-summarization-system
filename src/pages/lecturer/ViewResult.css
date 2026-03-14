@@ -1,0 +1,139 @@
+/* ViewResult.css */
+
+.view-result-container {
+  padding: 20px;
+  min-height: 100%;
+}
+
+.view-result-container h2 {
+  color: var(--text-heading);
+  font-family: var(--font-serif);
+  font-size: 34px;
+  text-align: center;
+  margin-bottom: 30px;
+  font-weight: normal;
+}
+
+.filters {
+  margin-bottom: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: var(--surface);
+  padding: 20px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.filters label {
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.filters select {
+  padding: 10px 15px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background-color: var(--filter-bg);
+  font-family: var(--font-sans);
+  color: var(--filter-text);
+  outline: none;
+  min-width: 150px;
+}
+
+.filters select:focus {
+  border-color: var(--primary);
+}
+
+.filters button {
+  padding: 10px 25px;
+  background-color: var(--btn-bg);
+  color: var(--btn-text);
+  border-radius: var(--radius-lg);
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: var(--font-sans);
+  transition: background 0.3s;
+}
+
+.filters button:hover {
+  background-color: var(--primary-hover);
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 30px;
+  background-color: #ffffff; /* Explicit solid background */
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-md);
+  overflow: hidden; /* Important for rounded corners */
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.results-table tbody tr {
+  background-color: #ffffff;
+}
+
+.results-table th,
+.results-table td {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08); /* distinct layout lines */
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 14px 10px;
+  text-align: center;
+}
+
+.results-table th:last-child, .results-table td:last-child {
+  border-right: none;
+}
+.results-table tr:last-child td {
+  border-bottom: none;
+}
+
+.results-table thead,
+.results-table thead tr,
+.results-table th {
+  background-color: #4F7C82 !important; /* Teal hex forced */
+  color: #ffffff !important;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.results-table tbody tr:nth-child(even) {
+  background-color: #e6f0f2; /* Soft light cyan background for even rows */
+}
+
+.results-table tbody tr:hover {
+  background-color: #cfe3e6; /* hovering row */
+  transition: background-color 0.2s;
+}
+
+.download-btn {
+  float: right;
+  padding: 14px 30px;
+  background-color: var(--btn-bg);
+  color: var(--btn-text);
+  border-radius: var(--radius-lg); /* matches email field button */
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: var(--font-sans);
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.download-btn:hover {
+  background-color: #0B2E33; /* darker navy/teal */
+  box-shadow: var(--shadow-md);
+}

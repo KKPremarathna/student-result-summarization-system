@@ -1,0 +1,94 @@
+/* Sidebar dashboard */
+.sidebar {
+    background-color: #4F7C82 !important; /* User specified sage teal */
+    min-height: calc(100vh - 80px);
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-x: hidden;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-toggle-container {
+    padding: 20px;
+    display: flex;
+    justify-content: center; /* Center the toggle icon */
+    transition: all 0.3s ease;
+}
+
+.sidebar.open .sidebar-toggle-container {
+    justify-content: flex-end; /* Align right when open */
+}
+
+.sidebar-toggle {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background 0.2s;
+}
+
+/* Setup open/close states */
+.sidebar.open {
+    width: 250px;
+}
+
+.sidebar.closed {
+    width: 65px; /* Mini sidebar width */
+    padding: 0;
+}
+
+.sidebar.closed ul, 
+.sidebar.closed .sidebar-section {
+    display: none; /* Hide everything else when closed */
+}
+
+
+/* menu list */
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar li {
+    margin: 5px 0;
+}
+
+.sidebar li a {
+    display: block;
+    color: #ffffff; /* pure white for better contrast on teal */
+    text-decoration: none;
+    padding: 12px 25px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.2s ease;
+}
+
+.sidebar li a:hover {
+    background-color: var(--sidebar-hover);
+    color: white;
+}
+
+.sidebar-section {
+    color: #d1e8d0; /* Lighter sage for header on teal bg */
+    font-size: 11px;
+    font-weight: 800;
+    padding: 20px 25px 5px 25px;
+    letter-spacing: 1.5px;
+    cursor: default;
+}
+
+.sidebar li:hover, .sidebar li a:hover {
+    background-color: var(--sidebar-hover); /* Darker teal hover */
+    color: var(--sidebar-text); /* Keep it white */
+    border-left: 4px solid var(--primary); /* Teal accent bar */
+}

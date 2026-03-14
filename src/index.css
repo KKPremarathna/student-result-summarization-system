@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+:root {
+  /* Winter Chill Color Palette */
+  --color-light: #B8E3E9;
+  --color-muted: #93B1B5;
+  --color-primary: #4F7C82;
+  --color-dark: #0B2E33;
+
+  /* Theme Colors Mapping */
+  --nav-bg: var(--color-dark);
+  --sidebar-bg: var(--color-primary);
+  --bg-color: var(--color-light);
+  --surface: #ffffff;
+  
+  --primary: var(--color-primary);
+  --primary-hover: #3D646A;
+  --secondary: var(--color-dark);
+  
+  --banner-gradient: linear-gradient(135deg, var(--color-dark) 0%, var(--color-primary) 100%);
+  
+  --nav-text: #ffffff;
+  --sidebar-text: #ffffff;
+  --sidebar-hover: var(--primary-hover); 
+  
+  --text-main: #0B2E33; 
+  --text-muted: var(--color-muted);
+  --text-heading: var(--color-dark);
+
+  /* Standardized Button & Filter Styles */
+  --btn-bg: #0B2E33;
+  --btn-text: #F0ECEC;
+  --filter-bg: #0B2E33;
+  --filter-text: #F0ECEC;
+
+  --border-color: #0b2e331a; 
+  
+  /* Utilities */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px; 
+  
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  --font-sans: Inter, "Segoe UI", system-ui, sans-serif;
+  --font-serif: var(--font-sans);
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure full height app wrapper */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-heading);
+  font-family: var(--font-serif);
+  font-weight: normal;
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 2.25rem;
+  letter-spacing: -0.025em;
+  margin-bottom: 1.5rem;
+}
+
+h2 {
+  font-size: 1.875rem;
+  letter-spacing: -0.025em;
+  margin-bottom: 1.25rem;
+}
+
+p {
+  line-height: 1.5;
+  margin: 0;
+}
+
+button {
+  font-family: var(--font-sans);
+}
