@@ -33,6 +33,8 @@ app.use("/api/user", userRoutes);
 const complaintRoutes = require("./routes/complaintRoutes");
 app.use("/api/complaints", complaintRoutes);
 
+const studentRoutes = require("./routes/studentRoutes");
+app.use("/api/student", studentRoutes);
 
 app.get("/", (req, res) => {
     res.send("Student Result Summarization System API");
