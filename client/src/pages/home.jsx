@@ -16,15 +16,21 @@ function Home() {
         <HomeNavbar />
 
         <div className="hero-content">
+          <div className="hero-badge">Modern Result Management</div>
           <h1 className="title">Academet</h1>
-          <h2>Welcome to Academet !</h2>
-          <p>A Secure Result Management And Analysis System</p>
+          <h2 className="subtitle">Precision. Security. Efficiency.</h2>
+          <p className="hero-desc">
+            A premium result management and architectural analysis system 
+            designed for modern educational excellence.
+          </p>
 
-          <div className="email-box">
-            <input type="email" placeholder="Enter Your Email" />
-            <Link to="/signup">
-              <button>SignUp</button>
-            </Link>
+          <div className="cta-container">
+            <div className="glass-input-group">
+              <input type="email" placeholder="Enter your academic email" />
+              <Link to="/SignUp">
+                <button className="gold-btn">Get Started</button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>

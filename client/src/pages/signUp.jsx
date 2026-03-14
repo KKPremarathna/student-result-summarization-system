@@ -18,69 +18,79 @@ function Signup() {
     <div className="signup-page">
       <InnerNavbar />
 
-      <div className="signup-main">
-        <div className="signup-left">
-          <img
-            src={signupImage}
-            alt="Signup illustration"
-            className="signup-image"
-          />
-        </div>
+      <main className="signup-container">
+        <div className="signup-card">
+          <div className="signup-header">
+            <h1 className="signup-title">Create Account</h1>
+            <p className="signup-subtitle">Join Academet for secure result analysis</p>
+          </div>
 
-        <div className="signup-right">
           <form className="signup-form">
-            <input type="text" placeholder="First name" />
-            <input type="text" placeholder="Last name" />
-            <input type="email" placeholder="Email" />
-            <input type="text" placeholder="Birth date" />
-            <input type="text" placeholder="Phone number" />
-
-            <div className="password-wrapper">
-              <input type="password" placeholder="Password" />
-              <span className="eye-icon">👁</span>
+            <div className="form-grid">
+              <input type="text" placeholder="First Name" />
+              <input type="text" placeholder="Last Name" />
             </div>
 
-            <div className="password-wrapper">
-              <input type="password" placeholder="Confirm password" />
-              <span className="eye-icon">👁</span>
+            <div className="form-group">
+              <input type="email" placeholder="Academic Email" />
             </div>
 
-            <div className="otp-row">
-              <div className="otp-boxes">
-                {otp.map((digit, index) => (
-                  <input
-                    key={index}
-                    type="text"
-                    maxLength="1"
-                    value={digit}
-                    onChange={(e) => handleOtpChange(index, e.target.value)}
-                    className="otp-input"
-                  />
-                ))}
+            <div className="form-grid">
+              <input type="text" placeholder="Birth Date (YYYY-MM-DD)" />
+              <input type="text" placeholder="Phone Number" />
+            </div>
+
+            <div className="form-grid">
+              <div className="password-wrapper">
+                <input type="password" placeholder="Password" />
+                <span className="eye-icon">👁</span>
               </div>
-
-              <button type="button" className="send-otp-btn">
-                send OTP
-              </button>
+              <div className="password-wrapper">
+                <input type="password" placeholder="Confirm Password" />
+                <span className="eye-icon">👁</span>
+              </div>
             </div>
 
-            <button type="button" className="verify-btn">
-              Verify
-            </button>
+            <div className="otp-section">
+              <p className="otp-label">Identity Verification</p>
+              <div className="otp-row">
+                <div className="otp-boxes">
+                  {otp.map((digit, index) => (
+                    <input
+                      key={index}
+                      type="text"
+                      maxLength="1"
+                      value={digit}
+                      onChange={(e) => handleOtpChange(index, e.target.value)}
+                      className="otp-input"
+                    />
+                  ))}
+                </div>
+                <button type="button" className="send-otp-btn">
+                  Send OTP
+                </button>
+              </div>
+              <div className="otp-actions">
+                <button type="button" className="verify-btn">
+                  Verify Identity
+                </button>
+              </div>
+            </div>
 
             <button type="submit" className="signup-btn">
-              SignUp
+              Create Account
             </button>
 
             <p className="signin-text">
-              Already have an Account ? 
-              <Link to="/signin">
-                <span>Sign In</span>
+              Already have an Account ?{" "}
+              <Link to="/SignIn" className="signin-link">
+                Sign In
               </Link>
             </p>
           </form>
         </div>
-      </div>
+      </main>
+
     </div>
   );
 }

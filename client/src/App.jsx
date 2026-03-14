@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import "./styles/global.css";
 import Home from "./pages/home";
 import SignUp from "./pages/signUp";
 import SignIn from "./pages/signIn"; 
@@ -17,17 +18,17 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="/adminhome" element={<AdminHome />} />
-        <Route path="/adduser" element={<AddUser />} />
-        <Route path="/addstudent" element={<AddStudent />} />
-        <Route path="/studentlist" element={<StudentList />} />
-        <Route path="/addlecture" element={<AddLecture />} />
-        <Route path="/lecturelist" element={<LectureList />} />
+        <Route path="/SignUp" element={<SignUp />} />
+        <Route path="/SignIn" element={<SignIn />} />
+        <Route path="/AdminHome" element={<AdminHome />} />
+        <Route path="/AddUser" element={<AddUser />} />
+        <Route path="/AddStudent" element={<AddStudent />} />
+        <Route path="/StudentList" element={<StudentList />} />
+        <Route path="/AddLecture" element={<AddLecture />} />
+        <Route path="/LectureList" element={<LectureList />} />
         <Route path="/AdminComplaint" element={<Complaint />} />
         <Route path="/AdminResults" element={<Results />} />
-        <Route path="/adminresetpassword" element={<ResetPassword />} />
+        <Route path="/AdminResetPassword" element={<ResetPassword />} />
       </Routes>
     </BrowserRouter>
   );

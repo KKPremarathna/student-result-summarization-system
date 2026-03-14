@@ -16,34 +16,45 @@ function AddLecture() {
       <div className="addlecture-container">
 
         {/* Sidebar */}
-        <aside className="adduser-sidebar">
-                  <ul className="sidebar-menu">
-                      <li>
-                      <Link to="/adminhome"> Admin Home</Link>
-                      </li>
-                    <li className="active">
-                      <Link to="/adduser">Add User</Link>
-                    </li>
-                    <li>
-                      <Link to="/admincomplaint">Complaint</Link>
-                    </li>
-                    <li>
-                      <Link to="/adminresults">Results</Link>
-                    </li>
-                    <li>
-                      <Link to="/adminresetpassword">Reset Password</Link>
-                    </li>
-                  </ul>
-                </aside>
+        <aside className="sidebar">
+          <div className="sidebar-title">Management</div>
+          <ul className="sidebar-menu">
+            <li>
+              <Link to="/AdminHome">
+                <span className="sidebar-icon">🏠</span>
+                Admin Home
+              </Link>
+            </li>
+            <li className="active">
+              <Link to="/AddUser">
+                <span className="sidebar-icon">👤</span>
+                Add User
+              </Link>
+            </li>
+            <li>
+              <Link to="/AdminComplaint">
+                <span className="sidebar-icon">📋</span>
+                Complaint
+              </Link>
+            </li>
+            <li >
+              <Link to="/AdminResults">
+                <span className="sidebar-icon">📊</span>
+                Results
+              </Link>
+            </li>
+            <li>
+              <Link to="/AdminResetPassword">
+                <span className="sidebar-icon">🔒</span>
+                Reset Password
+              </Link>
+            </li>
+          </ul>
+        </aside>
         {/* Main Section */}
-        <main
-          className="lecture-main"
-          style={{ backgroundImage: `url(${bgImage})` }}
-        >
+        <main className="addlecture-main">
+          <div className="addlecture-main-content">
 
-          <div className="overlay"></div>
-
-          <div className="lecture-content">
 
             <h2>Add New Lectures</h2>
 

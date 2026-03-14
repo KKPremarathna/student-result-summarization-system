@@ -52,33 +52,45 @@ function LectureList() {
       <Navbar />
 
       <div className="lecturelist-content">
-         <aside className="adduser-sidebar">
-                          <ul className="sidebar-menu">
-                              <li>
-                              <Link to="/adminhome"> Admin Home</Link>
-                              </li>
-                            <li className="active">
-                              <Link to="/adduser">Add User</Link>
-                            </li>
-                            <li>
-                              <Link to="/admincomplaint">Complaint</Link>
-                            </li>
-                            <li>
-                              <Link to="/adminresults">Results</Link>
-                            </li>
-                            <li>
-                              <Link to="/adminresetpassword">Reset Password</Link>
-                            </li>
-                          </ul>
-                        </aside>
+        <aside className="sidebar">
+          <div className="sidebar-title">Management</div>
+          <ul className="sidebar-menu">
+            <li>
+              <Link to="/AdminHome">
+                <span className="sidebar-icon">🏠</span>
+                Admin Home
+              </Link>
+            </li>
+            <li className="active">
+              <Link to="/AddUser">
+                <span className="sidebar-icon">👤</span>
+                Add User
+              </Link>
+            </li>
+            <li>
+              <Link to="/AdminComplaint">
+                <span className="sidebar-icon">📋</span>
+                Complaint
+              </Link>
+            </li>
+            <li >
+              <Link to="/AdminResults">
+                <span className="sidebar-icon">📊</span>
+                Results
+              </Link>
+            </li>
+            <li>
+              <Link to="/AdminResetPassword">
+                <span className="sidebar-icon">🔒</span>
+                Reset Password
+              </Link>
+            </li>
+          </ul>
+        </aside>
 
-        <main
-          className="lecturelist-main"
-          style={{ backgroundImage: `url(${bgImage})` }}
-        >
-          <div className="lecturelist-overlay"></div>
-
+        <main className="lecturelist-main">
           <div className="lecturelist-main-content">
+
             <h1>Lectures List</h1>
 
             <div className="lecture-filter-row">

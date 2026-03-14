@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../styles/AdminResult.css";
 import Navbar from "../components/InnerNavbar";
 import { Link } from "react-router-dom";
-import bgImage from "../assets/images/admin.jpg";
+
 
 function Results() {
   const [courseCode, setCourseCode] = useState("");
@@ -30,32 +30,44 @@ function Results() {
       <Navbar />
 
       <div className="results-content">
-        <aside className="adduser-sidebar">
-                          <ul className="sidebar-menu">
-                              <li>
-                              <Link to="/adminhome"> Admin Home</Link>
-                              </li>
-                            <li>
-                              <Link to="/adduser">Add User</Link>
-                            </li>
-                            <li>
-                              <Link to="/complaint">Complaint</Link>
-                            </li>
-                            <li className="active">
-                              <Link to="/AdminResults">Results</Link>
-                            </li>
-                            <li>
-                              <Link to="/resetpassword">Reset Password</Link>
-                            </li>
-                          </ul>
-                        </aside>
-        <main
-          className="results-main"
-          style={{ backgroundImage: `url(${bgImage})` }}
-        >
-          <div className="results-overlay"></div>
-
+        <aside className="sidebar">
+          <div className="sidebar-title">Management</div>
+          <ul className="sidebar-menu">
+            <li>
+              <Link to="/AdminHome">
+                <span className="sidebar-icon">🏠</span>
+                Admin Home
+              </Link>
+            </li>
+            <li>
+              <Link to="/AddUser">
+                <span className="sidebar-icon">👤</span>
+                Add User
+              </Link>
+            </li>
+            <li>
+              <Link to="/AdminComplaint">
+                <span className="sidebar-icon">📋</span>
+                Complaint
+              </Link>
+            </li>
+            <li className="active">
+              <Link to="/AdminResults">
+                <span className="sidebar-icon">📊</span>
+                Results
+              </Link>
+            </li>
+            <li>
+              <Link to="/AdminResetPassword">
+                <span className="sidebar-icon">🔒</span>
+                Reset Password
+              </Link>
+            </li>
+          </ul>
+        </aside>
+        <main className="results-main">
           <div className="results-main-content">
+
             <h1>Add Results</h1>
 
             <div className="results-form-top">

@@ -15,8 +15,8 @@ function Navbar({ logo, title }) {
         <Link to="/">Home</Link>
         <Link to="/about">About</Link>
         <Link to="/calendar">Academic Calendar</Link>
-        <Link to="/signin">SignIn</Link>
-        <Link to="/signup">SignUp</Link>
+        <Link to="/SignIn">SignIn</Link>
+        <Link to="/SignUp">SignUp</Link>
       </div>
     </div>
   );

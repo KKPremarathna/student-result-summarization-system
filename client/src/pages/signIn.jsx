@@ -11,50 +11,53 @@ function Signin() {
     <div className="signin-page">
       <InnerNavbar />
 
-      <div className="signin-main">
-        <div className="signin-left">
-          <img
-            src={signinImage}
-            alt="Signin illustration"
-            className="signin-image"
-          />
-        </div>
-
-        <div className="signin-right">
-          <form className="signin-form">
+      <main className="signin-container">
+        <div className="signin-card">
+          <div className="signin-header">
             <h1 className="signin-title">Sign In</h1>
             <p className="signin-subtitle">Enter your credentials to continue</p>
+          </div>
 
-            <input type="email" placeholder="Email" />
-
-            <div className="password-wrapper">
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-              />
-              <span
-                className="eye-icon"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                👁
-              </span>
+          <form className="signin-form">
+            <div className="form-group">
+              <input type="email" placeholder="Email" />
             </div>
 
-            <p className="forgot-password">Forgot Password ?</p>
+            <div className="form-group">
+              <div className="password-wrapper">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                />
+                <span
+                  className="eye-icon"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? "🙈" : "👁"}
+                </span>
+              </div>
+            </div>
+
+            <div className="form-footer">
+              <Link to="/AdminResetPassword">
+                <span className="forgot-password">Forgot Password ?</span>
+              </Link>
+            </div>
 
             <button type="submit" className="signin-btn">
               Sign In
             </button>
 
             <p className="signup-text">
-              Don’t have an Account ?{" "}
-              <Link to="/signup">
-                <span>Create One</span>
+              Don't have an Account ?{" "}
+              <Link to="/SignUp" className="signup-link">
+                Create One
               </Link>
             </p>
           </form>
         </div>
-      </div>
+      </main>
+
     </div>
   );
 }

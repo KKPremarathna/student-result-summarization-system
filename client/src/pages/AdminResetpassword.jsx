@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../styles/AdminResetPassword.css";
 import Navbar from "../components/InnerNavbar";
 import { Link } from "react-router-dom";
-import bgImage from "../assets/images/admin.jpg";
+
 
 function ResetPassword() {
   const [newPassword, setNewPassword] = useState("");
@@ -27,33 +27,45 @@ function ResetPassword() {
       <Navbar />
 
       <div className="reset-content">
-        <aside className="reset-sidebar">
-
-          <h2 className="sidebar-title">Admin Home page</h2>
-
+        <aside className="sidebar">
+          <div className="sidebar-title">Management</div>
           <ul className="sidebar-menu">
             <li>
-              <Link to="/adduser">Add User</Link>
+              <Link to="/AdminHome">
+                <span className="sidebar-icon">🏠</span>
+                Admin Home
+              </Link>
             </li>
             <li>
-              <Link to="/admincomplaint">Complaint</Link>
+              <Link to="/AddUser">
+                <span className="sidebar-icon">👤</span>
+                Add User
+              </Link>
             </li>
             <li>
-              <Link to="/adminresults">Results</Link>
+              <Link to="/AdminComplaint">
+                <span className="sidebar-icon">📋</span>
+                Complaint
+              </Link>
+            </li>
+            <li >
+              <Link to="/AdminResults">
+                <span className="sidebar-icon">📊</span>
+                Results
+              </Link>
             </li>
             <li className="active">
-              <Link to="/adminresetpassword">Reset Password</Link>
+              <Link to="/AdminResetPassword">
+                <span className="sidebar-icon">🔒</span>
+                Reset Password
+              </Link>
             </li>
           </ul>
         </aside>
 
-        <main
-          className="reset-main"
-          style={{ backgroundImage: `url(${bgImage})` }}
-        >
-          <div className="reset-overlay"></div>
-
+        <main className="reset-main">
           <div className="reset-main-content">
+
             <div className="profile-section">
               <div className="profile-icon">👤</div>
               <span className="edit-text">Edit</span>

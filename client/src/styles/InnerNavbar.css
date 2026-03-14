@@ -1,63 +1,62 @@
 .inner-navbar {
   width: 100%;
-  background: #c7def0;
+  background: var(--bg-dark); /* Dark background like the image */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 50px;
+  padding: 1.25rem 5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  position: sticky;
+  top: 0;
 }
 
 .inner-navbar__brand {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 1.5rem;
 }
 
 .inner-navbar__logo {
-  width: 70px;
-  height: 70px;
+  width: 50px;
+  height: 50px;
   object-fit: contain;
+  filter: brightness(0) invert(1) drop-shadow(0 0 5px rgba(184, 227, 233, 0.4));
 }
 
 .inner-navbar__title {
-  font-size: 50px;
-  font-weight: 500;
-  color: #000;
-  margin: 0;
-  font-family: serif;
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: white;
+  font-family: var(--font-heading);
+  letter-spacing: -1px;
 }
 
 .inner-navbar__links {
   display: flex;
-  gap: 30px;
+  gap: 3rem;
   align-items: center;
 }
 
 .inner-navbar__links a {
   text-decoration: none;
-  font-size: 25px;
-  font-weight: 500;
-  color: #111;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  transition: all var(--transition-fast);
 }
 
 .inner-navbar__links a:hover {
-  opacity: 0.8;
+  color: white;
+  transform: translateY(-1px);
 }
 
-@media (max-width: 700px) {
+
+@media (max-width: 768px) {
   .inner-navbar {
-    flex-direction: column;
-    gap: 15px;
-    padding: 16px 20px;
+    padding: 1rem 1.5rem;
   }
-
   .inner-navbar__links {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 16px;
-  }
-
-  .inner-navbar__title {
-    font-size: 30px;
+    display: none;
   }
 }

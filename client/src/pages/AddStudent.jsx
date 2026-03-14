@@ -10,33 +10,45 @@ function AddStudent() {
       <Navbar />
 
       <div className="addstudent-content">
-        <aside className="adduser-sidebar">
+        <aside className="sidebar">
+          <div className="sidebar-title">Management</div>
           <ul className="sidebar-menu">
-              <li>
-              <Link to="/adminhome"> Admin Home</Link>
-              </li>
+            <li>
+              <Link to="/AdminHome">
+                <span className="sidebar-icon">🏠</span>
+                Admin Home
+              </Link>
+            </li>
             <li className="active">
-              <Link to="/adduser">Add User</Link>
+              <Link to="/AddUser">
+                <span className="sidebar-icon">👤</span>
+                Add User
+              </Link>
             </li>
             <li>
-              <Link to="/admincomplaint">Complaint</Link>
+              <Link to="/AdminComplaint">
+                <span className="sidebar-icon">📋</span>
+                Complaint
+              </Link>
+            </li>
+            <li >
+              <Link to="/AdminResults">
+                <span className="sidebar-icon">📊</span>
+                Results
+              </Link>
             </li>
             <li>
-              <Link to="/adminresults">Results</Link>
-            </li>
-            <li>
-              <Link to="/adminresetpassword">Reset Password</Link>
+              <Link to="/AdminResetPassword">
+                <span className="sidebar-icon">🔒</span>
+                Reset Password
+              </Link>
             </li>
           </ul>
         </aside>
 
-        <main
-          className="addstudent-main"
-          style={{ backgroundImage: `url(${bgImage})` }}
-        >
-          <div className="addstudent-overlay"></div>
-
+        <main className="addstudent-main">
           <div className="addstudent-main-content">
+
             <h1>Add Student</h1>
 
             <div className="form-group">

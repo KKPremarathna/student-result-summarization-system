@@ -20,34 +20,46 @@ function StudentList() {
 
       <div className="studentlist-content">
         {/* left sidebar */}
-        <aside className="studentlist-sidebar">
+        <aside className="sidebar">
+          <div className="sidebar-title">Management</div>
           <ul className="sidebar-menu">
-              <li>
-              <Link to="/adminhome"> Admin Home</Link>
-              </li>  
+            <li>
+              <Link to="/AdminHome">
+                <span className="sidebar-icon">🏠</span>
+                Admin Home
+              </Link>
+            </li>
             <li className="active">
-              <Link to="/adduser">Add User</Link>
+              <Link to="/AddUser">
+                <span className="sidebar-icon">👤</span>
+                Add User
+              </Link>
             </li>
             <li>
-              <Link to="/complaint">Complaint</Link>
+              <Link to="/AdminComplaint">
+                <span className="sidebar-icon">📋</span>
+                Complaint
+              </Link>
+            </li>
+            <li >
+              <Link to="/AdminResults">
+                <span className="sidebar-icon">📊</span>
+                Results
+              </Link>
             </li>
             <li>
-              <Link to="/results">Results</Link>
-            </li>
-            <li>
-              <Link to="/resetpassword">Reset Password</Link>
+              <Link to="/AdminResetPassword">
+                <span className="sidebar-icon">🔒</span>
+                Reset Password
+              </Link>
             </li>
           </ul>
         </aside>
 
         {/* right section */}
-        <main
-          className="studentlist-main"
-          style={{ backgroundImage: `url(${bgImage})` }}
-        >
-          <div className="studentlist-overlay"></div>
-
+        <main className="studentlist-main">
           <div className="studentlist-main-content">
+
             <h1>Student List</h1>
 
             <div className="filter-row">
