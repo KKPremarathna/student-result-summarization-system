@@ -8,6 +8,104 @@
   padding-bottom: 2.5rem;
 }
 
+/* ── Responsive ───────────────────────────────── */
+@media (max-width: 1024px) {
+  .aic-filters {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .aic-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+  
+  .aic-save-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .aic-filters {
+    grid-template-columns: 1fr;
+  }
+  
+  .aic-footer {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .aic-finalize-btn {
+    width: 100%;
+  }
+}
+
+.aic-input {
+  width: 100%;
+  background: rgba(184, 227, 233, 0.1);
+  border: 2px solid transparent;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: #0B2E33;
+  font-weight: 700;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  box-sizing: border-box;
+}
+
+.aic-input:focus {
+  border-color: #4F7C82;
+  background: white;
+}
+
+/* ── Alerts ──────────────────────────────────── */
+.aic-alert {
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  animation: aicSlideIn 0.3s ease-out;
+}
+
+.aic-alert--success {
+  background: #dcfce7;
+  color: #16a34a;
+  border: 1px solid #bcf0da;
+}
+
+.aic-alert--error {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+@keyframes aicSlideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Empty State ──────────────────────────────── */
+.aic-empty-state {
+  padding: 4rem 2rem;
+  text-align: center;
+  color: #4F7C82;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.125rem;
+}
+
+.aic-empty-td {
+  padding: 4rem 2rem;
+  text-align: center;
+  color: #4F7C82;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.125rem;
+  background: rgba(255, 255, 255, 0.4);
+}
+
 /* ── Header ───────────────────────────────────── */
 .aic-header {
   display: flex;
@@ -28,7 +126,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #4F7C82;
+  color: rgba(255, 255, 255, 0.5);
   font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -37,21 +135,22 @@
 }
 
 .aic-breadcrumb__current {
-  color: #0B2E33;
+  color: #ffffff;
 }
 
 .aic-title {
   font-size: 2.25rem;
   font-weight: 900;
-  color: #0B2E33;
+  color: #ffffff;
   display: flex;
   align-items: center;
   gap: 0.75rem;
   margin: 0;
+  text-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
 .aic-title__icon {
-  color: #4F7C82;
+  color: #ffffff;
 }
 
 .aic-save-btn {
@@ -151,6 +250,11 @@
   appearance: none;
   -webkit-appearance: none;
   cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%230B2E33' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
   transition: box-shadow 0.2s;
 }
 
@@ -170,7 +274,29 @@
 }
 
 .aic-table-scroll {
-  overflow-x: auto;
+  overflow: auto;
+  max-height: 600px;
+  position: relative;
+}
+
+/* Custom Scrollbar */
+.aic-table-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.aic-table-scroll::-webkit-scrollbar-track {
+  background: rgba(184, 227, 233, 0.1);
+  border-radius: 4px;
+}
+
+.aic-table-scroll::-webkit-scrollbar-thumb {
+  background: rgba(79, 124, 130, 0.3);
+  border-radius: 4px;
+}
+
+.aic-table-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(79, 124, 130, 0.5);
 }
 
 .aic-table {
@@ -180,40 +306,48 @@
 
 /* ── Table head ───────────────────────────────── */
 .aic-thead-primary {
-  background: #0B2E33;
-  color: white;
+  background: #081D20;
+  color: #FFFFFF;
 }
 
 .aic-thead-secondary {
-  background: #1a454c;
-  color: rgba(255, 255, 255, 0.9);
+  background: #0B2E33;
+  color: rgba(184, 227, 233, 0.9);
 }
 
 .aic-th {
-  padding: 1.5rem 1rem;
+  padding: 1.25rem 1rem;
   font-weight: 800;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
+  vertical-align: middle;
 }
 
 .aic-th--border-r {
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .aic-th--border-b {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .aic-th-sm {
-  padding: 0.75rem 0.5rem;
-  font-size: 0.625rem;
-  font-weight: 900;
+  padding: 0.875rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  min-width: 60px;
 }
 
 /* ── Table body ───────────────────────────────── */
-.aic-tbody tr + tr {
-  border-top: 1px solid rgba(184, 227, 233, 0.3);
+.aic-tbody tr {
+  border-bottom: 1px solid rgba(184, 227, 233, 0.2);
+}
+
+.aic-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .aic-row {
@@ -229,11 +363,12 @@
 }
 
 .aic-td--enumber {
-  padding: 1rem;
+  padding: 1rem 1.5rem;
   text-align: center;
   color: #0B2E33;
   font-weight: 900;
   background: rgba(184, 227, 233, 0.05);
+  min-width: 140px;
 }
 
 .aic-td--border-r {
@@ -246,11 +381,13 @@
   color: #0B2E33;
   font-weight: 900;
   background: rgba(184, 227, 233, 0.2);
+  min-width: 110px;
 }
 
 .aic-td--center {
   padding: 1rem;
   text-align: center;
+  min-width: 80px;
 }
 
 /* ── Cell inputs ──────────────────────────────── */
@@ -321,13 +458,13 @@
 }
 
 .aic-footer__icon {
-  color: #B8E3E9;
+  color: #E5F3F5;
 }
 
 .aic-footer__label {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #B8E3E9;
+  color: #E5F3F5;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin: 0;
@@ -353,10 +490,301 @@
 }
 
 .aic-finalize-btn:hover {
-  background: #B8E3E9;
+  background: #E5F3F5;
   transform: scale(1.05);
 }
 
 .aic-finalize-btn:active {
   transform: scale(0.96);
+}
+
+/* ── Add Student Modal ───────────────────────── */
+.aic-entry-modal {
+  max-width: 600px !important;
+}
+
+.aic-entry-modes {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background: rgba(184, 227, 233, 0.2);
+  padding: 0.5rem;
+  border-radius: 1rem;
+}
+
+.aic-mode-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: none;
+  background: transparent;
+  color: #4F7C82;
+  font-weight: 800;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.aic-mode-tab.active {
+  background: white;
+  color: #0B2E33;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.aic-textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.aic-single-add {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.aic-add-btn-sm {
+  background: #0B2E33;
+  color: white;
+  border: none;
+  padding: 0 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.aic-parse-btn {
+  width: 100%;
+  margin-top: 1rem;
+  background: #4F7C82;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.aic-parse-btn:hover {
+  background: #3d6166;
+}
+
+.aic-preview-wrap {
+  margin-top: 2rem;
+  background: rgba(184, 227, 233, 0.1);
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  border: 1px dashed #4F7C82;
+}
+
+.aic-preview-title {
+  font-size: 0.875rem;
+  font-weight: 900;
+  color: #0B2E33;
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+}
+
+.aic-preview-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.aic-preview-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  padding: 0.4rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: #0B2E33;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.aic-preview-item button {
+  background: none;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  display: flex;
+  padding: 0;
+}
+
+.aic-preview-item button svg {
+  color: #dc2626 !important;
+}
+
+.aic-preview-empty {
+  font-size: 0.875rem;
+  color: #4F7C82;
+  font-style: italic;
+  margin: 0;
+}
+
+/* ── Row Actions ────────────────────────────── */
+.aic-row-delete {
+  background: transparent;
+  color: #94a3b8;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.aic-row-delete:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.aic-add-btn {
+  background: #4F7C82;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  font-weight: 900;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(79, 124, 130, 0.3);
+  transition: all 0.2s;
+}
+
+.aic-add-btn:hover:not(:disabled) {
+  background: #3d6166;
+  transform: translateY(-2px);
+}
+
+.aic-add-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.aic-header-actions {
+  display: flex;
+  gap: 1rem;
+}
+/* -- Range Entry Specifics --------------------- */
+.aic-range-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.aic-range-sep {
+  color: #4F7C82;
+  font-weight: 800;
+  font-size: 0.875rem;
+}
+
+/* -- Modal Footer Buttons ---------------------- */
+.aic-modal-cancel {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.aic-modal-cancel:hover {
+  background: #f8fafc;
+  color: #0B2E33;
+  border-color: #cbd5e1;
+}
+
+.aic-modal-commit {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  border: none;
+  background: #0B2E33;
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(11, 46, 51, 0.2);
+}
+
+.aic-modal-commit:hover:not(:disabled) {
+  background: #14454d;
+  transform: translateY(-1px);
+}
+
+.aic-modal-commit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* -- Edit Mode Toggle Button ------------------ */
+.aic-edit-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  color: #0B2E33;
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  font-weight: 900;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.aic-edit-toggle-btn:hover {
+  background: #f8fafc;
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+}
+
+.aic-edit-toggle-btn.active {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1);
+}
+
+.aic-edit-toggle-btn.active:hover {
+  background: #fecaca;
+}
+
+/* -- Animations ------------------------------- */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Disable Selects when editing */
+.aic-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(0, 0, 0, 0.05);
 }

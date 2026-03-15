@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import LecturerLayout from "../components/LecturerLayout.jsx";
-import axios from "axios";
+import { 
+  getCourseCodes, 
+  getBatches, 
+  getIncourseResults, 
+  getSubjectByCodeAndBatch 
+} from "../services/lecturerApi.js";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import "../styles/ViewResult.css";
@@ -15,78 +20,131 @@ import {
 } from "lucide-react";
 
 function ViewResult() {
-  const [course, setCourse] = useState("");
-  const [batch, setBatch] = useState("");
-  const [eNumber, setENumber] = useState("");
+  const [courseCodes, setCourseCodes] = useState([]);
+  const [batches, setBatches] = useState([]);
+  
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [selectedBatch, setSelectedBatch] = useState("");
+  const [eNumberFilter, setENumberFilter] = useState("");
+  
   const [results, setResults] = useState([]);
+  const [subjectInfo, setSubjectInfo] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const [structure, setStructure] = useState({
-    assignments: 3,
-    quizzes: 2,
-    labs: 4
+    assignments: 0,
+    quizzes: 0,
+    labs: 0
   });
 
-  const API = "http://localhost:5000/api";
-
+  // Fetch initial course codes
   useEffect(() => {
-    axios.get(`${API}/marks/structure`)
-      .then(res => setStructure(res.data))
-      .catch(err => console.warn("Backend not connected, showing default table"));
+    const fetchInitialData = async () => {
+      try {
+        const res = await getCourseCodes();
+        setCourseCodes(res.data);
+      } catch (err) {
+        console.error("Error fetching course codes:", err);
+      }
+    };
+    fetchInitialData();
   }, []);
 
+  // Fetch batches when course changes
+  useEffect(() => {
+    if (selectedCourse) {
+      const fetchBatches = async () => {
+        try {
+          const res = await getBatches(selectedCourse);
+          setBatches(res.data);
+          setSelectedBatch(""); // Reset batch when course changes
+        } catch (err) {
+          console.error("Error fetching batches:", err);
+        }
+      };
+      fetchBatches();
+    } else {
+      setBatches([]);
+      setSelectedBatch("");
+    }
+  }, [selectedCourse]);
+
   const fetchResults = async () => {
+    if (!selectedCourse || !selectedBatch) {
+      alert("Please select both course and batch");
+      return;
+    }
+
+    setLoading(true);
     try {
-      const res = await axios.get(`${API}/marks/filter`, {
-        params: { course, batch, eNumber }
-      });
-      setResults(res.data);
+      // 1. Get Subject ID
+      const subRes = await getSubjectByCodeAndBatch(selectedCourse, selectedBatch);
+      if (subRes.data && subRes.data.length > 0) {
+        const subject = subRes.data[0];
+        setSubjectInfo(subject);
+        
+        // Update structure based on subject assessments
+        setStructure({
+          assignments: subject.assessments?.assignmentCount || 0,
+          quizzes: subject.assessments?.quizCount || 0,
+          labs: subject.assessments?.labCount || 0
+        });
+
+        // 2. Get Results
+        const res = await getIncourseResults(subject._id);
+        const fetchedResults = res.data.results || [];
+        
+        // 3. Filter by E Registration Number if provided
+        if (eNumberFilter) {
+          setResults(fetchedResults.filter(r => 
+            r.studentENo.toLowerCase().includes(eNumberFilter.toLowerCase())
+          ));
+        } else {
+          setResults(fetchedResults);
+        }
+      } else {
+        alert("Subject configuration not found");
+      }
     } catch (err) {
-      console.warn("Backend not connected, results will be empty");
+      console.error("Error fetching results:", err);
+      alert("Failed to fetch results. Check backend connection.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const downloadPDF = () => {
-    const doc = new jsPDF();
-    const columns = [];
-    const rows = [];
+    if (results.length === 0) {
+      alert("No data to export");
+      return;
+    }
 
-    columns.push("E.No");
-    for (let i = 1; i <= structure.assignments; i++) columns.push(`A${i}`);
-    for (let i = 1; i <= structure.quizzes; i++) columns.push(`Q${i}`);
-    for (let i = 1; i <= structure.labs; i++) columns.push(`L${i}`);
-    columns.push("Mid", "Incourse", "End Marks", "Before Senate", "After Senate");
+    const doc = new jsPDF('p', 'mm', 'a4'); // Portrait orientation
+    const columns = ["E.No", "Mid Exam", "Incourse", "End Exam", "Grade"];
+    
+    const rows = results.map(r => [
+      r.studentENo,
+      r.mid ?? "-",
+      r.incourseTotal?.toFixed(1) || "0.0",
+      r.endExamMark ?? "-",
+      r.grade ?? "-"
+    ]);
 
-    results.forEach(r => {
-      rows.push([
-        r.eNumber,
-        ...r.assignments,
-        ...r.quizzes,
-        ...r.labs,
-        r.mid,
-        r.incourse,
-        r.endMarks,
-        r.beforeSenate,
-        r.afterSenate
-      ]);
+    doc.setFontSize(16);
+    doc.text(`Academic Results: ${selectedCourse} - ${selectedBatch}`, 14, 15);
+    doc.setFontSize(10);
+    doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 22);
+
+    autoTable(doc, { 
+      head: [columns], 
+      body: rows,
+      startY: 30,
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [11, 46, 51] }
     });
-
-    autoTable(doc, { head: [columns], body: rows });
-    doc.save("results.pdf");
+    
+    doc.save(`Results_${selectedCourse}_${selectedBatch}.pdf`);
   };
-
-  const defaultRows = [...Array(5)].map((_, idx) => ({
-    eNumber: `E00${idx + 1}`,
-    assignments: Array(structure.assignments).fill("***"),
-    quizzes: Array(structure.quizzes).fill("***"),
-    labs: Array(structure.labs).fill("***"),
-    mid: "***",
-    incourse: "***",
-    endMarks: "***",
-    beforeSenate: "Pending",
-    afterSenate: "Pending"
-  }));
-
-  const tableRows = results.length > 0 ? results : defaultRows;
 
   return (
     <LecturerLayout>
@@ -107,6 +165,7 @@ function ViewResult() {
           <button
             onClick={downloadPDF}
             className="vr-export-btn"
+            disabled={results.length === 0}
           >
             <FileDown size={20} />
             Export to PDF
@@ -129,12 +188,16 @@ function ViewResult() {
                 Course Code
               </label>
               <select
-                onChange={(e) => setCourse(e.target.value)}
+                value={selectedCourse}
+                onChange={(e) => setSelectedCourse(e.target.value)}
                 className="vr-select"
               >
                 <option value="">Select Course</option>
-                <option>EC9630</option>
-                <option>EC6060</option>
+                {courseCodes.map(item => (
+                  <option key={item.courseCode} value={item.courseCode}>
+                    {item.courseCode} - {item.courseName}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -144,36 +207,39 @@ function ViewResult() {
                 Batch
               </label>
               <select
-                onChange={(e) => setBatch(e.target.value)}
+                value={selectedBatch}
+                onChange={(e) => setSelectedBatch(e.target.value)}
                 className="vr-select"
+                disabled={!selectedCourse}
               >
                 <option value="">Select Batch</option>
-                <option>2021</option>
-                <option>2022</option>
+                {batches.map(batch => (
+                  <option key={batch} value={batch}>{batch}</option>
+                ))}
               </select>
             </div>
 
             <div className="vr-field">
               <label className="vr-label">
                 <Search size={14} />
-                E Number
+                E Registration No
               </label>
-              <select
-                onChange={(e) => setENumber(e.target.value)}
-                className="vr-select"
-              >
-                <option value="">Select E.No</option>
-                <option>E001</option>
-                <option>E002</option>
-              </select>
+              <input
+                type="text"
+                placeholder="Search by E No..."
+                value={eNumberFilter}
+                onChange={(e) => setENumberFilter(e.target.value)}
+                className="vr-input"
+              />
             </div>
 
             <button
               onClick={fetchResults}
               className="vr-filter-btn"
+              disabled={loading}
             >
               <Search size={18} />
-              Apply Filter
+              {loading ? "Loading..." : "Apply Filter"}
             </button>
           </div>
         </div>
@@ -181,51 +247,87 @@ function ViewResult() {
         {/* Results Table Card */}
         <div className="vr-table-card">
           <div className="vr-table-scroll">
-            <table className="vr-table">
-              <thead>
-                <tr className="vr-thead-primary">
-                  <th rowSpan="2" className="vr-th vr-th--border-r">E.No</th>
-                  <th colSpan={structure.assignments} className="vr-th vr-th--border-r vr-th--border-b">Assignments</th>
-                  <th colSpan={structure.quizzes} className="vr-th vr-th--border-r vr-th--border-b">Quizzes</th>
-                  <th colSpan={structure.labs} className="vr-th vr-th--border-r vr-th--border-b">Labs</th>
-                  <th rowSpan="2" className="vr-th vr-th--border-r">Mid</th>
-                  <th rowSpan="2" className="vr-th vr-th--border-r">Incourse</th>
-                  <th rowSpan="2" className="vr-th vr-th--border-r">End</th>
-                  <th colSpan="2" className="vr-th vr-th--border-b">Senate Results</th>
-                </tr>
-                <tr className="vr-thead-secondary">
-                  {[...Array(structure.assignments)].map((_, i) => <th key={i} className="vr-th-sm vr-th--border-r">A{i + 1}</th>)}
-                  {[...Array(structure.quizzes)].map((_, i) => <th key={i} className="vr-th-sm vr-th--border-r">Q{i + 1}</th>)}
-                  {[...Array(structure.labs)].map((_, i) => <th key={i} className="vr-th-sm vr-th--border-r">L{i + 1}</th>)}
-                  <th className="vr-th-sm vr-th--border-r">Before</th>
-                  <th className="vr-th-sm">After</th>
-                </tr>
-              </thead>
-
-              <tbody className="vr-tbody">
-                {tableRows.map((r, index) => (
-                  <tr key={index} className="vr-row">
-                    <td className="vr-td vr-td--enumber">{r.eNumber}</td>
-                    {r.assignments.map((a, i) => <td key={i} className="vr-td vr-td--data">{a}</td>)}
-                    {r.quizzes.map((q, i) => <td key={i} className="vr-td vr-td--data">{q}</td>)}
-                    {r.labs.map((l, i) => <td key={i} className="vr-td vr-td--data">{l}</td>)}
-                    <td className="vr-td vr-td--mid">{r.mid}</td>
-                    <td className="vr-td vr-td--incourse">{r.incourse}</td>
-                    <td className="vr-td vr-td--mid">{r.endMarks}</td>
-                    <td className="vr-td vr-td--center">
-                      <span className={`vr-badge ${r.beforeSenate === 'Pending' ? 'vr-badge--pending' : 'vr-badge--done'}`}>
-                        {r.beforeSenate}
-                      </span>
-                    </td>
-                    <td className="vr-td vr-td--center">
-                      <span className={`vr-badge ${r.afterSenate === 'Pending' ? 'vr-badge--pending' : 'vr-badge--done'}`}>
-                        {r.afterSenate}
-                      </span>
-                    </td>
+            {results.length > 0 ? (
+              <table className="vr-table">
+                <thead>
+                  <tr className="vr-thead-primary">
+                    <th rowSpan="2" className="vr-th vr-th--border-r">E.No</th>
+                    <th colSpan={structure.assignments} className="vr-th vr-th--border-r vr-th--border-b">Assignments</th>
+                    <th colSpan={structure.quizzes} className="vr-th vr-th--border-r vr-th--border-b">Quizzes</th>
+                    <th colSpan={structure.labs} className="vr-th vr-th--border-r vr-th--border-b">Labs</th>
+                    <th rowSpan="2" className="vr-th vr-th--border-r">Mid</th>
+                    <th rowSpan="2" className="vr-th vr-th--border-r">Incourse</th>
+                    <th rowSpan="2" className="vr-th vr-th--border-r">End</th>
+                    <th colSpan="2" className="vr-th vr-th--border-b">Final Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                  <tr className="vr-thead-secondary">
+                    {[...Array(structure.assignments)].map((_, i) => <th key={i} className="vr-th-sm vr-th--border-r">A{i + 1}</th>)}
+                    {[...Array(structure.quizzes)].map((_, i) => <th key={i} className="vr-th-sm vr-th--border-r">Q{i + 1}</th>)}
+                    {[...Array(structure.labs)].map((_, i) => <th key={i} className="vr-th-sm vr-th--border-r">L{i + 1}</th>)}
+                    <th className="vr-th-sm vr-th--border-r">Mark</th>
+                    <th className="vr-th-sm">Grade</th>
+                  </tr>
+                </thead>
+
+                <tbody className="vr-tbody">
+                  {results.map((r, index) => (
+                    <tr key={index} className="vr-row">
+                      <td className="vr-td vr-td--enumber">{r.studentENo}</td>
+                      {/* Assignments */}
+                      {[...Array(structure.assignments)].map((_, i) => (
+                        <td key={`a-${i}`} className="vr-td vr-td--data">
+                          {r.assignments && r.assignments[i] !== undefined ? r.assignments[i] : "-"}
+                        </td>
+                      ))}
+                      {/* Quizzes */}
+                      {[...Array(structure.quizzes)].map((_, i) => (
+                        <td key={`q-${i}`} className="vr-td vr-td--data">
+                          {r.quizzes && r.quizzes[i] !== undefined ? r.quizzes[i] : "-"}
+                        </td>
+                      ))}
+                      {/* Labs */}
+                      {[...Array(structure.labs)].map((_, i) => (
+                        <td key={`l-${i}`} className="vr-td vr-td--data">
+                          {r.labs && r.labs[i] !== undefined ? r.labs[i] : "-"}
+                        </td>
+                      ))}
+                      <td className="vr-td vr-td--mid">{r.mid ?? "-"}</td>
+                      <td className="vr-td vr-td--incourse">{r.incourseTotal?.toFixed(1)}</td>
+                      <td className="vr-td vr-td--mid">{r.endExamMark ?? "-"}</td>
+                      <td className="vr-td vr-td--center">
+                        <span className="vr-badge vr-badge--done">
+                          {r.finalMark ?? "-"}
+                        </span>
+                      </td>
+                      <td className="vr-td vr-td--center">
+                        <span className={`vr-badge ${r.grade === 'E' ? 'vr-badge--fail' : 'vr-badge--done'}`}>
+                          {r.grade ?? "N/A"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="vr-empty-state">
+                <div className="vr-empty-icon-wrap">
+                  <ClipboardCheck size={48} className="vr-empty-icon" />
+                  <Search size={24} className="vr-empty-icon-sub" />
+                </div>
+                <h3 className="vr-empty-title">Ready to View Results?</h3>
+                <p className="vr-empty-text">
+                  {loading 
+                    ? "We're fetching the academic data for you..." 
+                    : "Please select a course and batch from the filters above to retrieve the results table."}
+                </p>
+                {!loading && (
+                  <div className="vr-empty-hint">
+                    <Filter size={14} />
+                    <span>Use the search filters to get started</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 

@@ -4,12 +4,13 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background-color: #0B2E33; /* Original dark teal base */
 }
 
 .lecturer-layout__body {
   display: flex;
   flex: 1;
-  overflow: hidden;
+  position: relative; /* Allow sticky children */
 }
 
 .lecturer-layout__content {
@@ -18,7 +19,7 @@
   overflow: auto;
   display: flex;
   flex-direction: column;
-  background-color: rgba(3, 32, 19, 0.7);
+  background-color: rgba(0, 0, 0, 0.4); /* Original overlay */
 }
 
 .lecturer-layout__inner {

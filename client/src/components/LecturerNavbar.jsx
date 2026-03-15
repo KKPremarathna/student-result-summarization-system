@@ -23,11 +23,20 @@ function Navbar({ toggleSidebar }) {
 
       {/* Navigation Links */}
       <ul className="nav-links">
-        <li>Home</li>
-        <li>About</li>
-        <li>Academic Calender</li>
-        <li>SignIn</li>
-        <li>SignUp</li>
+        <li><Link to="/lecturer/home">Home</Link></li>
+        <li><Link to="/lecturer/setting">Profile</Link></li>
+        <li className="logout-item">
+          <button 
+            className="navbar-logout-btn"
+            onClick={() => {
+              localStorage.removeItem("token");
+              localStorage.removeItem("lecturer");
+              window.location.href = "/signin";
+            }}
+          >
+            Logout
+          </button>
+        </li>
       </ul>
 
     </div>
