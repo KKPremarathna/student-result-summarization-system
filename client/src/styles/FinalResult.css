@@ -297,6 +297,35 @@
   background: white;
 }
 
+.fr-grade-badge {
+  display: inline-block;
+  background: #0B2E33;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 900;
+  min-width: 2rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(11, 46, 51, 0.2);
+}
+
+.fr-enumber-text {
+  color: #0B2E33;
+  font-weight: 900;
+  font-size: 1rem;
+}
+
+.fr-value-display {
+  display: inline-block;
+  background: rgba(184, 227, 233, 0.2);
+  color: #0B2E33;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 900;
+  min-width: 3rem;
+  text-align: center;
+}
+
 /* ── Info bar ─────────────────────────────────── */
 .fr-info-bar {
   display: flex;

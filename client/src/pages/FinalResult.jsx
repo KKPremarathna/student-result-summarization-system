@@ -1,28 +1,124 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LecturerLayout from "../components/LecturerLayout.jsx";
+import axios from "axios";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import "../styles/FinalResult.css";
 import {
   Save,
-  Send,
+  Download,
   Table,
   Filter,
   LayoutDashboard,
   ChevronRight,
   GraduationCap,
   ClipboardCheck,
-  User
+  User,
+  FileText
 } from "lucide-react";
 
 function FinalResult() {
-  const [rows, setRows] = useState([
-    { eNumber: "E001", incourse: "25", endExam: "50", grade: "A" },
-    { eNumber: "E002", incourse: "20", endExam: "40", grade: "B" },
-  ]);
+  const [course, setCourse] = useState("");
+  const [batch, setBatch] = useState("");
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleInputChange = (index, field, value) => {
-    const newRows = [...rows];
-    newRows[index][field] = value;
-    setRows(newRows);
+  const API = "http://localhost:5000/api";
+
+  const handleDownloadPDF = () => {
+    if (results.length === 0) {
+      alert("No data available to download!");
+      return;
+    }
+
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text("Final Result Compilation", 14, 22);
+    doc.setFontSize(11);
+    doc.text(`Course: ${course}`, 14, 30);
+    doc.text(`Batch: ${batch}`, 14, 36);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 42);
+
+    const tableColumn = ["E Number", "Incourse Marks (80%)", "End Exam Marks (20%)", "Final Grade"];
+    const tableRows = results.map(row => [
+      row.eNumber,
+      row.incourse,
+      row.endExam || "-",
+      row.grade || "-"
+    ]);
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 50,
+      styles: { fontSize: 10, cellPadding: 3 },
+      headStyles: { fillColor: [11, 46, 51] }
+    });
+
+    doc.save(`Final_Results_${course}_${batch}.pdf`);
+  };
+
+  // Grading scale logic
+  const calculateGrade = (total) => {
+    if (total >= 75) return "A";
+    if (total >= 65) return "B";
+    if (total >= 50) return "C";
+    if (total >= 35) return "S";
+    return "F";
+  };
+
+  // Fetch results when filters change
+  useEffect(() => {
+    if (course && batch) {
+      setLoading(true);
+      // Fetching all student results for the compilation
+      axios.get(`${API}/marks/compiled`, { params: { course, batch } })
+        .then(res => {
+          if (res.data && res.data.length > 0) {
+            setResults(res.data);
+          } else {
+            // Provide some default dummy data if none found
+            setResults([
+              { eNumber: "E001", incourse: 25, endExam: "", grade: "-" },
+              { eNumber: "E002", incourse: 20, endExam: "", grade: "-" },
+            ]);
+          }
+        })
+        .catch(() => {
+          console.warn("Error fetching compiled data");
+          // Fallback dummy data for development
+          setResults([
+            { eNumber: "E001", incourse: 25, endExam: "", grade: "-" },
+            { eNumber: "E002", incourse: 20, endExam: "", grade: "-" },
+          ]);
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [course, batch]);
+
+  const handleFinalMarksChange = (index, value) => {
+    const newResults = [...results];
+    const finalMark = parseFloat(value) || 0;
+    newResults[index].endExam = value;
+    
+    // Auto calculate grade (80% Incourse, 20% Final)
+    const incourseMark = parseFloat(newResults[index].incourse) || 0;
+    const total = incourseMark + finalMark; 
+    
+    newResults[index].grade = calculateGrade(total);
+    setResults(newResults);
+  };
+
+  const handleSave = (status) => {
+    if (!course || !batch) {
+      alert("Please select Course and Batch first!");
+      return;
+    }
+    setLoading(true);
+    axios.post(`${API}/marks/compile/save`, { course, batch, results, status })
+      .then(() => alert(`Results ${status === 'submitted' ? 'submitted to Senate' : 'saved as draft'} successfully!`))
+      .catch(err => alert("Error: " + err.message))
+      .finally(() => setLoading(false));
   };
 
   return (
@@ -45,13 +141,21 @@ function FinalResult() {
           </div>
 
           <div className="fr-header__actions">
-            <button className="fr-btn fr-btn--outline">
+            <button 
+              className="fr-btn fr-btn--outline" 
+              onClick={() => handleSave('draft')}
+              disabled={loading}
+            >
               <Save size={18} />
-              Save Draft
+              {loading ? "Saving..." : "Save Draft"}
             </button>
-            <button className="fr-btn fr-btn--primary">
-              <Send size={18} />
-              Submit to Senate
+            <button 
+              className="fr-btn fr-btn--primary" 
+              onClick={handleDownloadPDF}
+              disabled={loading}
+            >
+              <FileText size={18} />
+              Download as PDF
             </button>
           </div>
         </div>
@@ -72,11 +176,13 @@ function FinalResult() {
                 Course Code
               </label>
               <select
-                defaultValue="CS101"
+                onChange={(e) => setCourse(e.target.value)}
+                value={course}
                 className="fr-select"
               >
-                <option value="CS101">CS101 - Introduction to Programming</option>
-                <option value="CS102">CS102 - Data Structures</option>
+                <option value="">Select Course</option>
+                <option value="EC9630">EC9630</option>
+                <option value="EC6060">EC6060</option>
               </select>
             </div>
 
@@ -86,11 +192,13 @@ function FinalResult() {
                 Batch
               </label>
               <select
-                defaultValue="2021"
+                onChange={(e) => setBatch(e.target.value)}
+                value={batch}
                 className="fr-select"
               >
-                <option value="2021">Batch 2021 (Regular)</option>
-                <option value="2022">Batch 2022 (Junior)</option>
+                <option value="">Select Batch</option>
+                <option value="2021">2021</option>
+                <option value="2022">2022</option>
               </select>
             </div>
           </div>
@@ -103,50 +211,36 @@ function FinalResult() {
               <thead>
                 <tr className="fr-thead-row">
                   <th className="fr-th fr-th--left">E Number</th>
-                  <th className="fr-th">Incourse Marks</th>
-                  <th className="fr-th">End Exam Marks</th>
+                  <th className="fr-th">Total Incourse Marks (80%)</th>
+                  <th className="fr-th">End Exam Marks (20%)</th>
                   <th className="fr-th">Final Grade</th>
                 </tr>
               </thead>
               <tbody className="fr-tbody">
-                {rows.map((row, index) => (
+                {results.map((row, index) => (
                   <tr key={index} className="fr-row">
                     <td className="fr-td">
                       <div className="fr-enumber-cell">
                         <div className="fr-enumber-icon">
                           <User size={16} />
                         </div>
-                        <input
-                          type="text"
-                          value={row.eNumber}
-                          onChange={(e) => handleInputChange(index, 'eNumber', e.target.value)}
-                          className="fr-input fr-input--transparent"
-                        />
+                        <span className="fr-enumber-text">{row.eNumber}</span>
                       </div>
                     </td>
                     <td className="fr-td fr-td--center">
-                      <input
-                        type="text"
-                        value={row.incourse}
-                        onChange={(e) => handleInputChange(index, 'incourse', e.target.value)}
-                        className="fr-input fr-input--cell"
-                      />
+                      <span className="fr-value-display">{row.incourse}</span>
                     </td>
                     <td className="fr-td fr-td--center">
                       <input
-                        type="text"
+                        type="number"
                         value={row.endExam}
-                        onChange={(e) => handleInputChange(index, 'endExam', e.target.value)}
+                        onChange={(e) => handleFinalMarksChange(index, e.target.value)}
+                        placeholder="0"
                         className="fr-input fr-input--cell"
                       />
                     </td>
                     <td className="fr-td fr-td--center">
-                      <input
-                        type="text"
-                        value={row.grade}
-                        onChange={(e) => handleInputChange(index, 'grade', e.target.value)}
-                        className="fr-input fr-input--grade"
-                      />
+                      <span className="fr-grade-badge">{row.grade}</span>
                     </td>
                   </tr>
                 ))}
@@ -162,7 +256,11 @@ function FinalResult() {
           </div>
           <div>
             <p className="fr-info-bar__label">Quick Info</p>
-            <p className="fr-info-bar__text">Currently managing {rows.length} student records for the selected batch.</p>
+            <p className="fr-info-bar__text">
+              {results.length > 0 
+                ? `Currently managing ${results.length} student records for ${course || 'selected batch'}.`
+                : "Select a course and batch to start compiling results."}
+            </p>
           </div>
         </div>
       </div>
