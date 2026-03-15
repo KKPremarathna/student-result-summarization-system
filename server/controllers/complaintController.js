@@ -8,7 +8,10 @@ exports.createComplaint = async (req, res) => {
         const { title, description } = req.body;
 
         const complaint = await Complaint.create({
-            lecturerId: req.user.id,
+            senderId: req.user.id,
+            senderRole: 'lecturer',
+            receiverId: req.user.id, // Fallback Admin lookup pending, assigning self or a designated admin ID later
+            receiverRole: 'admin',
             title,
             description,
             status: 'Pending'
@@ -21,12 +24,15 @@ exports.createComplaint = async (req, res) => {
     }
 };
 
-// @desc    Get all complaints created by the logged-in lecturer
+// @desc    Get all complaints assigned TO the logged-in lecturer (from students)
 // @route   GET /api/complaints/my-complaints
 // @access  Private (Lecturer)
 exports.getLecturerComplaints = async (req, res) => {
     try {
-        const complaints = await Complaint.find({ lecturerId: req.user.id }).sort({ createdAt: -1 });
+        const complaints = await Complaint.find({ receiverId: req.user.id })
+            .populate('senderId', 'firstName lastName email profilePicture')
+            .populate('subjectId', 'courseCode courseName')
+            .sort({ createdAt: -1 });
         res.status(200).json({ success: true, count: complaints.length, data: complaints });
     } catch (error) {
         console.error(error);
@@ -47,8 +53,8 @@ exports.updateComplaint = async (req, res) => {
             return res.status(404).json({ message: 'Complaint not found' });
         }
 
-        // Verify ownership
-        if (complaint.lecturerId.toString() !== req.user.id.toString()) {
+        // Verify ownership (can only update if they sent it)
+        if (complaint.senderId.toString() !== req.user.id.toString()) {
             return res.status(401).json({ message: 'Not authorized to update this complaint' });
         }
 
@@ -80,8 +86,8 @@ exports.deleteComplaint = async (req, res) => {
             return res.status(404).json({ message: 'Complaint not found' });
         }
 
-        // Verify ownership
-        if (complaint.lecturerId.toString() !== req.user.id.toString()) {
+        // Verify ownership (can only delete if they sent it) // Optional: allow receiver to delete as well, but standard is sender
+        if (complaint.senderId.toString() !== req.user.id.toString() && complaint.receiverId.toString() !== req.user.id.toString()) {
             return res.status(401).json({ message: 'Not authorized to delete this complaint' });
         }
 

@@ -20,6 +20,26 @@ const convertRegNumToEmail = (regNum) => {
 };
 
 /**
+ * Converts a student email address back to a registration number.
+ * @param {string} email
+ * @returns {string}
+ */
+const convertEmailToRegNum = (email) => {
+    if (!email) return null;
+    
+    // format: 20XXexxx@eng.jfn.ac.lk
+    const emailExp = /^20\d{2}e\d{3}@eng\.jfn\.ac\.lk$/;
+    if (!emailExp.test(email)) {
+        throw new Error('Invalid email format for student. Expected 20XXexxx@eng.jfn.ac.lk');
+    }
+
+    const year = email.substring(0, 4);
+    const num = email.substring(5, 8); // skipping 'e'
+
+    return `${year}/E/${num}`;
+};
+
+/**
  * array of emails from a range of registration numbers.
  * @param {string} startRegNum
  * @param {string} endRegNum
@@ -74,6 +94,7 @@ const isValidRegNum = (regNum) => {
 
 module.exports = {
     convertRegNumToEmail,
+    convertEmailToRegNum,
     generateEmailsFromRange,
     isValidEmail,
     isValidRegNum,
