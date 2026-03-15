@@ -1,4 +1,5 @@
 const AllowedEmail = require('../models/AllowedEmail');
+const User = require('../models/User');
 
 // @desc    Get all allowed emails
 // @route   GET /api/admin/allowed-emails
@@ -137,3 +138,63 @@ exports.addLecturerEmail = async (req, res) => {
     }
 };
 
+
+// @desc    Get all allowed emails for students only
+// @route   GET /api/admin/students/allowed
+// @access  Private (Admin Only)
+exports.getStudentAllowedEmails = async (req, res) => {
+    try {
+        const allowedEmails = await AllowedEmail.find({ role: 'student' }).sort({ createdAt: -1 });
+        res.status(200).json({ success: true, data: allowedEmails });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// @desc    Delete an allowed email by MongoDB id
+// @route   DELETE /api/admin/students/allowed/:id
+// @access  Private (Admin Only)
+exports.deleteAllowedEmailById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await AllowedEmail.findByIdAndDelete(id);
+        if (!result) {
+            return res.status(404).json({ message: 'Allowed email not found' });
+        }
+        res.status(200).json({ success: true, message: 'Allowed email deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// @desc    Get all registered students from users collection
+// @route   GET /api/admin/students/registered
+// @access  Private (Admin Only)
+exports.getRegisteredStudents = async (req, res) => {
+    try {
+        const students = await User.find({ role: 'student' }).select('-password').sort({ createdAt: -1 });
+        res.status(200).json({ success: true, data: students });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// @desc    Delete a registered student user by id
+// @route   DELETE /api/admin/students/registered/:id
+// @access  Private (Admin Only)
+exports.deleteRegisteredStudentById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await User.findByIdAndDelete(id);
+        if (!result) {
+            return res.status(404).json({ message: 'Student user not found' });
+        }
+        res.status(200).json({ success: true, message: 'Student deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
