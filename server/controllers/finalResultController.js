@@ -1,6 +1,7 @@
 const Subject = require("../models/Subject");
 const IncourseResult = require("../models/IncourseResult");
 const FinalResult = require("../models/FinalResult");
+const { isValidRegNum } = require("../utils/regUtils");
 const PDFDocument = require("pdfkit-table");
 
 function calcGrade(mark) {
@@ -74,6 +75,10 @@ exports.saveResult = async (req, res) => {
 
     if (!subjectId || !studentENo) {
       return res.status(400).json({ message: "subject and studentENo are required" });
+    }
+
+    if (!isValidRegNum(studentENo)) {
+      return res.status(400).json({ message: "Invalid registration number format. Expected 20XX/E/XXX" });
     }
     if (endExamMark === undefined || endExamMark === null) {
       return res.status(400).json({ message: "endExamMark is required" });
@@ -158,12 +163,16 @@ exports.getResults = async (req, res) => {
   }
 };
 
-// GET /api/final-results/by-eno?subject=<subjectId>&studentENo=2022E050
+// GET /api/final-results/by-eno?subject=<subjectId>&studentENo=2022/E/050
 exports.getResultByENo = async (req, res) => {
   try {
     const { subject: subjectId, studentENo } = req.query;
     if (!subjectId || !studentENo) {
       return res.status(400).json({ message: "subject and studentENo are required" });
+    }
+
+    if (!isValidRegNum(studentENo)) {
+      return res.status(400).json({ message: "Invalid registration number format. Expected 20XX/E/XXX" });
     }
 
     const result = await FinalResult.findOne({
