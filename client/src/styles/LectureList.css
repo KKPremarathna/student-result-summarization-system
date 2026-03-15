@@ -1,3 +1,4 @@
+/* ── Page layout ─────────────────────────────────────────── */
 .lecturelist-page {
   min-height: 100vh;
   background-color: var(--bg-main);
@@ -12,144 +13,408 @@
 
 .lecturelist-main {
   flex: 1;
-  padding: 3rem 4rem;
-  background: linear-gradient(135deg, #F8FAFC 0%, var(--primary-light) 40%, #E2EFF1 100%);
+  padding: 2.5rem 3rem;
+  background: linear-gradient(135deg, #f8fafc 0%, var(--primary-light, #e8f5f7) 40%, #e2eff1 100%);
   overflow-y: auto;
 }
 
-
 .lecturelist-main-content {
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
-  background: white;
-  padding: 4rem;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  border: var(--border-defined);
-  animation: fadeIn 0.8s ease-out;
-}
-
-.lecturelist-main-content h1 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: var(--bg-dark);
-  margin-bottom: 4rem;
-  text-align: center;
-}
-
-.lecture-filter-row {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+/* ── Section header ──────────────────────────────────────── */
+.ll-section-header {
+  display: flex;
   align-items: center;
-  gap: 2rem;
-  margin-bottom: 5rem;
-  padding-bottom: 3rem;
-  border-bottom: 1px dashed var(--text-light);
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.lecture-filter-row label {
+.ll-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ll-header-icon {
+  font-size: 2.4rem;
+}
+
+.ll-title {
+  font-size: 1.75rem;
   font-weight: 800;
-  color: var(--primary);
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  color: #1e3a4c;
+  margin: 0 0 0.2rem 0;
+}
+
+.ll-subtitle {
   font-size: 0.85rem;
+  color: #64818c;
+  margin: 0;
 }
 
-.lecture-filter-row select {
-  width: 250px;
-  height: 3.5rem;
-  background: var(--bg-main);
-  border: 1px solid var(--text-light);
-  border-radius: var(--radius-sm);
-  padding: 0 1.25rem;
-  font-family: var(--font-main);
-}
-
-.lecture-filter-row .view-btn {
-  height: 3.5rem;
-  padding: 0 3rem;
-  background: var(--bg-dark);
-  color: white;
-  border: none;
-  border-radius: var(--radius-sm);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-}
-
-.lecture-filter-row .view-btn:hover {
-  background: var(--primary);
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
-}
-
-/* Table Styling */
-.lecture-table-wrapper {
-  overflow-x: auto;
-}
-
-.lecture-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  border: var(--border-defined);
-}
-
-.lecture-table th {
-  background: var(--bg-dark);
-  color: white;
-  padding: 1.5rem;
-  text-align: left;
-  font-size: 0.9rem;
+.ll-count-badge {
+  background: linear-gradient(135deg, #0ea5c0, #0e7490);
+  color: #fff;
+  padding: 0.4rem 1.2rem;
+  border-radius: 100px;
+  font-size: 0.82rem;
   font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* ── Filter card ─────────────────────────────────────────── */
+.ll-filter-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+  border: 1px solid #e5ecf0;
+  padding: 1.5rem 2rem;
+  animation: llFadeIn 0.4s ease-out;
+}
+
+@keyframes llFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ll-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.ll-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.ll-filter-label {
+  font-weight: 800;
+  color: var(--primary, #0ea5c0);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
+  font-size: 0.8rem;
+  white-space: nowrap;
 }
 
-.lecture-table td {
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid var(--text-light);
-  color: var(--text-main);
-  font-size: 0.95rem;
+.ll-filter-select {
+  flex: 1;
+  max-width: 260px;
+  height: 3rem;
+  background: #f7fafb;
+  border: 1.5px solid #d1e3e8;
+  border-radius: 8px;
+  padding: 0 1rem;
+  font-size: 0.9rem;
+  color: #1e3a4c;
+  font-family: var(--font-main);
+  transition: border-color 0.2s;
+  cursor: pointer;
 }
 
-.no-data {
-  text-align: center;
-  padding: 4rem !important;
-  color: var(--text-muted) !important;
+.ll-filter-select:focus {
+  outline: none;
+  border-color: var(--primary, #0ea5c0);
+  background: #fff;
+}
+
+.ll-view-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 3rem;
+  padding: 0 2rem;
+  background: linear-gradient(135deg, #1e3a4c 0%, #2d5568 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  white-space: nowrap;
+}
+
+.ll-view-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0ea5c0 0%, #0e7490 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(14, 165, 192, 0.35);
+}
+
+.ll-view-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.ll-refresh-btn {
+  height: 3rem;
+  padding: 0 1.25rem;
+  background: transparent;
+  border: 1.5px solid var(--primary, #0ea5c0);
+  color: var(--primary, #0ea5c0);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ll-refresh-btn:hover {
+  background: var(--primary, #0ea5c0);
+  color: #fff;
+}
+
+.ll-hint {
+  margin: 1rem 0 0;
+  font-size: 0.82rem;
+  color: #94a8b0;
   font-style: italic;
 }
 
-.delete-btn {
-  background: var(--danger);
-  color: white;
-  border: none;
-  padding: 0.5rem 1.5rem;
-  border-radius: 100px;
+/* ── Alert ───────────────────────────────────────────────── */
+.ll-alert {
+  padding: 0.9rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.ll-alert--error {
+  background: #fff0f0;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+}
+
+/* ── Spinner ─────────────────────────────────────────────── */
+.ll-spinner-wrap {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+  padding: 3rem 2rem;
+  color: #64818c;
+  font-size: 0.9rem;
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #e5ecf0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+
+.ll-spinner,
+.ll-btn-spinner {
+  border-radius: 50%;
+  animation: llSpin 0.7s linear infinite;
+}
+
+.ll-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #e5ecf0;
+  border-top-color: var(--primary, #0ea5c0);
+}
+
+.ll-btn-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+}
+
+@keyframes llSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Table ───────────────────────────────────────────────── */
+.ll-table-wrapper {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+  border: 1px solid #e5ecf0;
+  overflow: hidden;
+  animation: llFadeIn 0.4s ease-out;
+}
+
+.ll-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.92rem;
+}
+
+.ll-table thead {
+  background: #1e3a4c;
+}
+
+.ll-table th {
+  color: #fff;
+  padding: 1rem 1.25rem;
+  text-align: left;
+  font-size: 0.78rem;
   font-weight: 700;
-  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
+}
+
+.ll-table tbody tr {
+  transition: background 0.15s;
+}
+
+.ll-table tbody tr:nth-child(even) {
+  background: #f7fafb;
+}
+
+.ll-table tbody tr:hover {
+  background: #e8f5f9;
+}
+
+.ll-table td {
+  padding: 0.95rem 1.25rem;
+  border-bottom: 1px solid #edf2f4;
+  color: #2d4e5c;
+  vertical-align: middle;
+}
+
+.ll-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.ll-td-num {
+  color: #94a8b0 !important;
+  font-weight: 700;
+  width: 48px;
+}
+
+.ll-td-name {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ll-title-badge {
+  background: #e8f5f9;
+  color: #0e7490;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.15rem 0.5rem;
+  white-space: nowrap;
+  border: 1px solid #bae6f5;
+}
+
+.ll-td-email {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #1e3a4c !important;
+  word-break: break-all;
+}
+
+.ll-dept-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 100px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ll-dept-none {
+  color: #94a8b0;
+}
+
+/* ── Delete button ───────────────────────────────────────── */
+.ll-delete-btn {
+  background: #fff0f0;
+  color: #dc2626;
+  border: 1.5px solid #fca5a5;
+  padding: 0.4rem 1rem;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 0.2s;
+  white-space: nowrap;
 }
 
-.delete-btn:hover {
+.ll-delete-btn:hover {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
   transform: scale(1.05);
-  box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
 }
 
+/* ── Empty state ─────────────────────────────────────────── */
+.ll-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #94a8b0;
+}
+
+.ll-empty-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.ll-empty p {
+  font-size: 0.95rem;
+  font-style: italic;
+}
+
+/* ── Toast ───────────────────────────────────────────────── */
+.ll-toast {
+  position: fixed;
+  top: 82px;
+  right: 2rem;
+  z-index: 9999;
+  padding: 1rem 1.75rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  animation: llFadeIn 0.3s ease-out;
+  max-width: 400px;
+}
+
+.ll-toast--success {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+.ll-toast--error {
+  background: #fff0f0;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .lecture-filter-row {
+  .lecturelist-main {
+    padding: 1.5rem 1rem;
+  }
+
+  .ll-filter-row {
     flex-direction: column;
     align-items: stretch;
-    gap: 1.5rem;
   }
-  .lecture-filter-row select {
-    width: 100%;
-  }
+
+  .ll-filter-group { flex-direction: column; align-items: flex-start; }
+  .ll-filter-select { max-width: 100%; width: 100%; }
+  .ll-view-btn, .ll-refresh-btn { width: 100%; justify-content: center; }
 }

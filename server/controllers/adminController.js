@@ -198,3 +198,37 @@ exports.deleteRegisteredStudentById = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
+
+// @desc    Get all registered lecturers, optionally filtered by department
+// @route   GET /api/admin/lecturers/registered?department=xxx
+// @access  Private (Admin Only)
+exports.getRegisteredLecturers = async (req, res) => {
+    try {
+        const filter = { role: 'lecturer' };
+        if (req.query.department) {
+            filter.department = req.query.department;
+        }
+        const lecturers = await User.find(filter).select('-password').sort({ createdAt: -1 });
+        res.status(200).json({ success: true, data: lecturers });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// @desc    Delete a registered lecturer user by id
+// @route   DELETE /api/admin/lecturers/registered/:id
+// @access  Private (Admin Only)
+exports.deleteRegisteredLecturerById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await User.findOneAndDelete({ _id: id, role: 'lecturer' });
+        if (!result) {
+            return res.status(404).json({ message: 'Lecturer not found' });
+        }
+        res.status(200).json({ success: true, message: 'Lecturer deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};

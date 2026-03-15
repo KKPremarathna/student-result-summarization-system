@@ -138,8 +138,8 @@ function AddLecture() {
                 {loading ? "Adding..." : "Add"}
               </button>
 
-              <Link to="/lecturelist" className="view-btn">
-                View lecture List
+              <Link to="/LectureList" className="view-btn">
+                View Lecture List
               </Link>
             </div>
           </div>

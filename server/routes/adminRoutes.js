@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { addAllowedEmail, addBulkAllowedEmails, addLecturerEmail, getStudentAllowedEmails, deleteAllowedEmailById, getRegisteredStudents, deleteRegisteredStudentById } = require('../controllers/adminController');
+const { addAllowedEmail, addBulkAllowedEmails, addLecturerEmail, getStudentAllowedEmails, deleteAllowedEmailById, getRegisteredStudents, deleteRegisteredStudentById, getRegisteredLecturers, deleteRegisteredLecturerById } = require('../controllers/adminController');
 const { deleteAllowedEmail, deleteBulkAllowedEmails, deleteLecturerEmail } = require('../controllers/adminDeleteController');
 const { addBatchResults, updateResult, deleteResult, deleteSubjectResults } = require('../controllers/adminResultController');
 const authMiddleware = require('../middleware/authMiddleware');
@@ -25,5 +25,9 @@ router.get('/students/allowed', getStudentAllowedEmails);
 router.delete('/students/allowed/:id', deleteAllowedEmailById);
 router.get('/students/registered', getRegisteredStudents);
 router.delete('/students/registered/:id', deleteRegisteredStudentById);
+
+// Lecturer list management routes
+router.get('/lecturers/registered', getRegisteredLecturers);
+router.delete('/lecturers/registered/:id', deleteRegisteredLecturerById);
 
 module.exports = router;

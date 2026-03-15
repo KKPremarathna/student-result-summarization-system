@@ -36,7 +36,9 @@ function Signin() {
         setTimeout(() => {
           if (user.role === "admin") {
             navigate("/AdminHome");
-          } else if (user.role === "student" || user.role === "lecturer") {
+          } else if (user.role === "lecturer") {
+            navigate("/lecturer/home");
+          } else if (user.role === "student") {
             navigate("/home");
           } else {
             navigate("/"); // Default fallback
