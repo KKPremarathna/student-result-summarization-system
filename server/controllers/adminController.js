@@ -1,25 +1,4 @@
 const AllowedEmail = require('../models/AllowedEmail');
-<<<<<<< HEAD
-
-// @desc    Add an email to the allowed list
-// @route   POST /api/admin/allowed-emails
-// @access  Private (Admin Only - simplified for now)
-exports.addAllowedEmail = async (req, res) => {
-    const { email, role } = req.body;
-
-    try {
-        const existing = await AllowedEmail.findOne({ email });
-        if (existing) {
-            return res.status(400).json({ message: 'Email already in allowed list.' });
-        }
-
-        const allowedEmail = await AllowedEmail.create({ email, role });
-        res.status(201).json({ success: true, data: allowedEmail });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
-    }
-};
 
 // @desc    Get all allowed emails
 // @route   GET /api/admin/allowed-emails
@@ -33,7 +12,6 @@ exports.getAllowedEmails = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
-=======
 const { convertRegNumToEmail, generateEmailsFromRange, isValidEmail } = require('../utils/regUtils');
 
 // Add a single allowed email from reg num
@@ -158,4 +136,4 @@ exports.addLecturerEmail = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
->>>>>>> 07dcee7de1b47abd0fcfd5c2663bc3556d6ba2df
+

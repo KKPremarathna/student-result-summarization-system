@@ -25,7 +25,7 @@ function Signin() {
 
       if (response.data.success) {
         const { token, user } = response.data;
-        
+
         // Store session info
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));

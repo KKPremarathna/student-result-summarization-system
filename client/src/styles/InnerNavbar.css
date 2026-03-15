@@ -1,11 +1,12 @@
 .inner-navbar {
   width: 100%;
-  background: var(--bg-dark); /* Dark background like the image */
+  background: var(--bg-dark);
+  /* Dark background like the image */
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1.25rem 5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
   z-index: 1000;
   position: sticky;
   top: 0;
@@ -32,22 +33,23 @@
   letter-spacing: -1px;
 }
 
-.inner-navbar__links {
+.home-navbar__links {
   display: flex;
   gap: 3rem;
   align-items: center;
 }
 
-.inner-navbar__links a {
+.home-navbar__links a {
   text-decoration: none;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: white; /* Match Academet text visibility */
   transition: all var(--transition-fast);
+  text-transform: capitalize;
 }
 
-.inner-navbar__links a:hover {
-  color: white;
+.home-navbar__links a:hover {
+  opacity: 0.8;
   transform: translateY(-1px);
 }
 
@@ -56,7 +58,8 @@
   .inner-navbar {
     padding: 1rem 1.5rem;
   }
-  .inner-navbar__links {
+
+  .home-navbar__links {
     display: none;
   }
 }

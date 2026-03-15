@@ -29,7 +29,7 @@ function Signup() {
     const updatedOtp = [...otp];
     updatedOtp[index] = value;
     setOtp(updatedOtp);
-    
+
     // Auto focus next input
     if (value && index < 5) {
       document.getElementById(`otp-${index + 1}`).focus();
@@ -224,4 +224,4 @@ function Signup() {
   );
 }
 
-export default Signup;
+export default Signup;

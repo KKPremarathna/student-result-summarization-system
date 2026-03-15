@@ -26,22 +26,12 @@ function InnerNavbar() {
         <h1 className="inner-navbar__title">Academet</h1>
       </div>
 
-      <nav className="inner-navbar__links">
+      <nav className="home-navbar__links">
         <Link to="/">Home</Link>
         <Link to="/about">About</Link>
         <Link to="/calendar">Academic Calendar</Link>
-        
-        {token ? (
-          <>
-            <Link to={user?.role === 'admin' ? '/AdminHome' : '/home'}>Dashboard</Link>
-            <button onClick={handleLogout} className="logout-nav-btn">Logout</button>
-          </>
-        ) : (
-          <>
-            <Link to="/SignIn">SignIn</Link>
-            <Link to="/SignUp">SignUp</Link>
-          </>
-        )}
+        <Link to="/SignIn">SignIn</Link>
+        <Link to="/SignUp">SignUp</Link>
       </nav>
     </header>
   );

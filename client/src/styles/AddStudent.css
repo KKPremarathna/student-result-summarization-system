@@ -136,6 +136,28 @@
   color: white;
 }
 
+
+.status-message {
+  padding: 1rem;
+  margin-bottom: 2rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  text-align: center;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.status-message.success {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.status-message.error {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
 @media (max-width: 600px) {
   .addstudent-main-content {
     padding: 2rem 1.5rem;
