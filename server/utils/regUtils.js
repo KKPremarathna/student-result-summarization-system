@@ -6,7 +6,7 @@
 const convertRegNumToEmail = (regNum) => {
     if (!regNum) return null;
 
-    // format: 20XX/E/xxx
+    // format: 20XX/E/XXX
     const regExp = /^20\d{2}\/E\/\d{3}$/;
     if (!regExp.test(regNum)) {
         throw new Error('Invalid registration number format. Expected 20XX/E/xxx (e.g., 2021/E/140)');
@@ -88,6 +88,7 @@ const isValidEmail = (email) => {
 };
 
 const isValidRegNum = (regNum) => {
+    // Strictly enforce 20XX/E/XXX format
     const regExp = /^20\d{2}\/E\/\d{3}$/;
     return regExp.test(regNum);
 };

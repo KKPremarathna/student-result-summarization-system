@@ -1,5 +1,6 @@
 const Subject = require("../models/Subject");
 const IncourseResult = require("../models/IncourseResult");
+const { isValidRegNum } = require("../utils/regUtils");
 
 function avg(arr) {
   if (!arr || arr.length === 0) return 0;
@@ -49,6 +50,10 @@ exports.saveResult = async (req, res) => {
 
     if (!subjectId || !studentENo) {
       return res.status(400).json({ message: "subject and studentENo are required" });
+    }
+
+    if (!isValidRegNum(studentENo)) {
+      return res.status(400).json({ message: "Invalid registration number format. Expected 20XX/E/XXX" });
     }
 
     const subject = await Subject.findOne({ _id: subjectId, createdBy: req.user._id });
@@ -114,12 +119,16 @@ exports.getResults = async (req, res) => {
   }
 };
 
-// GET /api/incourse/by-eno?subject=<subjectId>&studentENo=2022E050
+// GET /api/incourse/by-eno?subject=<subjectId>&studentENo=2022/E/050
 exports.getResultByENo = async (req, res) => {
   try {
     const { subject: subjectId, studentENo } = req.query;
     if (!subjectId || !studentENo) {
       return res.status(400).json({ message: "subject and studentENo are required" });
+    }
+
+    if (!isValidRegNum(studentENo)) {
+      return res.status(400).json({ message: "Invalid registration number format. Expected 20XX/E/XXX" });
     }
 
     const subject = await Subject.findOne({ _id: subjectId, createdBy: req.user._id });
