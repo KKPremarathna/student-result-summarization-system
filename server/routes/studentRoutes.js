@@ -14,7 +14,7 @@ router.use(authMiddleware);
 router.use(requireRole('student'));
 
 router.get('/incourse/subjects', getMyIncourseSubjects);
-router.get('/incourse/marks/:subjectId', getMyIncourseMarks);
+router.get('/incourse/marks/:courseCode', getMyIncourseMarks);
 router.post('/complaints', submitComplaint);
 
 module.exports = router;

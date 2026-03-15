@@ -30,12 +30,12 @@ exports.getMyIncourseSubjects = async (req, res) => {
     }
 };
 
-// @desc    Get specific incourse marks for the selected subject
-// @route   GET /api/student/incourse/marks/:subjectId
+// @desc    Get all incourse marks for a specific course code (including repeats)
+// @route   GET /api/student/incourse/marks/:courseCode
 // @access  Private (Student)
 exports.getMyIncourseMarks = async (req, res) => {
     try {
-        const { subjectId } = req.params;
+        const { courseCode } = req.params;
 
         let studentENo;
         try {
@@ -44,16 +44,26 @@ exports.getMyIncourseMarks = async (req, res) => {
             return res.status(400).json({ message: 'User email is not a valid student email pattern.' });
         }
 
-        const result = await IncourseResult.findOne({ 
-            subject: subjectId, 
-            studentENo: studentENo.toUpperCase() 
-        }).populate('subject', 'courseCode courseName assessments');
-
-        if (!result) {
-            return res.status(404).json({ message: 'No marks found for this subject.' });
+        // 1. Find all subjects with this course code
+        const subjects = await Subject.find({ courseCode: courseCode.toUpperCase() });
+        
+        if (!subjects || subjects.length === 0) {
+            return res.status(404).json({ message: 'No subjects found with this course code.' });
         }
 
-        res.status(200).json({ success: true, data: result });
+        const subjectIds = subjects.map(s => s._id);
+
+        // 2. Find all results for this student in those subjects
+        const results = await IncourseResult.find({ 
+            subject: { $in: subjectIds }, 
+            studentENo: studentENo.toUpperCase() 
+        }).populate('subject', 'courseCode courseName batch credits assessments');
+
+        if (!results || results.length === 0) {
+            return res.status(404).json({ message: 'No marks found for this course.' });
+        }
+
+        res.status(200).json({ success: true, count: results.length, data: results });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
