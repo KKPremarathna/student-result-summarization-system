@@ -18,6 +18,7 @@ function AddIncourse() {
   const [batch, setBatch] = useState("");
   const [eNumber, setENumber] = useState("");
   const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const [structure, setStructure] = useState({
     assignments: 3,
@@ -33,19 +34,72 @@ function AddIncourse() {
       .catch(() => console.warn("Backend not connected, using default structure"));
   }, []);
 
-  const defaultRows = [...Array(5)].map((_, idx) => ({
-    eNumber: `E00${idx + 1}`,
+  // Fetch results when filters change
+  useEffect(() => {
+    if (course && batch) {
+      setLoading(true);
+      axios.get(`${API}/marks`, { params: { course, batch, eNumber } })
+        .then(res => {
+          if (res.data && res.data.length > 0) {
+            setResults(res.data);
+          } else {
+            // If no data found, provide some default empty rows
+            setResults(generateDefaultRows());
+          }
+        })
+        .catch(() => {
+          console.warn("Error fetching data, using default rows");
+          setResults(generateDefaultRows());
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [course, batch, eNumber]);
+
+  const generateDefaultRows = () => [...Array(5)].map(() => ({
+    eNumber: "",
     assignments: Array(structure.assignments).fill(""),
     quizzes: Array(structure.quizzes).fill(""),
     labs: Array(structure.labs).fill(""),
     mid: "",
-    incourse: "",
-    endMarks: "",
-    beforeSenate: "Pending",
-    afterSenate: "Pending"
+    incourse: ""
   }));
 
-  const tableRows = results.length > 0 ? results : defaultRows;
+  const handleAddRow = () => {
+    const newRow = {
+      eNumber: "",
+      assignments: Array(structure.assignments).fill(""),
+      quizzes: Array(structure.quizzes).fill(""),
+      labs: Array(structure.labs).fill(""),
+      mid: "",
+      incourse: ""
+    };
+    setResults([...results, newRow]);
+  };
+
+  const handleInputChange = (index, field, value, subIndex = null) => {
+    const newResults = [...results];
+    if (subIndex !== null) {
+      newResults[index][field][subIndex] = value;
+    } else {
+      newResults[index][field] = value;
+    }
+
+    // Optional: Calculate total incourse marks if logic exists
+    // For now, it's just a manual entry or display
+    setResults(newResults);
+  };
+
+  const handleSave = () => {
+    if (!course || !batch) {
+      alert("Please select Course and Batch first!");
+      return;
+    }
+    setLoading(true);
+    axios.post(`${API}/marks/save`, { course, batch, results })
+      .then(() => alert("Marks saved successfully!"))
+      .catch(err => alert("Error saving marks: " + err.message))
+      .finally(() => setLoading(false));
+  };
 
   return (
     <LecturerLayout>
@@ -66,9 +120,9 @@ function AddIncourse() {
             </h2>
           </div>
 
-          <button className="aic-save-btn">
+          <button className="aic-save-btn" onClick={handleSave} disabled={loading}>
             <Save size={20} />
-            Save Changes
+            {loading ? "Saving..." : "Save Changes"}
           </button>
         </div>
 
@@ -89,9 +143,10 @@ function AddIncourse() {
               </label>
               <select
                 onChange={(e) => setCourse(e.target.value)}
+                value={course}
                 className="aic-select"
               >
-                <option>Select Course</option>
+                <option value="">Select Course</option>
                 <option>EC9630</option>
                 <option>EC6060</option>
               </select>
@@ -104,9 +159,10 @@ function AddIncourse() {
               </label>
               <select
                 onChange={(e) => setBatch(e.target.value)}
+                value={batch}
                 className="aic-select"
               >
-                <option>Select Batch</option>
+                <option value="">Select Batch</option>
                 <option>2021</option>
                 <option>2022</option>
               </select>
@@ -119,9 +175,10 @@ function AddIncourse() {
               </label>
               <select
                 onChange={(e) => setENumber(e.target.value)}
+                value={eNumber}
                 className="aic-select"
               >
-                <option>Select E.No</option>
+                <option value="">Select E.No</option>
                 <option>E001</option>
                 <option>E002</option>
               </select>
@@ -140,29 +197,34 @@ function AddIncourse() {
                   <th colSpan={structure.quizzes} className="aic-th aic-th--border-r aic-th--border-b">Quizzes</th>
                   <th colSpan={structure.labs} className="aic-th aic-th--border-r aic-th--border-b">Labs</th>
                   <th rowSpan="2" className="aic-th aic-th--border-r">Mid</th>
-                  <th rowSpan="2" className="aic-th aic-th--border-r">Incr.</th>
-                  <th rowSpan="2" className="aic-th aic-th--border-r">End</th>
-                  <th colSpan="2" className="aic-th aic-th--border-b">Senate Status</th>
+                  <th rowSpan="2" className="aic-th">Total incourse marks</th>
                 </tr>
                 <tr className="aic-thead-secondary">
                   {[...Array(structure.assignments)].map((_, i) => <th key={i} className="aic-th-sm aic-th--border-r">A{i + 1}</th>)}
                   {[...Array(structure.quizzes)].map((_, i) => <th key={i} className="aic-th-sm aic-th--border-r">Q{i + 1}</th>)}
                   {[...Array(structure.labs)].map((_, i) => <th key={i} className="aic-th-sm aic-th--border-r">L{i + 1}</th>)}
-                  <th className="aic-th-sm aic-th--border-r">Before</th>
-                  <th className="aic-th-sm">After</th>
                 </tr>
               </thead>
 
               <tbody className="aic-tbody">
-                {tableRows.map((r, index) => (
+                {results.map((r, index) => (
                   <tr key={index} className="aic-row">
-                    <td className="aic-td aic-td--enumber">{r.eNumber}</td>
+                    <td className="aic-td aic-td--enumber">
+                      <input
+                        type="text"
+                        value={r.eNumber}
+                        onChange={(e) => handleInputChange(index, "eNumber", e.target.value)}
+                        placeholder="E.No"
+                        className="aic-cell-input"
+                      />
+                    </td>
 
                     {r.assignments.map((a, i) => (
                       <td key={i} className="aic-td aic-td--border-r">
                         <input
                           type="number"
-                          defaultValue={a}
+                          value={a}
+                          onChange={(e) => handleInputChange(index, "assignments", e.target.value, i)}
                           placeholder="-"
                           className="aic-cell-input"
                         />
@@ -173,7 +235,8 @@ function AddIncourse() {
                       <td key={i} className="aic-td aic-td--border-r">
                         <input
                           type="number"
-                          defaultValue={q}
+                          value={q}
+                          onChange={(e) => handleInputChange(index, "quizzes", e.target.value, i)}
                           placeholder="-"
                           className="aic-cell-input"
                         />
@@ -184,7 +247,8 @@ function AddIncourse() {
                       <td key={i} className="aic-td aic-td--border-r">
                         <input
                           type="number"
-                          defaultValue={l}
+                          value={l}
+                          onChange={(e) => handleInputChange(index, "labs", e.target.value, i)}
                           placeholder="-"
                           className="aic-cell-input"
                         />
@@ -194,33 +258,31 @@ function AddIncourse() {
                     <td className="aic-td aic-td--border-r">
                       <input
                         type="number"
-                        defaultValue={r.mid}
+                        value={r.mid}
+                        onChange={(e) => handleInputChange(index, "mid", e.target.value)}
                         placeholder="-"
                         className="aic-cell-input aic-cell-input--mid"
                       />
                     </td>
 
-                    <td className="aic-td aic-td--incourse">{r.incourse}</td>
-
-                    <td className="aic-td aic-td--border-r">
+                    <td className="aic-td aic-td--incourse">
                       <input
                         type="number"
-                        defaultValue={r.endMarks}
+                        value={r.incourse}
+                        onChange={(e) => handleInputChange(index, "incourse", e.target.value)}
                         placeholder="-"
-                        className="aic-cell-input aic-cell-input--end"
+                        className="aic-cell-input"
                       />
-                    </td>
-
-                    <td className="aic-td aic-td--center">
-                      <span className="aic-status">{r.beforeSenate}</span>
-                    </td>
-                    <td className="aic-td aic-td--center">
-                      <span className="aic-status">{r.afterSenate}</span>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+          <div className="aic-table-footer">
+            <button className="aic-add-row-btn" onClick={handleAddRow}>
+              + Add Student Row
+            </button>
           </div>
         </div>
 
@@ -235,7 +297,7 @@ function AddIncourse() {
               <p className="aic-footer__text">All marks strictly validated against course structure</p>
             </div>
           </div>
-          <button className="aic-finalize-btn">
+          <button className="aic-finalize-btn" onClick={handleSave}>
             Finalize Marks
           </button>
         </div>

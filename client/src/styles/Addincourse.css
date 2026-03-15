@@ -360,3 +360,30 @@
 .aic-finalize-btn:active {
   transform: scale(0.96);
 }
+
+/* ── Table Footer ─────────────────────────────── */
+.aic-table-footer {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: center;
+  background: rgba(184, 227, 233, 0.05);
+  border-top: 1px solid rgba(184, 227, 233, 0.3);
+}
+
+.aic-add-row-btn {
+  background: transparent;
+  color: #0B2E33;
+  border: 2px dashed #4F7C82;
+  padding: 0.75rem 2rem;
+  border-radius: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+}
+
+.aic-add-row-btn:hover {
+  background: rgba(79, 124, 130, 0.1);
+  border-style: solid;
+  transform: translateY(-2px);
+}
