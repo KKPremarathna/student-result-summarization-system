@@ -1,0 +1,207 @@
+/* AddSubject.css */
+
+/* ── Page wrapper ─────────────────────────────── */
+.as-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding-bottom: 2.5rem;
+}
+
+/* ── Breadcrumb ───────────────────────────────── */
+.as-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #4F7C82;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.as-breadcrumb__current {
+  color: #0B2E33;
+}
+
+/* ── Page title ───────────────────────────────── */
+.as-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.as-title {
+  font-size: 2.25rem;
+  font-weight: 900;
+  color: #0B2E33;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.as-title__icon {
+  color: #4F7C82;
+}
+
+/* ── Form ─────────────────────────────────────── */
+.as-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ── Card ─────────────────────────────────────── */
+.as-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid white;
+  border-radius: 2.5rem;
+  padding: 2.5rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+}
+
+.as-card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.as-card__icon-wrap {
+  padding: 0.75rem;
+  background: rgba(184, 227, 233, 0.3);
+  border-radius: 1rem;
+  color: #0B2E33;
+}
+
+.as-card__title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #0B2E33;
+  margin: 0;
+}
+
+/* ── Grids ────────────────────────────────────── */
+.as-grid {
+  display: grid;
+  gap: 2rem;
+}
+
+.as-grid--2col {
+  grid-template-columns: 1fr 1fr;
+}
+
+.as-grid--3col {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.as-grid--5col {
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.5rem;
+}
+
+/* ── Field ────────────────────────────────────── */
+.as-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.as-field--full {
+  grid-column: 1 / -1;
+}
+
+/* ── Labels ───────────────────────────────────── */
+.as-label {
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: #4F7C82;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding-left: 0.25rem;
+}
+
+.as-label--small {
+  font-size: 0.625rem;
+}
+
+/* ── Inputs ───────────────────────────────────── */
+.as-input {
+  width: 100%;
+  background: rgba(184, 227, 233, 0.1);
+  border: 2px solid transparent;
+  border-radius: 1rem;
+  padding: 1rem 1.5rem;
+  color: #0B2E33;
+  font-weight: 700;
+  font-size: 1rem;
+  outline: none;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.2s, background 0.2s;
+  box-sizing: border-box;
+}
+
+.as-input:focus {
+  border-color: #4F7C82;
+  background: white;
+}
+
+/* ── Percent field ────────────────────────────── */
+.as-percent-wrap {
+  position: relative;
+}
+
+.as-input--percent {
+  padding-right: 2.5rem;
+}
+
+.as-percent-symbol {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #4F7C82;
+  font-weight: 900;
+  font-size: 0.75rem;
+}
+
+/* ── Submit row ───────────────────────────────── */
+.as-submit-row {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 1rem;
+}
+
+.as-submit-btn {
+  background: #0B2E33;
+  color: white;
+  padding: 1.25rem 3rem;
+  border-radius: 2rem;
+  font-weight: 900;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.as-submit-btn:hover {
+  background: #1a454c;
+  transform: translateY(-2px);
+}
+
+/* ── Responsive ───────────────────────────────── */
+@media (max-width: 768px) {
+  .as-grid--2col,
+  .as-grid--3col,
+  .as-grid--5col {
+    grid-template-columns: 1fr;
+  }
+}

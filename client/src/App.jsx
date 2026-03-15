@@ -13,6 +13,15 @@ import Results from "./pages/AdminResults";
 import ResetPassword from "./pages/AdminResetpassword";
 import Setting from "./pages/Setting";
 
+//lecture pages
+import LecturerHome from "./pages/LecturerHome.jsx";
+import ViewResult from "./pages/ViewResult.jsx";
+import AddSubject from "./pages/AddSubject.jsx";
+import AddIncourse from "./pages/Addincourse.jsx";
+import PendingResult from "./pages/PendingResult.jsx";
+import FinalResult from "./pages/FinalResult.jsx";
+import LectureSetting from "./pages/LecturerSetting.jsx";
+
 function App() {
   return (
     <BrowserRouter>
@@ -30,6 +39,16 @@ function App() {
         <Route path="/AdminResults" element={<Results />} />
         <Route path="/adminresetpassword" element={<ResetPassword />} />
         <Route path="/setting" element={<Setting />} />
+
+        {/* Lecturer Routes */}
+        <Route path="/lecturer/home" element={<LecturerHome />} />
+        <Route path="/lecturer/results" element={<ViewResult />} />
+        <Route path="/lecturer/addsubject" element={< AddSubject />} />
+        <Route path="/lecturer/addincourse" element={< AddIncourse />} />
+        <Route path="/lecturer/pending" element={< PendingResult />} />
+        <Route path="/lecturer/final" element={< FinalResult />} />
+        <Route path="/lecturer/setting" element={< LectureSetting />} />
+
       </Routes>
     </BrowserRouter>
   );

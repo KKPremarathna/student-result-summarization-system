@@ -1,0 +1,32 @@
+/* LecturerLayout.css */
+
+.lecturer-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.lecturer-layout__body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.lecturer-layout__content {
+  flex: 1;
+  position: relative;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(3, 32, 19, 0.7);
+}
+
+.lecturer-layout__inner {
+  position: relative;
+  z-index: 1;
+  padding: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  flex: 1;
+}
