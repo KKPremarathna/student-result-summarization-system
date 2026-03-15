@@ -1,11 +1,57 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import InnerNavbar from "../components/InnerNavbar";
-import signinImage from "../assets/images/signup-image.png";
+import axios from "axios";
 import "../styles/signIn.css";
 
 function Signin() {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ type: "", text: "" });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage({ type: "", text: "" });
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/auth/login", {
+        email,
+        password,
+      });
+
+      if (response.data.success) {
+        const { token, user } = response.data;
+        
+        // Store session info
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+
+        setMessage({ type: "success", text: "Login successful! Redirecting..." });
+
+        // Role-based redirection
+        setTimeout(() => {
+          if (user.role === "admin") {
+            navigate("/AdminHome");
+          } else if (user.role === "student" || user.role === "lecturer") {
+            navigate("/home");
+          } else {
+            navigate("/"); // Default fallback
+          }
+        }, 1500);
+      }
+    } catch (error) {
+      setMessage({
+        type: "error",
+        text: error.response?.data?.message || "Invalid email or password.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="signin-page">
@@ -18,9 +64,21 @@ function Signin() {
             <p className="signin-subtitle">Enter your credentials to continue</p>
           </div>
 
-          <form className="signin-form">
+          {message.text && (
+            <div className={`message-alert ${message.type}`}>
+              {message.text}
+            </div>
+          )}
+
+          <form className="signin-form" onSubmit={handleSubmit}>
             <div className="form-group">
-              <input type="email" placeholder="Email" />
+              <input
+                type="email"
+                placeholder="Email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
 
             <div className="form-group">
@@ -28,6 +86,9 @@ function Signin() {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
                 <span
                   className="eye-icon"
@@ -44,8 +105,8 @@ function Signin() {
               </Link>
             </div>
 
-            <button type="submit" className="signin-btn">
-              Sign In
+            <button type="submit" className="signin-btn" disabled={loading}>
+              {loading ? "Signing In..." : "Sign In"}
             </button>
 
             <p className="signup-text">
@@ -57,7 +118,6 @@ function Signin() {
           </form>
         </div>
       </main>
-
     </div>
   );
 }

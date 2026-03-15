@@ -26,11 +26,15 @@ mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
     console.log("MongoDB Connected Successfully");
+    console.log("Connected DB:", mongoose.connection.name);
+    console.log("Connected Host:", mongoose.connection.host);
   })
   .catch((err) => {
     console.error("MongoDB Connection Error:");
     console.error(err.message);
   });
+
+console.log("Connected DB:", mongoose.connection.name);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port: ${PORT}`);

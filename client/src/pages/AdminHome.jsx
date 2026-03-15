@@ -5,6 +5,8 @@ import bgImage from "../assets/images/admin.jpg";
 import { Link } from "react-router-dom";
 
 function AdminHome() {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
   return (
     <div className="admin-page">
       <Navbar/>
@@ -55,8 +57,8 @@ function AdminHome() {
                 <div className="profile-avatar">👤</div>
                 <div className="welcome-text">
                   <h1>Welcome back,</h1>
-                  <h2>Mrs K.B Ranathunga</h2>
-                  <p className="admin-email">admin@academet.com</p>
+                  <h2>{user.firstName} {user.lastName}</h2>
+                  <p className="admin-email">{user.email}</p>
                 </div>
               </div>
               <div className="welcome-badge">Systems Administrator</div>
@@ -97,7 +99,7 @@ function AdminHome() {
 
               <div className="stat-card">
                 <div className="stat-header">
-                  <h3>Complaints</h3>
+                  <h3>Total Complaints</h3>
                   <span className="stat-icon">⚠️</span>
                 </div>
                 <p>06</p>
@@ -118,4 +120,4 @@ function AdminHome() {
   );
 }
 
-export default AdminHome;
+export default AdminHome;

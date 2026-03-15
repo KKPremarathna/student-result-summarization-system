@@ -65,23 +65,26 @@ exports.signup = async (req, res) => {
     const { firstName, lastName, email, phone, dob, password, otp } = req.body;
 
     try {
-        // 1. Verify OTP
+        console.log("Signup body:", req.body);
+
         const validOTP = await OTP.findOne({ email, otp });
+        console.log("validOTP:", validOTP);
+
         if (!validOTP) {
             return res.status(400).json({ message: 'Invalid or expired OTP.' });
         }
 
-        // 2. Check allowed email again (security best practice) & get role
         const allowedEmail = await AllowedEmail.findOne({ email });
+        console.log("allowedEmail:", allowedEmail);
+
         if (!allowedEmail) {
             return res.status(403).json({ message: 'Email not allowed.' });
         }
 
-        // 3. Hash Password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
+        console.log("hashedPassword created");
 
-        // 4. Create User
         const user = await User.create({
             firstName,
             lastName,
@@ -92,20 +95,18 @@ exports.signup = async (req, res) => {
             role: allowedEmail.role
         });
 
-        // 5. Delete OTP
+        console.log("user created:", user);
+
         await OTP.deleteOne({ email });
+        console.log("otp deleted");
 
         res.status(201).json({ success: true, data: user });
 
     } catch (error) {
-        if (error.code === 11000) {
-            return res.status(400).json({ message: 'Email already exists.' });
-        }
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
+        console.error("SIGNUP ERROR FULL:", error);
+        res.status(500).json({ message: 'Server Error', error: error.message });
     }
 };
-
 // @desc    Login a user
 // @route   POST /api/auth/login
 // @access  Public
