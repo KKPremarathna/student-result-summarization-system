@@ -12,6 +12,16 @@ import LectureList from "./pages/LectureList";
 import Complaint from "./pages/AdminComplaint";
 import Results from "./pages/AdminResults";
 import ResetPassword from "./pages/AdminResetpassword";
+import Setting from "./pages/Setting";
+
+//lecture pages
+import LecturerHome from "./pages/LecturerHome.jsx";
+import ViewResult from "./pages/ViewResult.jsx";
+import AddSubject from "./pages/AddSubject.jsx";
+import AddIncourse from "./pages/Addincourse.jsx";
+import PendingResult from "./pages/PendingResult.jsx";
+import FinalResult from "./pages/FinalResult.jsx";
+import LectureSetting from "./pages/LecturerSetting.jsx";
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const token = localStorage.getItem("token");
@@ -33,6 +43,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+<<<<<<< HEAD
         <Route path="/SignUp" element={<SignUp />} />
         <Route path="/SignIn" element={<SignIn />} />
         
@@ -73,6 +84,30 @@ function App() {
           path="/AdminResetPassword" 
           element={<ProtectedRoute allowedRoles={['admin']}><ResetPassword /></ProtectedRoute>} 
         />
+=======
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/adminhome" element={<AdminHome />} />
+        <Route path="/adduser" element={<AddUser />} />
+        <Route path="/addstudent" element={<AddStudent />} />
+        <Route path="/studentlist" element={<StudentList />} />
+        <Route path="/addlecture" element={<AddLecture />} />
+        <Route path="/lecturelist" element={<LectureList />} />
+        <Route path="/AdminComplaint" element={<Complaint />} />
+        <Route path="/AdminResults" element={<Results />} />
+        <Route path="/adminresetpassword" element={<ResetPassword />} />
+        <Route path="/setting" element={<Setting />} />
+
+        {/* Lecturer Routes */}
+        <Route path="/lecturer/home" element={<LecturerHome />} />
+        <Route path="/lecturer/results" element={<ViewResult />} />
+        <Route path="/lecturer/addsubject" element={< AddSubject />} />
+        <Route path="/lecturer/addincourse" element={< AddIncourse />} />
+        <Route path="/lecturer/pending" element={< PendingResult />} />
+        <Route path="/lecturer/final" element={< FinalResult />} />
+        <Route path="/lecturer/setting" element={< LectureSetting />} />
+
+>>>>>>> 07dcee7de1b47abd0fcfd5c2663bc3556d6ba2df
       </Routes>
     </BrowserRouter>
   );

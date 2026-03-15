@@ -14,6 +14,10 @@ const otpSchema = new mongoose.Schema({
         default: Date.now,
         expires: 600, // 10 minutes
     },
+    isVerified: {
+        type: Boolean,
+        default: false
+    }
 });
 
 module.exports = mongoose.model('OTP', otpSchema);

@@ -1,0 +1,293 @@
+/* ViewResult.css */
+
+/* ── Page ─────────────────────────────────────── */
+.vr-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding-bottom: 2.5rem;
+}
+
+/* ── Header ───────────────────────────────────── */
+.vr-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+@media (min-width: 768px) {
+  .vr-header {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.vr-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #4F7C82;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.vr-breadcrumb__current {
+  color: #0B2E33;
+}
+
+.vr-title {
+  font-size: 2.25rem;
+  font-weight: 900;
+  color: #0B2E33;
+  margin: 0;
+}
+
+.vr-export-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #0B2E33;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 1rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  transition: background 0.2s, transform 0.2s;
+  white-space: nowrap;
+}
+
+.vr-export-btn:hover {
+  background: #1a454c;
+  transform: translateY(-2px);
+}
+
+/* ── Card ─────────────────────────────────────── */
+.vr-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid white;
+  border-radius: 2.5rem;
+  padding: 2rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+}
+
+.vr-card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.vr-card__icon-wrap {
+  padding: 0.5rem;
+  background: rgba(184, 227, 233, 0.3);
+  border-radius: 0.5rem;
+  color: #0B2E33;
+}
+
+.vr-card__title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0B2E33;
+  margin: 0;
+}
+
+/* ── Filters ──────────────────────────────────── */
+.vr-filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  align-items: end;
+}
+
+@media (min-width: 768px) {
+  .vr-filters {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.vr-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.vr-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: #4F7C82;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.vr-select {
+  width: 100%;
+  background: rgba(184, 227, 233, 0.1);
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: #0B2E33;
+  font-weight: 700;
+  font-size: 1rem;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+.vr-select:focus {
+  box-shadow: 0 0 0 2px #4F7C82;
+}
+
+.vr-filter-btn {
+  background: #4F7C82;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: background 0.2s;
+}
+
+.vr-filter-btn:hover {
+  background: #3d646a;
+}
+
+/* ── Table Card ───────────────────────────────── */
+.vr-table-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid white;
+  border-radius: 2.5rem;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+}
+
+.vr-table-scroll {
+  overflow-x: auto;
+}
+
+.vr-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* ── Table head ───────────────────────────────── */
+.vr-thead-primary {
+  background: #0B2E33;
+  color: white;
+}
+
+.vr-thead-secondary {
+  background: #1a454c;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.vr-th {
+  padding: 1.5rem 1rem;
+  font-weight: 800;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.vr-th--border-r {
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.vr-th--border-b {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.vr-th-sm {
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* ── Table body ───────────────────────────────── */
+.vr-tbody tr + tr {
+  border-top: 1px solid rgba(184, 227, 233, 0.3);
+}
+
+.vr-row {
+  transition: background 0.2s;
+}
+
+.vr-row:hover {
+  background: rgba(184, 227, 233, 0.1);
+}
+
+.vr-td {
+  padding: 1rem;
+  text-align: center;
+}
+
+.vr-td--enumber {
+  color: #0B2E33;
+  font-weight: 900;
+}
+
+.vr-row:hover .vr-td--enumber {
+  background: rgba(184, 227, 233, 0.2);
+}
+
+.vr-td--data {
+  color: #4F7C82;
+  font-weight: 500;
+}
+
+.vr-td--mid {
+  color: #0B2E33;
+  font-weight: 700;
+}
+
+.vr-td--incourse {
+  color: #0B2E33;
+  font-weight: 700;
+  background: rgba(184, 227, 233, 0.05);
+}
+
+.vr-td--center {
+  text-align: center;
+}
+
+/* ── Status badges ────────────────────────────── */
+.vr-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.625rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.vr-badge--pending {
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+.vr-badge--done {
+  background: #dcfce7;
+  color: #16a34a;
+}
