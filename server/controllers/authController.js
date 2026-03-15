@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken');
 // @desc    Request OTP for Signup
 // @route   POST /api/auth/request-otp
 // @access  Public
-exports.requestOTP = async (req, res) => {
+exports.requestOTP = async(req, res) => {
     const { email } = req.body;
 
     try {
@@ -29,11 +29,7 @@ exports.requestOTP = async (req, res) => {
         const otpIndex = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digit OTP
 
         // 4. Save OTP to DB (upsert to replace existing OTP for same email)
-        await OTP.findOneAndUpdate(
-            { email },
-            { otp: otpIndex },
-            { upsert: true, new: true, setDefaultsOnInsert: true }
-        );
+        await OTP.findOneAndUpdate({ email }, { otp: otpIndex }, { upsert: true, new: true, setDefaultsOnInsert: true });
 
         // 5. Send OTP via Email
         const message = `Your OTP for registration is: ${otpIndex}. It expires in 5 minutes.`;
@@ -61,7 +57,7 @@ exports.requestOTP = async (req, res) => {
 // @desc    Register a new user
 // @route   POST /api/auth/signup
 // @access  Public
-exports.signup = async (req, res) => {
+exports.signup = async(req, res) => {
     const { firstName, lastName, email, phone, dob, password, otp } = req.body;
 
     try {
@@ -109,7 +105,7 @@ exports.signup = async (req, res) => {
 // @desc    Login a user
 // @route   POST /api/auth/login
 // @access  Public
-exports.login = async (req, res) => {
+exports.login = async(req, res) => {
     const { email, password } = req.body;
 
     try {
@@ -126,10 +122,8 @@ exports.login = async (req, res) => {
         }
 
         // 3. Generate JWT
-        const token = jwt.sign(
-            { id: user._id, role: user.role },
-            process.env.JWT_SECRET,
-            { expiresIn: '1d' }
+        const token = jwt.sign({ id: user._id, role: user.role },
+            process.env.JWT_SECRET, { expiresIn: '1d' }
         );
 
         res.status(200).json({
@@ -153,7 +147,7 @@ exports.login = async (req, res) => {
 // @desc    Forgot Password (Send OTP)
 // @route   POST /api/auth/forgot-password
 // @access  Public
-exports.forgotPassword = async (req, res) => {
+exports.forgotPassword = async(req, res) => {
     const { email } = req.body;
 
     try {
@@ -167,9 +161,7 @@ exports.forgotPassword = async (req, res) => {
         const otpIndex = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digit OTP
 
         // 3. Save OTP to DB
-        await OTP.findOneAndUpdate(
-            { email },
-            { otp: otpIndex, isVerified: false }, // Reset isVerified on new request
+        await OTP.findOneAndUpdate({ email }, { otp: otpIndex, isVerified: false }, // Reset isVerified on new request
             { upsert: true, new: true, setDefaultsOnInsert: true }
         );
 
@@ -198,7 +190,7 @@ exports.forgotPassword = async (req, res) => {
 // @desc    Verify Reset OTP
 // @route   POST /api/auth/verify-reset-otp
 // @access  Public
-exports.verifyResetOTP = async (req, res) => {
+exports.verifyResetOTP = async(req, res) => {
     const { email, otp } = req.body;
 
     try {
@@ -223,7 +215,7 @@ exports.verifyResetOTP = async (req, res) => {
 // @desc    Reset Password using OTP
 // @route   POST /api/auth/reset-password
 // @access  Public
-exports.resetPassword = async (req, res) => {
+exports.resetPassword = async(req, res) => {
     const { email, newPassword } = req.body; // No longer taking OTP from body
 
     try {
@@ -238,14 +230,10 @@ exports.resetPassword = async (req, res) => {
         const hashedPassword = await bcrypt.hash(newPassword, salt);
 
         // 3. Update User Password
-        const updatedUser = await User.findOneAndUpdate(
-            { email },
-            { password: hashedPassword },
-            { new: true } 
-        );
+        const updatedUser = await User.findOneAndUpdate({ email }, { password: hashedPassword }, { new: true });
 
         if (!updatedUser) {
-             return res.status(404).json({ message: 'User not found during password update.' });
+            return res.status(404).json({ message: 'User not found during password update.' });
         }
 
         // 4. Delete the used OTP
@@ -255,6 +243,41 @@ exports.resetPassword = async (req, res) => {
 
     } catch (error) {
         console.error("Reset password error:", error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// @desc    Change password for logged-in user
+// @route   POST /api/auth/change-password
+// @access  Private
+exports.changePassword = async(req, res) => {
+    const { oldPassword, newPassword } = req.body;
+
+    try {
+        if (oldPassword === newPassword) {
+            return res.status(400).json({ message: 'New password cannot be the same as the current password.' });
+        }
+
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Incorrect current password.' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        user.password = hashedPassword;
+        await user.save();
+
+        res.status(200).json({ message: 'Password changed successfully.' });
+
+    } catch (error) {
+        console.error("Change password error:", error);
         res.status(500).json({ message: 'Server Error' });
     }
 };
