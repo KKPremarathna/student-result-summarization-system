@@ -11,7 +11,7 @@ import AddLecture from "./pages/AddLecture";
 import LectureList from "./pages/LectureList";
 import Complaint from "./pages/AdminComplaint";
 import Results from "./pages/AdminResults";
-import ResetPassword from "./pages/AdminResetpassword";
+import AdminProfile from "./pages/AdminProfile";
 import Setting from "./pages/Setting";
 
 //lecture pages
@@ -81,8 +81,8 @@ function App() {
           element={<ProtectedRoute allowedRoles={['admin']}><Results /></ProtectedRoute>}
         />
         <Route
-          path="/AdminResetPassword"
-          element={<ProtectedRoute allowedRoles={['admin']}><ResetPassword /></ProtectedRoute>}
+          path="/AdminProfile"
+          element={<ProtectedRoute allowedRoles={['admin']}><AdminProfile /></ProtectedRoute>}
         />
         <Route
           path="/Setting"

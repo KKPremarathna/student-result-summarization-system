@@ -329,7 +329,7 @@ function Results() {
             <li><Link to="/AddUser"><span className="sidebar-icon">👤</span>Add User</Link></li>
             <li><Link to="/AdminComplaint"><span className="sidebar-icon">📋</span>Complaint</Link></li>
             <li className="active"><Link to="/AdminResults"><span className="sidebar-icon">📊</span>Results</Link></li>
-            <li><Link to="/AdminResetPassword"><span className="sidebar-icon">🔒</span>Reset Password</Link></li>
+            <li><Link to="/AdminProfile"><span className="sidebar-icon">👤</span>Profile</Link></li>
           </ul>
         </aside>
 

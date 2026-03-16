@@ -67,9 +67,9 @@ function Complaint() {
               </Link>
             </li>
             <li>
-              <Link to="/AdminResetPassword">
-                <span className="sidebar-icon">🔒</span>
-                Reset Password
+              <Link to="/AdminProfile">
+                <span className="sidebar-icon">👤</span>
+                Profile
               </Link>
             </li>
           </ul>

@@ -102,7 +102,7 @@ function Signin() {
             </div>
 
             <div className="form-footer">
-              <Link to="/AdminResetPassword">
+              <Link to="#">
                 <span className="forgot-password">Forgot Password ?</span>
               </Link>
             </div>
