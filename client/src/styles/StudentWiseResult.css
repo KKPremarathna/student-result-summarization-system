@@ -1,0 +1,421 @@
+/* StudentWiseResult.css - Winter Chill Theme */
+
+.st-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding-bottom: 3rem;
+}
+
+/* ── Premium Banner ─────────────────────────── */
+.st-banner {
+  background: linear-gradient(135deg, #0B2E33 0%, #4F7C82 100%);
+  border-radius: 2rem;
+  padding: 3rem;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 25px 50px rgba(11, 46, 51, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.st-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(184, 227, 233, 0.15) 0%, transparent 70%);
+  z-index: 1;
+}
+
+.st-banner__content {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.st-banner__avatar {
+  width: 100px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-radius: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
+.st-banner__avatar-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #B8E3E9;
+}
+
+.st-banner__badge {
+  background: rgba(184, 227, 233, 0.2);
+  color: #B8E3E9;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.75rem;
+  display: inline-block;
+  border: 1px solid rgba(184, 227, 233, 0.2);
+}
+
+.st-banner__title {
+  font-size: 2.75rem;
+  font-weight: 900;
+  color: white;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.02em;
+}
+
+.st-banner__meta {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.st-banner__meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #B8E3E9;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.st-banner__meta-divider {
+  width: 1px;
+  height: 1.25rem;
+  background: rgba(184, 227, 233, 0.3);
+}
+
+.st-banner__semester {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+/* ── Semester Picker ──────────────────────────── */
+.st-semester-picker label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.st-select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 200px;
+}
+
+.st-select-icon {
+  position: absolute;
+  left: 1rem;
+  color: #4F7C82;
+  pointer-events: none;
+}
+
+.st-select {
+  width: 100%;
+  padding: 0.65rem 1rem 0.65rem 3rem;
+  background: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0B2E33;
+  appearance: none;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* ── Vertical Flow Layout ────────────────────── */
+.st-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.st-row {
+  width: 100%;
+}
+
+.st-row--top {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 2rem;
+  align-items: stretch;
+}
+
+@media (max-width: 1024px) {
+  .st-row--top {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Side Column Cards ───────────────────────── */
+.st-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid white;
+  border-radius: 1.75rem;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.st-card-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0B2E33;
+  margin: 0 0 1.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.st-metrics {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.st-metric {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 2rem;
+  background: white;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(184, 227, 233, 0.4);
+  transition: all 0.3s ease;
+}
+
+.st-metric:hover {
+  transform: translateX(5px);
+  border-color: #4F7C82;
+}
+
+.st-metric__label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #4F7C82;
+}
+
+.st-metric__value {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #0B2E33;
+}
+
+.st-text--green { color: #2D6A4F !important; }
+.st-text--red { color: #D62828 !important; }
+
+/* ── Grade Distribution ──────────────────────── */
+.st-chart-wrap {
+  margin-top: 0.5rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(184, 227, 233, 0.3);
+}
+
+.st-gpa-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.st-gpa-card {
+  background: #0B2E33;
+  color: white;
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 15px 35px rgba(11, 46, 51, 0.3);
+  flex: 1;
+}
+
+.st-gpa-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.st-gpa-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #B8E3E9;
+  display: block;
+}
+
+.st-gpa-value {
+  font-size: 2.5rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.st-gpa-progress {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.st-gpa-bar {
+  height: 100%;
+  background: linear-gradient(to right, #B8E3E9, #4F7C82);
+  border-radius: 3px;
+}
+
+/* ── Main Column: Table ──────────────────────── */
+.st-table-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.st-table-header {
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.st-table-container {
+  overflow-x: auto;
+}
+
+.st-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.st-table th {
+  background: rgba(184, 227, 233, 0.2);
+  padding: 1.25rem 2rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #4F7C82;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(184, 227, 233, 0.3);
+}
+
+.st-table td {
+  padding: 1.5rem 2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0B2E33;
+  border-bottom: 1px solid rgba(184, 227, 233, 0.2);
+}
+
+.st-table tr:last-child td {
+  border-bottom: none;
+}
+
+.st-font-mono { font-family: monospace; font-weight: 700; }
+
+.st-grade-badge {
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.st-grade--A { background: rgba(45, 106, 79, 0.1); color: #2D6A4F; }
+.st-grade--B { background: rgba(33, 158, 188, 0.1); color: #219EBC; }
+.st-grade--C { background: rgba(255, 183, 3, 0.1); color: #FFB703; }
+.st-grade--D { background: rgba(251, 133, 0, 0.1); color: #FB8500; }
+.st-grade--E, .st-grade--F { background: rgba(214, 40, 40, 0.1); color: #D62828; }
+
+/* ── Action Buttons ──────────────────────────── */
+.st-action-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.st-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: #4F7C82;
+  font-weight: 500;
+}
+
+.st-btn-group {
+  display: flex;
+  gap: 1rem;
+}
+
+.st-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.5rem;
+  border-radius: 1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.st-btn--primary {
+  background: #219EBC;
+  color: white;
+  box-shadow: 0 10px 20px rgba(33, 158, 188, 0.2);
+}
+
+.st-btn--secondary {
+  background: #0B2E33;
+  color: white;
+  box-shadow: 0 10px 20px rgba(11, 46, 51, 0.2);
+}
+
+.st-btn--outline {
+  background: white;
+  color: #0B2E33;
+  border: 2px solid rgba(11, 46, 51, 0.1);
+}
+
+.st-btn--full {
+  width: 100%;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.st-btn:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.1);
+}
