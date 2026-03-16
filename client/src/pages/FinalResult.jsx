@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import LecturerLayout from "../components/LecturerLayout.jsx";
-import axios from "axios";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import { getCourseCodes, getBatches, getSubjectByCodeAndBatch, getIncourseResults, saveFinalResult } from "../services/lecturerApi";
 import "../styles/FinalResult.css";
 import {
   Save,
-  Download,
+  Send,
   Table,
   Filter,
   LayoutDashboard,
@@ -14,111 +12,113 @@ import {
   GraduationCap,
   ClipboardCheck,
   User,
-  FileText
+  Edit2,
+  Lock,
+  Loader2,
+  AlertCircle,
+  CheckCircle2
 } from "lucide-react";
 
 function FinalResult() {
-  const [course, setCourse] = useState("");
-  const [batch, setBatch] = useState("");
-  const [results, setResults] = useState([]);
+  const [courseCodes, setCourseCodes] = useState([]);
+  const [batches, setBatches] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [selectedBatch, setSelectedBatch] = useState("");
+  const [rows, setRows] = useState([]);
+  const [subjectId, setSubjectId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [status, setStatus] = useState({ type: null, message: "" });
 
-  const API = "http://localhost:5000/api";
-
-  const handleDownloadPDF = () => {
-    if (results.length === 0) {
-      alert("No data available to download!");
-      return;
-    }
-
-    const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text("Final Result Compilation", 14, 22);
-    doc.setFontSize(11);
-    doc.text(`Course: ${course}`, 14, 30);
-    doc.text(`Batch: ${batch}`, 14, 36);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 42);
-
-    const tableColumn = ["E Number", "Incourse Marks (80%)", "End Exam Marks (20%)", "Final Grade"];
-    const tableRows = results.map(row => [
-      row.eNumber,
-      row.incourse,
-      row.endExam || "-",
-      row.grade || "-"
-    ]);
-
-    autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 50,
-      styles: { fontSize: 10, cellPadding: 3 },
-      headStyles: { fillColor: [11, 46, 51] }
-    });
-
-    doc.save(`Final_Results_${course}_${batch}.pdf`);
-  };
-
-  // Grading scale logic
-  const calculateGrade = (total) => {
-    if (total >= 75) return "A";
-    if (total >= 65) return "B";
-    if (total >= 50) return "C";
-    if (total >= 35) return "S";
-    return "F";
-  };
-
-  // Fetch results when filters change
   useEffect(() => {
-    if (course && batch) {
-      setLoading(true);
-      // Fetching all student results for the compilation
-      axios.get(`${API}/marks/compiled`, { params: { course, batch } })
-        .then(res => {
-          if (res.data && res.data.length > 0) {
-            setResults(res.data);
-          } else {
-            // Provide some default dummy data if none found
-            setResults([
-              { eNumber: "E001", incourse: 25, endExam: "", grade: "-" },
-              { eNumber: "E002", incourse: 20, endExam: "", grade: "-" },
-            ]);
-          }
-        })
-        .catch(() => {
-          console.warn("Error fetching compiled data");
-          // Fallback dummy data for development
-          setResults([
-            { eNumber: "E001", incourse: 25, endExam: "", grade: "-" },
-            { eNumber: "E002", incourse: 20, endExam: "", grade: "-" },
-          ]);
-        })
-        .finally(() => setLoading(false));
-    }
-  }, [course, batch]);
+    fetchCourseCodes();
+  }, []);
 
-  const handleFinalMarksChange = (index, value) => {
-    const newResults = [...results];
-    const finalMark = parseFloat(value) || 0;
-    newResults[index].endExam = value;
-    
-    // Auto calculate grade (80% Incourse, 20% Final)
-    const incourseMark = parseFloat(newResults[index].incourse) || 0;
-    const total = incourseMark + finalMark; 
-    
-    newResults[index].grade = calculateGrade(total);
-    setResults(newResults);
+  const fetchCourseCodes = async () => {
+    try {
+      const res = await getCourseCodes();
+      setCourseCodes(res.data);
+    } catch (err) {
+      console.error("Failed to fetch course codes", err);
+    }
   };
 
-  const handleSave = (status) => {
-    if (!course || !batch) {
-      alert("Please select Course and Batch first!");
-      return;
+  useEffect(() => {
+    if (selectedCourse) fetchBatches(selectedCourse);
+    else {
+      setBatches([]);
+      setSelectedBatch("");
     }
+  }, [selectedCourse]);
+
+  const fetchBatches = async (code) => {
+    try {
+      const res = await getBatches(code);
+      setBatches(res.data);
+      setSelectedBatch(""); // Reset batch when course changes
+    } catch (err) {
+      console.error("Failed to fetch batches", err);
+    }
+  };
+
+  const handleFetchResults = async () => {
+    if (!selectedCourse || !selectedBatch) return;
     setLoading(true);
-    axios.post(`${API}/marks/compile/save`, { course, batch, results, status })
-      .then(() => alert(`Results ${status === 'submitted' ? 'submitted to Senate' : 'saved as draft'} successfully!`))
-      .catch(err => alert("Error: " + err.message))
-      .finally(() => setLoading(false));
+    setStatus({ type: null, message: "" });
+    try {
+      const subRes = await getSubjectByCodeAndBatch(selectedCourse, selectedBatch);
+      if (subRes.data.length > 0) {
+        const sub = subRes.data[0];
+        setSubjectId(sub._id);
+        const res = await getIncourseResults(sub._id);
+        setRows(res.data.results);
+      } else {
+        setRows([]);
+        setStatus({ type: "error", message: "Subject not found." });
+      }
+    } catch (err) {
+      console.error("Failed to fetch results", err);
+      setStatus({ type: "error", message: "Failed to load results." });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (index, value) => {
+    const newRows = [...rows];
+    newRows[index].endExamMark = value;
+    
+    // Auto-calculate final mark and grade locally for instant feedback
+    const incourseTotal = newRows[index].incourseTotal || 0;
+    const endMark = parseFloat(value) || 0;
+    // Assuming endExamWeight is 60 as per common pattern, or fetch from subject if available
+    // For simplicity, let's keep it locally updated after saving.
+    setRows(newRows);
+  };
+
+  const handleSave = async () => {
+    setLoading(true);
+    let successCount = 0;
+    try {
+      for (const row of rows) {
+        if (row.endExamMark !== null && row.endExamMark !== undefined) {
+          await saveFinalResult({
+            subject: subjectId,
+            studentENo: row.studentENo,
+            endExamMark: parseFloat(row.endExamMark)
+          });
+          successCount++;
+        }
+      }
+      setStatus({ type: "success", message: `Successfully saved ${successCount} records.` });
+      setIsEditMode(false);
+      handleFetchResults(); // Refresh to get grades
+    } catch (err) {
+      console.error("Save failed", err);
+      setStatus({ type: "error", message: "Some records failed to save." });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -142,23 +142,28 @@ function FinalResult() {
 
           <div className="fr-header__actions">
             <button 
-              className="fr-btn fr-btn--outline" 
-              onClick={() => handleSave('draft')}
-              disabled={loading}
+              className={`fr-btn ${isEditMode ? 'fr-btn--outline' : 'fr-btn--primary'}`}
+              onClick={() => setIsEditMode(!isEditMode)}
+              disabled={loading || rows.length === 0}
             >
-              <Save size={18} />
-              {loading ? "Saving..." : "Save Draft"}
+              {isEditMode ? <Lock size={18} /> : <Edit2 size={18} />}
+              {isEditMode ? "Lock Editing" : "Edit Marks"}
             </button>
-            <button 
-              className="fr-btn fr-btn--primary" 
-              onClick={handleDownloadPDF}
-              disabled={loading}
-            >
-              <FileText size={18} />
-              Download as PDF
-            </button>
+            {isEditMode && (
+              <button className="fr-btn fr-btn--primary" onClick={handleSave} disabled={loading}>
+                <Save size={18} />
+                Save Changes
+              </button>
+            )}
           </div>
         </div>
+
+        {status.message && (
+          <div className={`fr-card fr-status-bar ${status.type}`}>
+            {status.type === "success" ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+            <span>{status.message}</span>
+          </div>
+        )}
 
         {/* Filters Card */}
         <div className="fr-card">
@@ -176,13 +181,17 @@ function FinalResult() {
                 Course Code
               </label>
               <select
-                onChange={(e) => setCourse(e.target.value)}
-                value={course}
+                value={selectedCourse}
+                onChange={(e) => setSelectedCourse(e.target.value)}
                 className="fr-select"
+                disabled={isEditMode || loading}
               >
                 <option value="">Select Course</option>
-                <option value="EC9630">EC9630</option>
-                <option value="EC6060">EC6060</option>
+                {courseCodes.map(item => (
+                  <option key={item.courseCode} value={item.courseCode}>
+                    {item.courseCode} - {item.courseName}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -192,14 +201,21 @@ function FinalResult() {
                 Batch
               </label>
               <select
-                onChange={(e) => setBatch(e.target.value)}
-                value={batch}
+                value={selectedBatch}
+                onChange={(e) => setSelectedBatch(e.target.value)}
                 className="fr-select"
+                disabled={!selectedCourse || isEditMode || loading}
               >
                 <option value="">Select Batch</option>
-                <option value="2021">2021</option>
-                <option value="2022">2022</option>
+                {batches.map(batch => <option key={batch} value={batch}>{batch}</option>)}
               </select>
+            </div>
+
+            <div className="fr-field" style={{ justifyContent: 'flex-end' }}>
+               <button className="fr-btn fr-btn--primary" onClick={handleFetchResults} disabled={loading || isEditMode}>
+                  {loading ? <Loader2 className="animate-spin" size={18} /> : <Table size={18} />}
+                  Load Students
+               </button>
             </div>
           </div>
         </div>
@@ -211,58 +227,67 @@ function FinalResult() {
               <thead>
                 <tr className="fr-thead-row">
                   <th className="fr-th fr-th--left">E Number</th>
-                  <th className="fr-th">Total Incourse Marks (80%)</th>
-                  <th className="fr-th">End Exam Marks (20%)</th>
+                  <th className="fr-th">Incourse Marks</th>
+                  <th className="fr-th">End Exam Marks</th>
                   <th className="fr-th">Final Grade</th>
                 </tr>
               </thead>
               <tbody className="fr-tbody">
-                {results.map((row, index) => (
-                  <tr key={index} className="fr-row">
-                    <td className="fr-td">
-                      <div className="fr-enumber-cell">
-                        <div className="fr-enumber-icon">
-                          <User size={16} />
-                        </div>
-                        <span className="fr-enumber-text">{row.eNumber}</span>
-                      </div>
-                    </td>
-                    <td className="fr-td fr-td--center">
-                      <span className="fr-value-display">{row.incourse}</span>
-                    </td>
-                    <td className="fr-td fr-td--center">
-                      <input
-                        type="number"
-                        value={row.endExam}
-                        onChange={(e) => handleFinalMarksChange(index, e.target.value)}
-                        placeholder="0"
-                        className="fr-input fr-input--cell"
-                      />
-                    </td>
-                    <td className="fr-td fr-td--center">
-                      <span className="fr-grade-badge">{row.grade}</span>
+                {rows.length === 0 ? (
+                  <tr>
+                    <td colSpan="4" className="fr-td fr-td--center" style={{ padding: '4rem', opacity: 0.5 }}>
+                      Select Course & Batch to load student results
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  rows.map((row, index) => (
+                    <tr key={index} className="fr-row">
+                      <td className="fr-td">
+                        <div className="fr-enumber-cell">
+                          <div className="fr-enumber-icon">
+                            <User size={16} />
+                          </div>
+                          <span className="fr-enumber-text">{row.studentENo}</span>
+                        </div>
+                      </td>
+                      <td className="fr-td fr-td--center">
+                         <span className="fr-incourse-text">{row.incourseTotal?.toFixed(2) || "0.00"}</span>
+                      </td>
+                      <td className="fr-td fr-td--center">
+                        <input
+                          type="number"
+                          value={row.endExamMark ?? ""}
+                          onChange={(e) => handleInputChange(index, e.target.value)}
+                          disabled={!isEditMode || loading}
+                          className={`fr-input ${isEditMode ? 'fr-input--cell' : 'fr-input--transparent'}`}
+                          placeholder="-"
+                        />
+                      </td>
+                      <td className="fr-td fr-td--center">
+                        <span className={`fr-grade-badge ${row.grade === 'E' ? 'fail' : 'pass'}`}>
+                          {row.grade || "-"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </div>
 
         {/* Summary Footer */}
-        <div className="fr-info-bar">
-          <div className="fr-info-bar__icon-wrap">
-            <Table size={24} />
+        {rows.length > 0 && (
+          <div className="fr-info-bar">
+            <div className="fr-info-bar__icon-wrap">
+              <Table size={24} />
+            </div>
+            <div>
+              <p className="fr-info-bar__label">Quick Info</p>
+              <p className="fr-info-bar__text">Currently managing {rows.length} student records for the selected batch.</p>
+            </div>
           </div>
-          <div>
-            <p className="fr-info-bar__label">Quick Info</p>
-            <p className="fr-info-bar__text">
-              {results.length > 0 
-                ? `Currently managing ${results.length} student records for ${course || 'selected batch'}.`
-                : "Select a course and batch to start compiling results."}
-            </p>
-          </div>
-        </div>
+        )}
       </div>
     </LecturerLayout>
   );

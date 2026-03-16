@@ -26,7 +26,9 @@ const SubjectSchema = new mongoose.Schema(
     courseCode: { type: String, required: true, trim: true, uppercase: true },
     courseName: { type: String, required: true, trim: true },
     batch: { type: String, required: true, trim: true },
+    semester: { type: String, required: true, trim: true },
     credit: { type: Number, required: true, min: 0 },
+    description: { type: String, default: "" },
 
     assessments: { type: AssessmentSchema, default: () => ({}) }
   },

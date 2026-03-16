@@ -1,5 +1,5 @@
 import "../styles/Sidebar.css";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { FaBars } from 'react-icons/fa';
 
 /*
@@ -8,6 +8,17 @@ Collapsible toggle logic added
 */
 
 function Sidebar({ isOpen, toggleSidebar }) {
+  const location = useLocation();
+
+  const menuItems = [
+    { name: "Lecturer Home", path: "/lecturer/home" },
+    { name: "View Results", path: "/lecturer/results" },
+    { name: "Manage Subjects", path: "/lecturer/addsubject" },
+    { name: "Incourse Marks", path: "/lecturer/addincourse" },
+    { name: "Pending Review", path: "/lecturer/pending" },
+    { name: "Final Result", path: "/lecturer/final" },
+    { name: "Profile Settings", path: "/lecturer/setting" },
+  ];
 
   return (
     <div className={`sidebar ${isOpen ? "open" : "closed"}`}>
@@ -20,13 +31,11 @@ function Sidebar({ isOpen, toggleSidebar }) {
       <div className="sidebar-menu">
         <div className="sidebar-section">Main Menu</div>
         <ul>
-          <li><Link to="/lecturer/home">Lecturer Home</Link></li>
-          <li><Link to="/lecturer/results">View Results</Link></li>
-          <li><Link to="/lecturer/addsubject">Manage Subjects</Link></li>
-          <li><Link to="/lecturer/addincourse">Incourse Marks</Link></li>
-          <li><Link to="/lecturer/pending">Pending Review</Link></li>
-          <li><Link to="/lecturer/final">Final Result</Link></li>
-          <li><Link to="/lecturer/setting">Profile Settings</Link></li>
+          {menuItems.map((item) => (
+            <li key={item.path} className={location.pathname === item.path ? "active" : ""}>
+              <Link to={item.path}>{item.name}</Link>
+            </li>
+          ))}
         </ul>
       </div>
     </div>

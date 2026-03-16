@@ -82,11 +82,25 @@ exports.getSubjects = async (req, res) => {
 };
 
 // GET /api/subjects/my-course-codes (lecturer only)
-// Returns distinct course codes for dropdown
+// Returns distinct course codes and names for dropdown
 exports.getMyCourseCodes = async (req, res) => {
   try {
-    const codes = await Subject.distinct("courseCode", { createdBy: req.user._id });
-    return res.json(codes);
+    const subjects = await Subject.find({ createdBy: req.user._id }, "courseCode courseName");
+    
+    // Use a Map to get unique courseCodes
+    const uniqueMap = new Map();
+    subjects.forEach(s => {
+      if (!uniqueMap.has(s.courseCode)) {
+        uniqueMap.set(s.courseCode, s.courseName);
+      }
+    });
+
+    const result = Array.from(uniqueMap).map(([code, name]) => ({
+      courseCode: code,
+      courseName: name
+    }));
+
+    return res.json(result);
   } catch (e) {
     return res.status(500).json({ message: e.message });
   }

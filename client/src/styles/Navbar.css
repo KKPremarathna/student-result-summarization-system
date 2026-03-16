@@ -3,12 +3,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #0B2E33 !important; /* User specified dark teal */
+  background-color: #0B2E33 !important; /* Original dark teal */
   padding: 10px 40px;
   border-bottom: 2px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1000;
   height: 80px;
+  position: sticky;
+  top: 0;
 }
 
 .logo-container {
@@ -41,6 +43,7 @@
 
 .nav-links {
   display: flex;
+  align-items: center; /* Center links and button vertically */
   list-style: none;
   gap: 30px;
   margin: 0;
@@ -70,6 +73,32 @@
 
 .nav-links li:hover,
 .nav-links li a:hover {
-  color: var(--primary);
-  /* Sage green on hover */
+  color: var(--primary); /* Sage green on hover */
+}
+
+/* Logout Button Styles */
+.navbar-logout-btn {
+    background: transparent;
+    color: #ffffff;
+    border: 2px solid #FF4D4D;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.75rem;
+    font-weight: 800;
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar-logout-btn:hover {
+    background: #FF4D4D;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 77, 77, 0.4);
+}
+
+.logout-item {
+    display: flex;
+    align-items: center;
 }
