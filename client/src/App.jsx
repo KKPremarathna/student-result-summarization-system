@@ -22,6 +22,13 @@ import PendingResult from "./pages/PendingResult.jsx";
 import FinalResult from "./pages/FinalResult.jsx";
 import LectureSetting from "./pages/LecturerSetting.jsx";
 
+//Student pages
+import StudentHome from "./pages/StudentHome.jsx";
+import SubjectWiseResult from "./pages/SubjectWiseResult.jsx";
+import StudentWiseResult from "./pages/StudentWiseResult.jsx";
+import IncourseMarks from "./pages/IncourseMarks.jsx";
+import StudentProfile from "./pages/StudentProfile.jsx";
+
 function App() {
   return (
     <BrowserRouter>
@@ -48,6 +55,13 @@ function App() {
         <Route path="/lecturer/pending" element={< PendingResult />} />
         <Route path="/lecturer/final" element={< FinalResult />} />
         <Route path="/lecturer/setting" element={< LectureSetting />} />
+
+        {/* Student Routes */}
+        <Route path="/student/home" element={<StudentHome />} />
+        <Route path="/student/subject-wise" element={<SubjectWiseResult />} />
+        <Route path="/student/student-wise" element={<StudentWiseResult />} />
+        <Route path="/student/incourse-marks" element={<IncourseMarks />} />
+        <Route path="/student/profile" element={<StudentProfile />} />
 
       </Routes>
     </BrowserRouter>
