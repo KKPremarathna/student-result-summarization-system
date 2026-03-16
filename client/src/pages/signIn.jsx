@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import InnerNavbar from "../components/InnerNavbar";
 import axios from "axios";
 import "../styles/signIn.css";
+import "../styles/Toast.css";
 
 function Signin() {
   const navigate = useNavigate();
@@ -11,6 +12,15 @@ function Signin() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
+
+  useEffect(() => {
+    if (message.text) {
+      const timer = setTimeout(() => {
+        setMessage({ type: "", text: "" });
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -59,18 +69,26 @@ function Signin() {
     <div className="signin-page">
       <InnerNavbar />
 
+      {message.text && (
+        <div className="toast-container">
+          <div className={`toast ${message.type}`}>
+            <div className="toast-content">
+              <span className="toast-icon">
+                {message.type === "success" ? "✅" : "❌"}
+              </span>
+              <span className="toast-message">{message.text}</span>
+            </div>
+            <button className="toast-close" onClick={() => setMessage({ type: "", text: "" })}>✕</button>
+          </div>
+        </div>
+      )}
+
       <main className="signin-container">
         <div className="signin-card">
           <div className="signin-header">
             <h1 className="signin-title">Sign In</h1>
             <p className="signin-subtitle">Enter your credentials to continue</p>
           </div>
-
-          {message.text && (
-            <div className={`message-alert ${message.type}`}>
-              {message.text}
-            </div>
-          )}
 
           <form className="signin-form" onSubmit={handleSubmit}>
             <div className="form-group">
@@ -124,4 +142,4 @@ function Signin() {
   );
 }
 
-export default Signin;
+export default Signin;

@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import signupImage from "../assets/images/signup-image.png";
 import "../styles/signup.css";
+import "../styles/Toast.css";
 import InnerNavbar from "../components/InnerNavbar";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -19,6 +20,15 @@ function Signup() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
+
+  useEffect(() => {
+    if (message.text) {
+      const timer = setTimeout(() => {
+        setMessage({ type: "", text: "" });
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -94,18 +104,26 @@ function Signup() {
     <div className="signup-page">
       <InnerNavbar />
 
+      {message.text && (
+        <div className="toast-container">
+          <div className={`toast ${message.type}`}>
+            <div className="toast-content">
+              <span className="toast-icon">
+                {message.type === "success" ? "✅" : "❌"}
+              </span>
+              <span className="toast-message">{message.text}</span>
+            </div>
+            <button className="toast-close" onClick={() => setMessage({ type: "", text: "" })}>✕</button>
+          </div>
+        </div>
+      )}
+
       <main className="signup-container">
         <div className="signup-card">
           <div className="signup-header">
             <h1 className="signup-title">Create Account</h1>
             <p className="signup-subtitle">Join Academet for secure result analysis</p>
           </div>
-
-          {message.text && (
-            <div className={`message-alert ${message.type}`}>
-              {message.text}
-            </div>
-          )}
 
           <form className="signup-form" onSubmit={handleSubmit}>
             <div className="form-grid">
@@ -225,3 +243,4 @@ function Signup() {
 }
 
 export default Signup;
+
