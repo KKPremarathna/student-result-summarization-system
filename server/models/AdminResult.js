@@ -4,7 +4,7 @@ const FinalResultSchema = new mongoose.Schema({
     courseCode: { type: String, required: true, trim: true, uppercase: true },
     semester: { type: String, required: true, trim: true },
     batch: { type: String, required: true, trim: true },
-    lectureId: { type: String, required: true, trim: true },
+    lecturerEmail: { type: String, required: true, trim: true, lowercase: true },
     studentRegNum: { type: String, required: true, trim: true, uppercase: true },
     grade: { type: String, required: true, trim: true, uppercase: true },
 }, { timestamps: true });

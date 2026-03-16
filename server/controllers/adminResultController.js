@@ -3,14 +3,18 @@ const { isValidRegNum } = require('../utils/regUtils');
 
 /**
  * Add final results in batch
- * req.body = { courseCode, semester, batch, lectureId, results: [{ regNum, grade }, ...] }
+ * req.body = { courseCode, semester, batch, lecturerEmail, results: [{ regNum, grade }, ...] }
  */
 exports.addBatchResults = async(req, res) => {
     try {
-        const { courseCode, semester, batch, lectureId, results } = req.body;
+        const { courseCode, semester, batch, lecturerEmail, results } = req.body;
 
-        if (!courseCode || !semester || !batch || !lectureId || !results || !Array.isArray(results)) {
+        if (!courseCode || !semester || !batch || !lecturerEmail || !results || !Array.isArray(results)) {
             return res.status(400).json({ message: 'Missing required fields or results array' });
+        }
+
+        if (results.length === 0) {
+            return res.status(400).json({ message: 'Results array cannot be empty' });
         }
 
         // Validate all registration numbers first
@@ -18,13 +22,16 @@ exports.addBatchResults = async(req, res) => {
             if (!isValidRegNum(item.regNum)) {
                 return res.status(400).json({ message: `Invalid registration number format: ${item.regNum}. Expected 20XX/E/xxx` });
             }
+            if (!item.grade || item.grade.trim() === '') {
+                return res.status(400).json({ message: `Grade is required for ${item.regNum}` });
+            }
         }
 
         const formattedResults = results.map(item => ({
             courseCode: courseCode.toUpperCase(),
             semester,
             batch,
-            lectureId,
+            lecturerEmail: lecturerEmail.toLowerCase(),
             studentRegNum: item.regNum.toUpperCase(),
             grade: item.grade.toUpperCase(),
         }));
@@ -45,7 +52,7 @@ exports.addBatchResults = async(req, res) => {
         const result = await AdminResult.bulkWrite(bulkOps);
 
         res.status(201).json({
-            message: 'Results added/updated successfully',
+            message: `Results saved successfully (${result.upsertedCount} added, ${result.modifiedCount} updated)`,
             data: {
                 matchedCount: result.matchedCount,
                 modifiedCount: result.modifiedCount,
@@ -57,15 +64,15 @@ exports.addBatchResults = async(req, res) => {
     }
 };
 
-//Update a single final result
+// Update a single final result
 exports.updateResult = async(req, res) => {
     try {
         const { id } = req.params;
-        const { grade, lectureId, courseCode, semester, batch } = req.body;
+        const { grade, lecturerEmail, courseCode, semester, batch } = req.body;
 
         const updateData = {};
         if (grade) updateData.grade = grade.toUpperCase();
-        if (lectureId) updateData.lectureId = lectureId;
+        if (lecturerEmail) updateData.lecturerEmail = lecturerEmail.toLowerCase();
         if (courseCode) updateData.courseCode = courseCode.toUpperCase();
         if (semester) updateData.semester = semester;
         if (batch) updateData.batch = batch;
@@ -87,7 +94,7 @@ exports.updateResult = async(req, res) => {
     }
 };
 
-//Delete a single student result by ID
+// Delete a single student result by ID
 exports.deleteResult = async(req, res) => {
     try {
         const { id } = req.params;
@@ -122,6 +129,27 @@ exports.deleteSubjectResults = async(req, res) => {
         res.status(200).json({
             message: `${result.deletedCount} results deleted successfully`
         });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Get results filtered by courseCode, batch, semester  
+exports.getResultsByCourse = async(req, res) => {
+    try {
+        const { courseCode, batch, semester } = req.query;
+
+        if (!courseCode || !batch || !semester) {
+            return res.status(400).json({ message: 'Please provide courseCode, batch, and semester as query params' });
+        }
+
+        const results = await AdminResult.find({
+            courseCode: courseCode.toUpperCase(),
+            batch,
+            semester
+        }).sort({ studentRegNum: 1 });
+
+        res.status(200).json({ success: true, data: results });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

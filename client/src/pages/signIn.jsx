@@ -1,60 +1,125 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import InnerNavbar from "../components/InnerNavbar";
-import signinImage from "../assets/images/signup-image.png";
+import axios from "axios";
 import "../styles/signIn.css";
 
 function Signin() {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ type: "", text: "" });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage({ type: "", text: "" });
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/auth/login", {
+        email,
+        password,
+      });
+
+      if (response.data.success) {
+        const { token, user } = response.data;
+
+        // Store session info
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+
+        setMessage({ type: "success", text: "Login successful! Redirecting..." });
+
+        // Role-based redirection
+        setTimeout(() => {
+          if (user.role === "admin") {
+            navigate("/AdminHome");
+          } else if (user.role === "lecturer") {
+            navigate("/lecturer/home");
+          } else if (user.role === "student") {
+            navigate("/home");
+          } else {
+            navigate("/"); // Default fallback
+          }
+        }, 1500);
+      }
+    } catch (error) {
+      setMessage({
+        type: "error",
+        text: error.response?.data?.message || "Invalid email or password.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="signin-page">
       <InnerNavbar />
 
-      <div className="signin-main">
-        <div className="signin-left">
-          <img
-            src={signinImage}
-            alt="Signin illustration"
-            className="signin-image"
-          />
-        </div>
-
-        <div className="signin-right">
-          <form className="signin-form">
+      <main className="signin-container">
+        <div className="signin-card">
+          <div className="signin-header">
             <h1 className="signin-title">Sign In</h1>
             <p className="signin-subtitle">Enter your credentials to continue</p>
+          </div>
 
-            <input type="email" placeholder="Email" />
+          {message.text && (
+            <div className={`message-alert ${message.type}`}>
+              {message.text}
+            </div>
+          )}
 
-            <div className="password-wrapper">
+          <form className="signin-form" onSubmit={handleSubmit}>
+            <div className="form-group">
               <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
+                type="email"
+                placeholder="Email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
-              <span
-                className="eye-icon"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                👁
-              </span>
             </div>
 
-            <p className="forgot-password">Forgot Password ?</p>
+            <div className="form-group">
+              <div className="password-wrapper">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <span
+                  className="eye-icon"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? "👁" : "👁"}
+                </span>
+              </div>
+            </div>
 
-            <button type="submit" className="signin-btn">
-              Sign In
+            <div className="form-footer">
+              <Link to="#">
+                <span className="forgot-password">Forgot Password ?</span>
+              </Link>
+            </div>
+
+            <button type="submit" className="signin-btn" disabled={loading}>
+              {loading ? "Signing In..." : "Sign In"}
             </button>
 
             <p className="signup-text">
-              Don’t have an Account ?{" "}
-              <Link to="/signup">
-                <span>Create One</span>
+              Don't have an Account ?{" "}
+              <Link to="/SignUp" className="signup-link">
+                Create One
               </Link>
             </p>
           </form>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

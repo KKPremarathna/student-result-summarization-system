@@ -12,7 +12,7 @@ exports.getUserDetails = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        
+
         // Fetch subjects assigned to this user
         const subjects = await Subject.find({ createdBy: req.user.id });
 
@@ -27,17 +27,19 @@ exports.getUserDetails = async (req, res) => {
 // @route   PUT /api/user/update-profile
 // @access  Private
 exports.updateProfile = async (req, res) => {
-    const { 
-        firstName, 
-        lastName, 
-        profilePicture, 
-        oldPassword, 
-        newPassword, 
-        title, 
-        position, 
-        faculty, 
-        university, 
+    const {
+        title,
+        position,
+        faculty,
+        university,
         department,
+        firstName,
+        lastName,
+        phone,
+        dob,
+        profilePicture,
+        oldPassword,
+        newPassword,
         lecturerId
     } = req.body;
 
@@ -48,7 +50,7 @@ exports.updateProfile = async (req, res) => {
         }
 
         let updatedFields = {};
-        
+
         // 1. Update Profile Fields if provided
         if (firstName !== undefined) updatedFields.firstName = firstName;
         if (lastName !== undefined) updatedFields.lastName = lastName;
@@ -58,19 +60,17 @@ exports.updateProfile = async (req, res) => {
         if (faculty !== undefined) updatedFields.faculty = faculty;
         if (university !== undefined) updatedFields.university = university;
         if (department !== undefined) updatedFields.department = department;
+        if (firstName !== undefined) updatedFields.firstName = firstName;
+        if (lastName !== undefined) updatedFields.lastName = lastName;
+        if (phone !== undefined) updatedFields.phone = phone;
+        if (dob !== undefined) updatedFields.dob = dob;
         if (lecturerId !== undefined) updatedFields.lecturerId = lecturerId;
 
-        // 2. Update Password if both old & new are provided
-        if (oldPassword && newPassword) {
-            const isMatch = await bcrypt.compare(oldPassword, user.password);
-            if (!isMatch) {
-                return res.status(400).json({ message: 'Invalid old password.' });
-            }
 
+        // 2. Update Password if new password is provided
+        if (newPassword) {
             const salt = await bcrypt.genSalt(10);
             updatedFields.password = await bcrypt.hash(newPassword, salt);
-        } else if ((oldPassword && !newPassword) || (!oldPassword && newPassword)) {
-             return res.status(400).json({ message: 'Both old and new password are required to update password.' });
         }
 
         // 3. Save updates if any

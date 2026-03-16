@@ -43,7 +43,7 @@ const studentRoutes = require("./routes/studentRoutes");
 app.use("/api/student", studentRoutes);
 
 app.get("/", (req, res) => {
-    res.send("Student Result Summarization System API");
+  res.send("Student Result Summarization System API");
 });
 
 // Serve uploaded files statically
@@ -51,15 +51,19 @@ app.use('/uploads', express.static('uploads'));
 
 // Database Connection
 mongoose
-    .connect(process.env.MONGODB_URI)
-    .then(() => {
-        console.log("MongoDB Connected Successfully");
-    })
-    .catch((err) => {
-        console.error("MongoDB Connection Error:");
-        console.error(err.message);
-    });
+  .connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log("MongoDB Connected Successfully");
+    console.log("Connected DB:", mongoose.connection.name);
+    console.log("Connected Host:", mongoose.connection.host);
+  })
+  .catch((err) => {
+    console.error("MongoDB Connection Error:");
+    console.error(err.message);
+  });
+
+console.log("Connected DB:", mongoose.connection.name);
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port: ${PORT}`);
+  console.log(`Server is running on port: ${PORT}`);
 });

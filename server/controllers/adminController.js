@@ -1,9 +1,10 @@
 const AllowedEmail = require('../models/AllowedEmail');
+const User = require('../models/User');
 const { convertRegNumToEmail, generateEmailsFromRange, isValidEmail } = require('../utils/regUtils');
 
 // Add a single allowed email from reg num
 
-exports.addAllowedEmail = async (req, res) => {
+exports.addAllowedEmail = async(req, res) => {
     try {
         if (!req.body) {
             return res.status(400).json({ message: 'Request body is missing. Please ensure you are sending JSON data with Content-Type: application/json' });
@@ -41,7 +42,7 @@ exports.addAllowedEmail = async (req, res) => {
 };
 
 // Add bulk allowed emails from reg num range
-exports.addBulkAllowedEmails = async (req, res) => {
+exports.addBulkAllowedEmails = async(req, res) => {
     try {
         if (!req.body) {
             return res.status(400).json({ message: 'Request body is missing. Please ensure you are sending JSON data with Content-Type: application/json' });
@@ -88,7 +89,7 @@ exports.addBulkAllowedEmails = async (req, res) => {
 };
 
 // Add a lecturer allowed email directly
-exports.addLecturerEmail = async (req, res) => {
+exports.addLecturerEmail = async(req, res) => {
     try {
         if (!req.body) {
             return res.status(400).json({ message: 'Request body is missing' });
@@ -121,5 +122,48 @@ exports.addLecturerEmail = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+};
+
+// Get allowed emails
+exports.getAllowedEmails = async(req, res) => {
+    try {
+        const { role, department } = req.query;
+        const filter = {};
+
+        if (role) {
+            filter.role = role;
+        }
+
+        if (role === 'lecturer' && department) {
+            filter.department = department;
+        }
+
+        const allowedEmails = await AllowedEmail.find(filter).sort({ createdAt: -1 });
+        res.status(200).json({ success: true, data: allowedEmails });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// Get registered users
+exports.getRegisteredUsers = async(req, res) => {
+    try {
+        const { role, department } = req.query;
+        if (!role) {
+            return res.status(400).json({ message: 'Please provide a role (student or lecturer)' });
+        }
+
+        const filter = { role };
+        if (role === 'lecturer' && department) {
+            filter.department = department;
+        }
+
+        const users = await User.find(filter).select('-password').sort({ createdAt: -1 });
+        res.status(200).json({ success: true, data: users });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
     }
 };

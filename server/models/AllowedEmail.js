@@ -8,7 +8,7 @@ const allowedEmailSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['student', 'lecturer'],
+        enum: ['student', 'lecturer', 'admin'],
         required: true,
     },
     department: {
