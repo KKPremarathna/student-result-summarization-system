@@ -93,6 +93,25 @@
   opacity: 0.4;
 }
 
+.form-group-date {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.date-label {
+  font-size: 0.85rem;
+  color: #1a3636;
+  font-weight: 700;
+  margin-left: 0.5rem;
+  opacity: 0.8;
+}
+
+.signup-form input[type="date"] {
+  color-scheme: light;
+}
+
 /* OTP Section Styling */
 .otp-section {
   background: rgba(184, 227, 233, 0.1);

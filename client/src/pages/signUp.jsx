@@ -157,14 +157,16 @@ function Signup() {
             </div>
 
             <div className="form-grid">
-              <input
-                type="text"
-                name="dob"
-                placeholder="Birth Date (YYYY-MM-DD)"
-                required
-                value={formData.dob}
-                onChange={handleChange}
-              />
+              <div className="form-group-date">
+                <label className="date-label">Birth Date</label>
+                <input
+                  type="date"
+                  name="dob"
+                  required
+                  value={formData.dob}
+                  onChange={handleChange}
+                />
+              </div>
               <input
                 type="text"
                 name="phone"

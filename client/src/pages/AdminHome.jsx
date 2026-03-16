@@ -76,6 +76,7 @@ function AdminHome() {
               <div className="welcome-profile">
                 <div className="profile-avatar">
                   {user.firstName ? user.firstName.charAt(0).toUpperCase() : ""}
+                  {user.lastName ? user.lastName.charAt(0).toUpperCase() : ""}
                 </div>
                 <div className="welcome-text">
                   <h1>Welcome back,</h1>
