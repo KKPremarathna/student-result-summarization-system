@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { addAllowedEmail, addBulkAllowedEmails, addLecturerEmail, getStudentAllowedEmails, deleteAllowedEmailById, getRegisteredStudents, deleteRegisteredStudentById, getRegisteredLecturers, deleteRegisteredLecturerById } = require('../controllers/adminController');
 const { deleteAllowedEmail, deleteBulkAllowedEmails, deleteLecturerEmail } = require('../controllers/adminDeleteController');
-const { addBatchResults, updateResult, deleteResult, deleteSubjectResults } = require('../controllers/adminResultController');
+const { addBatchResults, updateResult, deleteResult, deleteSubjectResults, getResultsByCourse } = require('../controllers/adminResultController');
 const authMiddleware = require('../middleware/authMiddleware');
 const requireRole = require('../middleware/requireRole');
 
@@ -16,6 +16,7 @@ router.delete('/delete-allowed-email', deleteAllowedEmail);
 router.delete('/delete-bulk-allowed-emails', deleteBulkAllowedEmails);
 router.delete('/delete-lecturer-email', deleteLecturerEmail);
 router.post('/add-results', addBatchResults);
+router.get('/get-results', getResultsByCourse);
 router.put('/update-result/:id', updateResult);
 router.delete('/delete-result/:id', deleteResult);
 router.delete('/delete-subject-results', deleteSubjectResults);
