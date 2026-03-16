@@ -33,6 +33,9 @@ app.use("/api/user", userRoutes);
 const complaintRoutes = require("./routes/complaintRoutes");
 app.use("/api/complaints", complaintRoutes);
 
+const notificationRoutes = require("./routes/notificationRoutes");
+app.use("/api/notifications", notificationRoutes);
+
 const studentRoutes = require("./routes/studentRoutes");
 app.use("/api/student", studentRoutes);
 
