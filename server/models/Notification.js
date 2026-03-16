@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const NOTIFICATION_TEMPLATES = {
     INCOURSE_MARKS_ADDED: "New incourse marks for {courseCode} have been added.",
     FINAL_RESULTS_PUBLISHED: "Final results for {courseCode} have been published.",
+    SENATE_APPROVED_RESULTS_ADDED: "Senate approved results for {courseCode} have been added.",
     COMPLAINT_RESPONDED: "Your complaint regarding {courseCode} has received a response.",
     SYSTEM_UPDATE: "System update: {message}"
 };
