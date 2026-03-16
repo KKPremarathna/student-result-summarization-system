@@ -1,5 +1,5 @@
 const IncourseResult = require('../models/IncourseResult');
-const { convertEmailToRegNum } = require('../utils/regUtils');
+const { convertEmailToRegNum, generateRegNoRegex } = require('../utils/regUtils');
 const Complaint = require('../models/Complaint');
 const Subject = require('../models/Subject');
 
@@ -16,8 +16,10 @@ exports.getMyIncourseSubjects = async(req, res) => {
             return res.status(400).json({ message: 'User email is not a valid student email pattern.' });
         }
 
+        const regNoRegex = generateRegNoRegex(studentENo);
+
         // Find all distinct subjects where this student has records
-        const results = await IncourseResult.find({ studentENo: studentENo.toUpperCase() })
+        const results = await IncourseResult.find({ studentENo: regNoRegex })
             .populate('subject', 'courseCode courseName batch');
 
         // Return only the populated subjects for the dropdown
@@ -53,11 +55,13 @@ exports.getMyIncourseMarks = async(req, res) => {
 
         const subjectIds = subjects.map(s => s._id);
 
+        const regNoRegex = generateRegNoRegex(studentENo);
+
         // 2. Find all results for this student in those subjects
         const results = await IncourseResult.find({
             subject: { $in: subjectIds },
-            studentENo: studentENo.toUpperCase()
-        }).populate('subject', 'courseCode courseName batch credits assessments');
+            studentENo: regNoRegex
+        }).populate('subject', 'courseCode courseName batch credit assessments');
 
         if (!results || results.length === 0) {
             return res.status(404).json({ message: 'No marks found for this course.' });

@@ -1,25 +1,23 @@
-const AdminResult = require('../models/AdminResult');
+const FinalResult = require('../models/FinalResult');
 const Subject = require('../models/Subject');
 
+const { generateRegNoRegex } = require('./regUtils');
+
 /**
- * Calculates the GPA for a student given their registration number.
- * @param {string} studentRegNum
+ * Calculates the GPA for a student given their enrollment number.
+ * @param {string} studentENo
  * @returns {Promise<Object>}
  */
-const calculateStudentGPA = async(studentRegNum) => {
-    const results = await AdminResult.find({ studentRegNum: studentRegNum.toUpperCase() });
+const calculateStudentGPA = async(studentENo) => {
+    const regNoRegex = generateRegNoRegex(studentENo);
+    if (!regNoRegex) return { gpa: 0, totalCredits: 0, coursesCount: 0, studentENo };
+
+    const results = await FinalResult.find({ studentENo: regNoRegex })
+        .populate('subject', 'credit');
 
     if (!results || results.length === 0) {
-        return { gpa: 0, totalCredits: 0, coursesCount: 0 };
+        return { gpa: 0, totalCredits: 0, coursesCount: 0, studentENo: studentENo };
     }
-
-    const courseCodes = [...new Set(results.map(r => r.courseCode))];
-    const subjects = await Subject.find({ courseCode: { $in: courseCodes } });
-
-    const creditsMap = {};
-    subjects.forEach(sub => {
-        creditsMap[sub.courseCode] = sub.credit;
-    });
 
     // Define grade points mapping
     const gradePoints = {
@@ -34,18 +32,18 @@ const calculateStudentGPA = async(studentRegNum) => {
         'C-': 1.7,
         'D+': 1.3,
         'D': 1.0,
-        'E': 0.0
+        'E': 0.0,
+        'F': 0.0
     };
 
     let totalQualityPoints = 0;
     let totalCredits = 0;
 
     results.forEach(result => {
-        const courseCode = result.courseCode;
-        const grade = result.grade.toUpperCase();
-        const credits = creditsMap[courseCode];
+        const grade = (result.afterSenateGrade || result.grade).toUpperCase();
+        const credits = result.subject ? result.subject.credit : 0;
 
-        if (credits !== undefined && gradePoints[grade] !== undefined) {
+        if (credits > 0 && gradePoints[grade] !== undefined) {
             totalQualityPoints += (gradePoints[grade] * credits);
             totalCredits += credits;
         }
@@ -56,7 +54,8 @@ const calculateStudentGPA = async(studentRegNum) => {
     return {
         gpa: parseFloat(gpa),
         totalCredits,
-        coursesCount: results.length
+        coursesCount: results.length,
+        studentENo: studentENo.toUpperCase()
     };
 };
 

@@ -465,8 +465,8 @@ exports.getStudentFinalResults = async (req, res) => {
             gradeDistribution[finalGrade]++;
         }
 
-        // Pass condition: finalGrade is not E, AND incourse is > 35
-        if (finalGrade !== "E" && r.incourseTotal > 35) {
+        // Pass condition: Grade is not E (or F)
+        if (finalGrade !== "E" && finalGrade !== "F") {
             summary.passed++;
         } else {
             summary.failed++;

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import StudentLayout from "../components/StudentLayout.jsx";
 import "../styles/StudentWiseResult.css";
+import { getStudentAcademicSummary, getStudentGPA, downloadReport } from "../services/studentApi";
 import {
   BarChart,
   Bar,
@@ -29,40 +30,99 @@ import {
 } from "lucide-react";
 
 const StudentWiseResult = () => {
-  const [selectedSemester, setSelectedSemester] = useState("Semester 5");
+  const [studentInfo, setStudentInfo] = useState({
+    name: "Loading...",
+    eNumber: "---",
+    gpa: "0.00"
+  });
 
-  const studentInfo = {
-    name: "Karunarathna K.P.S",
-    eNumber: "2021/E/162",
-    gpa: "3.75"
-  };
-
-  const summary = {
-    totalEnrolled: 8,
-    passed: 8,
+  const [summary, setSummary] = useState({
+    totalEnrolled: 0,
+    passed: 0,
     failed: 0
+  });
+
+  const [gradeDistributionData, setGradeDistributionData] = useState([]);
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Fetching "All" results by default
+      const [summaryRes, gpaRes] = await Promise.all([
+        getStudentAcademicSummary(""),
+        getStudentGPA().catch(() => ({ data: { gpa: 0, studentENo: "N/A" } }))
+      ]);
+
+      if (summaryRes.data) {
+        setSummary({
+          totalEnrolled: summaryRes.data.summary.enrolled,
+          passed: summaryRes.data.summary.passed,
+          failed: summaryRes.data.summary.failed
+        });
+
+        setResults(summaryRes.data.results.map(r => ({
+          batch: r.subject?.batch || "N/A",
+          code: r.subject?.courseCode || "N/A",
+          name: r.subject?.courseName || "Unknown",
+          beforeSenate: r.grade || "E",
+          afterSenate: r.afterSenateGrade || r.grade || "E",
+          credit: r.subject?.credit || 0
+        })));
+
+        // Transform Grade Distribution
+        const dist = summaryRes.data.gradeDistribution;
+        const formattedDist = Object.keys(dist).map(grade => ({
+          grade,
+          count: dist[grade],
+          color: getColorForGrade(grade)
+        }));
+        setGradeDistributionData(formattedDist);
+      }
+
+      const user = JSON.parse(localStorage.getItem("user")) || {};
+      const fallbackENo = user.email ? user.email.split('@')[0].toUpperCase() : "N/A";
+      
+      setStudentInfo({
+        name: user.firstName ? `${user.firstName} ${user.lastName}` : "Student",
+        eNumber: gpaRes.data.studentENo || user.studentENo || fallbackENo,
+        gpa: gpaRes.data.gpa ? gpaRes.data.gpa.toFixed(2) : "0.00"
+      });
+
+    } catch (error) {
+      console.error("Error fetching student results:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const gradeDistributionData = [
-    { grade: "A+", count: 1, color: "#219EBC" },
-    { grade: "A", count: 0, color: "#219EBC" },
-    { grade: "A-", count: 3, color: "#219EBC" },
-    { grade: "B+", count: 6, color: "#8ECAE6" },
-    { grade: "B", count: 2, color: "#8ECAE6" },
-    { grade: "B-", count: 3, color: "#8ECAE6" },
-    { grade: "C+", count: 3, color: "#FFB703" },
-    { grade: "C", count: 2, color: "#FFB703" },
-    { grade: "C-", count: 0, color: "#FFB703" },
-    { grade: "D+", count: 0, color: "#FB8500" },
-    { grade: "D", count: 0, color: "#FB8500" },
-    { grade: "E", count: 1, color: "#D62828" },
-  ];
+  const handleDownload = async () => {
+    try {
+      const response = await downloadReport();
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Academic_Report_${studentInfo.eNumber}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error("Download failed:", error);
+    }
+  };
 
-  const results = [
-    { batch: "E 21", code: "EC5080", name: "Software Construction", beforeSenate: "C-", afterSenate: "C", credit: "03" },
-    { batch: "E 21", code: "EC9630", name: "Machine Learning", beforeSenate: "E", afterSenate: "E", credit: "02" },
-    { batch: "E 22", code: "EC9630", name: "Machine Learning", beforeSenate: "C", afterSenate: "C", credit: "02" },
-  ];
+  const getColorForGrade = (grade) => {
+    if (grade.startsWith('A')) return "#219EBC";
+    if (grade.startsWith('B')) return "#8ECAE6";
+    if (grade.startsWith('C')) return "#FFB703";
+    if (grade.startsWith('D')) return "#FB8500";
+    return "#D62828"; // E or F
+  };
 
   return (
     <StudentLayout>
@@ -93,22 +153,9 @@ const StudentWiseResult = () => {
           </div>
 
           <div className="st-banner__semester">
-            <div className="st-semester-picker">
-              <label>Select Semester</label>
-              <div className="st-select-wrapper">
-                <Calendar size={18} className="st-select-icon" />
-                <select 
-                  value={selectedSemester} 
-                  onChange={(e) => setSelectedSemester(e.target.value)}
-                  className="st-select"
-                >
-                  <option>Semester 1</option>
-                  <option>Semester 2</option>
-                  <option>Semester 3</option>
-                  <option>Semester 4</option>
-                  <option>Semester 5</option>
-                </select>
-              </div>
+            <div className="st-info-item">
+              <Calendar size={18} />
+              <span>Academic Summary: All Results</span>
             </div>
           </div>
         </div>
@@ -202,7 +249,7 @@ const StudentWiseResult = () => {
               <div className="st-table-header">
                 <h2 className="st-card-title">Detailed Performance</h2>
                 <div className="st-table-actions">
-                  <button className="st-btn st-btn--outline">
+                  <button className="st-btn st-btn--outline" onClick={handleDownload}>
                     <Download size={16} />
                     Download PDF
                   </button>
@@ -222,16 +269,22 @@ const StudentWiseResult = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {results.map((row, idx) => (
-                      <tr key={idx}>
-                        <td>{row.batch}</td>
-                        <td className="st-font-mono">{row.code}</td>
-                        <td>{row.name}</td>
-                        <td><span className={`st-grade-badge st-grade--${row.beforeSenate.charAt(0)}`}>{row.beforeSenate}</span></td>
-                        <td><span className={`st-grade-badge st-grade--${row.afterSenate.charAt(0)}`}>{row.afterSenate}</span></td>
-                        <td>{row.credit}</td>
-                      </tr>
-                    ))}
+                    {loading ? (
+                      <tr><td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>Loading results...</td></tr>
+                    ) : results.length > 0 ? (
+                      results.map((row, idx) => (
+                        <tr key={idx}>
+                          <td>{row.batch}</td>
+                          <td className="st-font-mono">{row.code}</td>
+                          <td>{row.name}</td>
+                          <td><span className={`st-grade-badge st-grade--${row.beforeSenate.charAt(0)}`}>{row.beforeSenate}</span></td>
+                          <td><span className={`st-grade-badge st-grade--${row.afterSenate.charAt(0)}`}>{row.afterSenate}</span></td>
+                          <td>{row.credit}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr><td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>No results found.</td></tr>
+                    )}
                   </tbody>
                 </table>
               </div>

@@ -5,6 +5,7 @@ import profile from '../assets/profile.png';
 import dashboardBg from '../assets/dashboard-bg.png';
 import "../styles/StudentHome.css";
 import { Link } from "react-router-dom";
+import { getStudentDetails } from "../services/studentApi";
 import {
   User,
   BookOpen,
@@ -19,12 +20,34 @@ import {
 
 function StudentHome() {
   const [student, setStudent] = useState({
-    name: "User Name",
-    email: "2021e262@eng.jfn.ac.lk",
+    name: "Loading...",
+    email: "",
     faculty: "Faculty Of Engineering",
     university: "University Of Jaffna",
-    indexNo: "2021E262"
+    indexNo: "---"
   });
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const res = await getStudentDetails();
+      if (res.data && res.data.data) {
+        const u = res.data.data;
+        setStudent({
+          name: `${u.firstName} ${u.lastName}`,
+          email: u.email,
+          faculty: u.faculty || "Faculty Of Engineering",
+          university: u.university || "University Of Jaffna",
+          indexNo: u.studentENo || u.email.split('@')[0].toUpperCase()
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching student profile:", error);
+    }
+  };
 
   return (
     <StudentLayout>

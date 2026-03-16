@@ -51,4 +51,24 @@ const isValidRegNum = (regNo) => {
     return /^\d{4}\/?[A-Z]\/?\d{3,4}$/i.test(regNo);
 };
 
-module.exports = { normalizeRegNo, extractRegNoFromEmail, generateRegNoRegex, isValidRegNum };
+/**
+ * Converts email to a consistent registration number format (20XX/E/XXX).
+ */
+const convertEmailToRegNum = (email) => {
+    const prefix = extractRegNoFromEmail(email); // e.g., 2021E162
+    if (!prefix) throw new Error("Invalid student email");
+    
+    // Convert 2021E162 -> 2021/E/162
+    const year = prefix.substring(0, 4);
+    const letter = prefix.substring(4, 5);
+    const num = prefix.substring(5);
+    return `${year}/${letter}/${num}`;
+};
+
+module.exports = { 
+    normalizeRegNo, 
+    extractRegNoFromEmail, 
+    generateRegNoRegex, 
+    isValidRegNum,
+    convertEmailToRegNum 
+};
