@@ -36,12 +36,18 @@ app.use("/api/complaints", complaintRoutes);
 const notificationRoutes = require("./routes/notificationRoutes");
 app.use("/api/notifications", notificationRoutes);
 
+const academicCalendarRoutes = require("./routes/academicCalendarRoutes");
+app.use("/api/academic-calendar", academicCalendarRoutes);
+
 const studentRoutes = require("./routes/studentRoutes");
 app.use("/api/student", studentRoutes);
 
 app.get("/", (req, res) => {
   res.send("Student Result Summarization System API");
 });
+
+// Serve uploaded files statically
+app.use('/uploads', express.static('uploads'));
 
 // Database Connection
 mongoose
