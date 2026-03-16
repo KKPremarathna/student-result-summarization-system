@@ -124,8 +124,7 @@ function App() {
           path="/lecturer/setting"
           element={<ProtectedRoute allowedRoles={['lecturer']}><LectureSetting /></ProtectedRoute>}
         />
-      </Routes >
-    </BrowserRouter >
+        
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/adminhome" element={<AdminHome />} />
@@ -136,7 +135,6 @@ function App() {
         <Route path="/lecturelist" element={<LectureList />} />
         <Route path="/AdminComplaint" element={<Complaint />} />
         <Route path="/AdminResults" element={<Results />} />
-        <Route path="/adminresetpassword" element={<ResetPassword />} />
         <Route path="/setting" element={<Setting />} />
 
         {/* Lecturer Routes */}
@@ -154,9 +152,8 @@ function App() {
         <Route path="/student/student-wise" element={<StudentWiseResult />} />
         <Route path="/student/incourse-marks" element={<IncourseMarks />} />
         <Route path="/student/profile" element={<StudentProfile />} />
-
-      </Routes>
-    </BrowserRouter>
+      </Routes >
+    </BrowserRouter >
   );
 }
 
