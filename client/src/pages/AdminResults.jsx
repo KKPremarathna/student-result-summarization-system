@@ -4,7 +4,7 @@ import Navbar from "../components/InnerNavbar";
 import { Link } from "react-router-dom";
 
 const API_BASE = "http://localhost:5000/api/admin";
-const GRADES = ["A+","A","A-","B+","B","B-","C+","C","C-","D","E","AB"];
+const GRADES = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D", "E", "AB"];
 
 // ── Reg-num helper (client-side mirror) ────────────────────────────────────
 const REG_PATTERN = /^20\d{2}\/E\/\d{3}$/i;
@@ -80,7 +80,7 @@ function AddStudentModal({ courseCode, onCommit, onCancel, existingRegs }) {
         {/* Modal header */}
         <div className="ar-modal-header">
           <div className="ar-modal-title">
-            <span className="ar-modal-title-icon">👤+</span>
+            <span className="ar-modal-title-icon"></span>
             Add Students {courseCode ? `to ${courseCode.toUpperCase()}` : ""}
           </div>
           <button className="ar-modal-close" onClick={onCancel}>✕</button>
@@ -88,7 +88,7 @@ function AddStudentModal({ courseCode, onCommit, onCancel, existingRegs }) {
 
         {/* Tabs */}
         <div className="ar-tabs">
-          {[["bulk","👥 Bulk Entry"],["range","⟩ Range"],["individual","👤 Individual"]].map(([key, label]) => (
+          {[["bulk", "👥 Bulk Entry"], ["range", "⟩ Range"], ["individual", "👤 Individual"]].map(([key, label]) => (
             <button
               key={key}
               className={`ar-tab ${tab === key ? "ar-tab--active" : ""}`}
@@ -325,11 +325,11 @@ function Results() {
         <aside className="sidebar">
           <div className="sidebar-title">Management</div>
           <ul className="sidebar-menu">
-            <li><Link to="/AdminHome"><span className="sidebar-icon">🏠</span>Admin Home</Link></li>
-            <li><Link to="/AddUser"><span className="sidebar-icon">👤</span>Add User</Link></li>
-            <li><Link to="/AdminComplaint"><span className="sidebar-icon">📋</span>Complaint</Link></li>
-            <li className="active"><Link to="/AdminResults"><span className="sidebar-icon">📊</span>Results</Link></li>
-            <li><Link to="/AdminProfile"><span className="sidebar-icon">👤</span>Profile</Link></li>
+            <li><Link to="/AdminHome"><span className="sidebar-icon"></span>Admin Home</Link></li>
+            <li><Link to="/AddUser"><span className="sidebar-icon"></span>Add User</Link></li>
+            <li><Link to="/AdminComplaint"><span className="sidebar-icon"></span>Complaint</Link></li>
+            <li className="active"><Link to="/AdminResults"><span className="sidebar-icon"></span>Results</Link></li>
+            <li><Link to="/AdminProfile"><span className="sidebar-icon"></span>Profile</Link></li>
           </ul>
         </aside>
 
@@ -384,8 +384,8 @@ function Results() {
             <div className="ar-table-wrapper">
               {rows.length === 0 ? (
                 <div className="ar-empty-table">
-                  <span className="ar-empty-icon">📋</span>
-                  <p>No students added yet.<br/>Click <strong>👤+ Add Students</strong> to begin.</p>
+                  <span className="ar-empty-icon"></span>
+                  <p>No students added yet.<br />Click <strong>Add Students</strong> to begin.</p>
                 </div>
               ) : (
                 <table className="ar-table">
@@ -421,7 +421,7 @@ function Results() {
                               onClick={() => handleUpdateRow(idx)}
                               title="Update this grade in DB"
                             >
-                              ✏️ Update
+                              Update
                             </button>
                           )}
                           <button
@@ -429,7 +429,7 @@ function Results() {
                             onClick={() => handleDeleteRow(idx)}
                             title="Remove row"
                           >
-                            🗑 Delete
+                            Delete
                           </button>
                         </td>
                       </tr>
@@ -456,7 +456,7 @@ function Results() {
                   {saving ? (
                     <><span className="ar-btn-spinner" /> Saving…</>
                   ) : (
-                    "🎯 Finalize Marks"
+                    " Finalize Marks"
                   )}
                 </button>
               </div>

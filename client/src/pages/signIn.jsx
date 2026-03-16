@@ -96,7 +96,7 @@ function Signin() {
                   className="eye-icon"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? "🙈" : "👁"}
+                  {showPassword ? "👁" : "👁"}
                 </span>
               </div>
             </div>

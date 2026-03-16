@@ -1,6 +1,6 @@
 /* Sidebar dashboard */
 .sidebar {
-    background-color: #4F7C82 !important; /* User specified sage teal */
+    background-color: var(--bg-dark) !important; /* User specified sage teal */
     min-height: calc(100vh - 80px);
     transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     overflow-x: hidden;

@@ -137,27 +137,27 @@ function StudentList() {
           <ul className="sidebar-menu">
             <li>
               <Link to="/AdminHome">
-                <span className="sidebar-icon">🏠</span>Admin Home
+                <span className="sidebar-icon"></span>Admin Home
               </Link>
             </li>
             <li className="active">
               <Link to="/AddUser">
-                <span className="sidebar-icon">👤</span>Add User
+                <span className="sidebar-icon"></span>Add User
               </Link>
             </li>
             <li>
               <Link to="/AdminComplaint">
-                <span className="sidebar-icon">📋</span>Complaint
+                <span className="sidebar-icon"></span>Complaint
               </Link>
             </li>
             <li>
               <Link to="/AdminResults">
-                <span className="sidebar-icon">📊</span>Results
+                <span className="sidebar-icon"></span>Results
               </Link>
             </li>
             <li>
               <Link to="/AdminProfile">
-                <span className="sidebar-icon">👤</span>Profile
+                <span className="sidebar-icon"></span>Profile
               </Link>
             </li>
           </ul>
@@ -223,7 +223,7 @@ function StudentList() {
                                 className="sl-delete-btn"
                                 onClick={() => handleDeleteAllowed(item._id, item.email)}
                               >
-                                🗑 Delete
+                                Delete
                               </button>
                             </td>
                           </tr>
@@ -251,7 +251,7 @@ function StudentList() {
               <div className="sl-section sl-section--registered">
                 <div className="sl-section-header">
                   <div className="sl-section-header-left">
-                    <span className="sl-section-icon">✅</span>
+                    <span className="sl-section-icon"></span>
                     <div>
                       <h2 className="sl-section-title">Registered Students</h2>
                       <p className="sl-section-sub">
@@ -303,7 +303,7 @@ function StudentList() {
                                     handleDeleteRegistered(student._id, student.email)
                                   }
                                 >
-                                  🗑 Delete
+                                  Delete
                                 </button>
                               </td>
                             </tr>

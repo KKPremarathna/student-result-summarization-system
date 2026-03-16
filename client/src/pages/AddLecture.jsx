@@ -33,7 +33,7 @@ function AddLecture() {
     setMessage({ type: "", text: "" });
 
     try {
-      const response = await axios.post("http://localhost:5000/api/admin/add-lecturer-email", 
+      const response = await axios.post("http://localhost:5000/api/admin/add-lecturer-email",
         { email, department },
         { headers }
       );
@@ -63,31 +63,31 @@ function AddLecture() {
           <ul className="sidebar-menu">
             <li>
               <Link to="/AdminHome">
-                <span className="sidebar-icon">🏠</span>
+                <span className="sidebar-icon"></span>
                 Admin Home
               </Link>
             </li>
             <li className="active">
               <Link to="/AddUser">
-                <span className="sidebar-icon">👤</span>
+                <span className="sidebar-icon"></span>
                 Add User
               </Link>
             </li>
             <li>
               <Link to="/AdminComplaint">
-                <span className="sidebar-icon">📋</span>
+                <span className="sidebar-icon"></span>
                 Complaint
               </Link>
             </li>
             <li >
               <Link to="/AdminResults">
-                <span className="sidebar-icon">📊</span>
+                <span className="sidebar-icon"></span>
                 Results
               </Link>
             </li>
             <li>
               <Link to="/AdminProfile">
-                <span className="sidebar-icon">👤</span>
+                <span className="sidebar-icon"></span>
                 Profile
               </Link>
             </li>
@@ -149,4 +149,4 @@ function AddLecture() {
   );
 }
 
-export default AddLecture;
+export default AddLecture;

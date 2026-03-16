@@ -44,31 +44,31 @@ function Complaint() {
           <ul className="sidebar-menu">
             <li>
               <Link to="/AdminHome">
-                <span className="sidebar-icon">🏠</span>
+                <span className="sidebar-icon"></span>
                 Admin Home
               </Link>
             </li>
             <li>
               <Link to="/AddUser">
-                <span className="sidebar-icon">👤</span>
+                <span className="sidebar-icon"></span>
                 Add User
               </Link>
             </li>
             <li className="active">
               <Link to="/AdminComplaint">
-                <span className="sidebar-icon">📋</span>
+                <span className="sidebar-icon"></span>
                 Complaint
               </Link>
             </li>
             <li >
               <Link to="/AdminResults">
-                <span className="sidebar-icon">📊</span>
+                <span className="sidebar-icon"></span>
                 Results
               </Link>
             </li>
             <li>
               <Link to="/AdminProfile">
-                <span className="sidebar-icon">👤</span>
+                <span className="sidebar-icon"></span>
                 Profile
               </Link>
             </li>

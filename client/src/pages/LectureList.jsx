@@ -99,27 +99,27 @@ function LectureList() {
           <ul className="sidebar-menu">
             <li>
               <Link to="/AdminHome">
-                <span className="sidebar-icon">🏠</span>Admin Home
+                <span className="sidebar-icon"></span>Admin Home
               </Link>
             </li>
             <li className="active">
               <Link to="/AddUser">
-                <span className="sidebar-icon">👤</span>Add User
+                <span className="sidebar-icon"></span>Add User
               </Link>
             </li>
             <li>
               <Link to="/AdminComplaint">
-                <span className="sidebar-icon">📋</span>Complaint
+                <span className="sidebar-icon"></span>Complaint
               </Link>
             </li>
             <li>
               <Link to="/AdminResults">
-                <span className="sidebar-icon">📊</span>Results
+                <span className="sidebar-icon"></span>Results
               </Link>
             </li>
             <li>
               <Link to="/AdminProfile">
-                <span className="sidebar-icon">👤</span>Profile
+                <span className="sidebar-icon"></span>Profile
               </Link>
             </li>
           </ul>
@@ -132,7 +132,7 @@ function LectureList() {
             {/* Section Header */}
             <div className="ll-section-header">
               <div className="ll-header-left">
-                <span className="ll-header-icon">👨‍🏫</span>
+                <span className="ll-header-icon"></span>
                 <div>
                   <h1 className="ll-title">Registered Lecturers</h1>
                   <p className="ll-subtitle">
