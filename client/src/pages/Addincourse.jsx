@@ -408,15 +408,23 @@ function AddIncourse() {
                   <tr className="aic-thead-primary">
                   <th rowSpan="2" className="aic-th aic-th--border-r">E.No</th>
                     {structure.assignments > 0 && (
-                      <th colSpan={structure.assignments} className="aic-th aic-th--border-r aic-th--border-b">Assignments</th>
+                      <th colSpan={structure.assignments} className="aic-th aic-th--border-r aic-th--border-b">
+                        Assignments ({subjectInfo.assessments?.assignmentWeight || 0}%)
+                      </th>
                     )}
                     {structure.quizzes > 0 && (
-                      <th colSpan={structure.quizzes} className="aic-th aic-th--border-r aic-th--border-b">Quizzes</th>
+                      <th colSpan={structure.quizzes} className="aic-th aic-th--border-r aic-th--border-b">
+                        Quizzes ({subjectInfo.assessments?.quizWeight || 0}%)
+                      </th>
                     )}
                     {structure.labs > 0 && (
-                      <th colSpan={structure.labs} className="aic-th aic-th--border-r aic-th--border-b">Labs</th>
+                      <th colSpan={structure.labs} className="aic-th aic-th--border-r aic-th--border-b">
+                        Labs ({subjectInfo.assessments?.labWeight || 0}%)
+                      </th>
                     )}
-                    <th rowSpan="2" className="aic-th aic-th--border-r">MID</th>
+                    <th rowSpan="2" className="aic-th aic-th--border-r">
+                      MID ({subjectInfo.assessments?.midWeight || 0}%)
+                    </th>
                     <th rowSpan="2" className="aic-th aic-th--border-r">INCR. TOTAL</th>
                     <th rowSpan="2" className="aic-th">Actions</th>
                   </tr>
