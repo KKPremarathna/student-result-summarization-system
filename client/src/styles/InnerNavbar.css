@@ -43,7 +43,7 @@
   text-decoration: none;
   font-size: 1.2rem;
   font-weight: 700;
-  color: white; /* Match Academet text visibility */
+  color: white;
   transition: all var(--transition-fast);
   text-transform: capitalize;
 }
@@ -52,7 +52,6 @@
   opacity: 0.8;
   transform: translateY(-1px);
 }
-
 
 @media (max-width: 768px) {
   .inner-navbar {
@@ -63,3 +62,4 @@
     display: none;
   }
 }
+
