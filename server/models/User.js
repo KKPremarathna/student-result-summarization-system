@@ -60,6 +60,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: '',
     },
+    studentENo: {
+        type: String,
+        default: '',
+        unique: true,
+        sparse: true, // Allow multiple users with empty string if not a student
+    },
     createdAt: {
         type: Date,
         default: Date.now,

@@ -6,6 +6,16 @@ const complaintSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
+    studentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+    },
+    subjectId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Subject',
+        required: true,
+    },
     title: {
         type: String,
         required: true,
