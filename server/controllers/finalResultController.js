@@ -3,6 +3,7 @@ const IncourseResult = require("../models/IncourseResult");
 const FinalResult = require("../models/FinalResult");
 const { isValidRegNum } = require("../utils/regUtils");
 const PDFDocument = require("pdfkit-table");
+const { normalizeRegNo, extractRegNoFromEmail, generateRegNoRegex } = require("../utils/regUtils");
 
 function calcGrade(mark) {
   if (mark >= 85) return "A+";
@@ -419,5 +420,175 @@ exports.deleteResult = async (req, res) => {
     return res.json({ message: "Deleted", id: req.params.id });
   } catch (e) {
     return res.status(500).json({ message: e.message });
+  }
+};
+
+// GET /api/final-results/student/all
+exports.getStudentFinalResults = async (req, res) => {
+  try {
+    const { semester } = req.query;
+    let studentENo = normalizeRegNo(req.user.studentENo);
+    
+    if (!studentENo) {
+        studentENo = extractRegNoFromEmail(req.user.email);
+    }
+
+    if (!studentENo) {
+      return res.status(400).json({ message: "Could not identify your registration number from profile or email" });
+    }
+
+    const regNoRegex = generateRegNoRegex(studentENo);
+
+    let query = { studentENo: regNoRegex };
+    
+    // Find all results first
+    let results = await FinalResult.find(query)
+      .populate("subject", "courseCode courseName batch semester credit");
+
+    // Filter by semester if requested
+    if (semester) {
+        results = results.filter(r => r.subject && r.subject.semester === semester);
+    }
+
+    // Calculate Summary and Distribution
+    const summary = { enrolled: results.length, passed: 0, failed: 0 };
+    const gradeDistribution = {
+      "A+": 0, "A": 0, "A-": 0,
+      "B+": 0, "B": 0, "B-": 0,
+      "C+": 0, "C": 0, "C-": 0,
+      "D+": 0, "D": 0, "E": 0
+    };
+
+    results.forEach(r => {
+        const finalGrade = r.afterSenateGrade || r.grade;
+        if (gradeDistribution[finalGrade] !== undefined) {
+            gradeDistribution[finalGrade]++;
+        }
+
+        // Pass condition: finalGrade is not E, AND incourse is > 35
+        if (finalGrade !== "E" && r.incourseTotal > 35) {
+            summary.passed++;
+        } else {
+            summary.failed++;
+        }
+    });
+
+    return res.json({
+        summary,
+        gradeDistribution,
+        results
+    });
+  } catch (e) {
+    return res.status(500).json({ message: e.message });
+  }
+};
+
+// GET /api/final-results/student/analytics?courseCode=CS301&batch=Y3S1
+exports.getSubjectAnalytics = async (req, res) => {
+  try {
+    const { courseCode, batch } = req.query;
+    if (!courseCode || !batch) {
+      return res.status(400).json({ message: "courseCode and batch are required" });
+    }
+
+    const subject = await Subject.findOne({ 
+      courseCode: courseCode.toUpperCase(), 
+      batch 
+    }).populate("createdBy", "firstName lastName title");
+
+    if (!subject) return res.status(404).json({ message: "Subject not found" });
+
+    const finalResults = await FinalResult.find({ subject: subject._id });
+    const incourseCount = await IncourseResult.countDocuments({ subject: subject._id });
+
+    const gradeDistribution = {
+      "A+": 0, "A": 0, "A-": 0,
+      "B+": 0, "B": 0, "B-": 0,
+      "C+": 0, "C": 0, "D": 0, "E": 0
+    };
+
+    let passed = 0;
+    let failed = 0;
+
+    finalResults.forEach(r => {
+        if (gradeDistribution[r.grade] !== undefined) {
+            gradeDistribution[r.grade]++;
+        }
+        
+        // Pass condition: Grade is not E, AND incourse is > 35
+        if (r.grade !== "E" && r.incourseTotal > 35) {
+            passed++;
+        } else {
+            failed++;
+        }
+    });
+
+    // Students with incourse but no final results are considered failed/incomplete in stats
+    failed += (incourseCount - finalResults.length);
+
+    return res.json({
+      subjectInfo: {
+        courseCode: subject.courseCode,
+        courseName: subject.courseName,
+        credit: subject.credit,
+        description: subject.description,
+        lecturer: `${subject.createdBy.title} ${subject.createdBy.firstName} ${subject.createdBy.lastName}`
+      },
+      statistics: {
+        enrolled: incourseCount,
+        passed,
+        failed
+      },
+      gradeDistribution
+    });
+  } catch (e) {
+    return res.status(500).json({ message: e.message });
+  }
+};
+
+// GET /api/final-results/student/download-pdf
+exports.downloadStudentReportPdf = async (req, res) => {
+  try {
+    let studentENo = normalizeRegNo(req.user.studentENo);
+    if (!studentENo) studentENo = extractRegNoFromEmail(req.user.email);
+
+    if (!studentENo) return res.status(400).json({ message: "Registration number not found" });
+
+    const results = await FinalResult.find({ studentENo: generateRegNoRegex(studentENo) })
+      .populate("subject", "courseCode courseName batch semester credit");
+
+    const doc = new PDFDocument({ margin: 30, size: 'A4' });
+    res.setHeader('Content-disposition', `attachment; filename=results_${studentENo}.pdf`);
+    res.setHeader('Content-type', 'application/pdf');
+    doc.pipe(res);
+
+    doc.fontSize(20).text(`Final Results Report`, { align: 'center' });
+    doc.fontSize(14).text(`Name: ${req.user.firstName} ${req.user.lastName}`, { align: 'center' });
+    doc.text(`E-Number: ${studentENo}`, { align: 'center' });
+    doc.moveDown(2);
+
+    const tableRows = results.map(r => [
+      r.subject?.batch || "-",
+      r.subject?.courseCode || "-",
+      r.subject?.courseName || "-",
+      r.grade || "E",
+      r.afterSenateGrade || r.grade || "E",
+      r.subject?.credit || 0
+    ]);
+
+    const table = {
+      title: "Academic Performance Summary",
+      headers: ["Batch", "Code", "Name", "Result (Before)", "Result (After)", "Credit"],
+      rows: tableRows
+    };
+
+    await doc.table(table, {
+      prepareHeader: () => doc.font("Helvetica-Bold").fontSize(10),
+      prepareRow: (row, i) => doc.font("Helvetica").fontSize(9)
+    });
+
+    doc.end();
+  } catch (e) {
+    if (!res.headersSent) res.status(500).json({ message: e.message });
   }
 };

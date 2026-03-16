@@ -12,25 +12,30 @@ const {
   getSummary,
   downloadPdf,
   updateResult,
-  deleteResult
+  deleteResult,
+  getStudentFinalResults,
+  getSubjectAnalytics,
+  downloadStudentReportPdf
 } = require("../controllers/finalResultController");
 
 // Must be logged in
 router.use(authMiddleware);
 
-// Lecturer-only for all routes
-router.use(requireRole("lecturer"));
-
 // Named routes (must be BEFORE /:id)
-router.get("/incourse-list", getIncourseList);
-router.post("/save", saveResult);
-router.get("/summary", getSummary);
-router.get("/download-pdf", downloadPdf);
-router.get("/by-eno", getResultByENo);
+router.get("/incourse-list", requireRole("lecturer"), getIncourseList);
+router.post("/save", requireRole("lecturer"), saveResult);
+router.get("/summary", requireRole("lecturer"), getSummary);
+router.get("/download-pdf", requireRole("lecturer"), downloadPdf);
+router.get("/by-eno", requireRole("lecturer"), getResultByENo);
 
 // Standard CRUD
-router.get("/", getResults);
-router.put("/:id", updateResult);
-router.delete("/:id", deleteResult);
+router.get("/", requireRole("lecturer"), getResults);
+router.put("/:id", requireRole("lecturer"), updateResult);
+router.delete("/:id", requireRole("lecturer"), deleteResult);
+
+// Student-specific routes
+router.get("/student/all", requireRole("student"), getStudentFinalResults);
+router.get("/student/analytics", requireRole("student"), getSubjectAnalytics);
+router.get("/student/download-pdf", requireRole("student"), downloadStudentReportPdf);
 
 module.exports = router;

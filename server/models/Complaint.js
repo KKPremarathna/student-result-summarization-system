@@ -1,30 +1,20 @@
 const mongoose = require('mongoose');
 
 const complaintSchema = new mongoose.Schema({
-    senderId: {
+    lecturerId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
     },
-    senderRole: {
-        type: String,
-        enum: ['student', 'lecturer', 'admin'],
-        required: true,
-    },
-    receiverId: {
+    studentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true, // For student->lecturer this is the lecturer. For lecturer->admin, this is an Admin ID.
-    },
-    receiverRole: {
-        type: String,
-        enum: ['lecturer', 'admin'],
         required: true,
     },
     subjectId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Subject',
-        default: null, // Optional. Mainly used for student complaints about a specific subject.
+        required: true,
     },
     title: {
         type: String,
