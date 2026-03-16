@@ -13,7 +13,7 @@ const sendEmail = async (options) => {
     }
 
     const transporter = nodemailer.createTransport({
-        service: 'gmail', // or use host/port from env if preferred
+        service: 'gmail',
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS,
@@ -21,11 +21,11 @@ const sendEmail = async (options) => {
     });
 
     const mailOptions = {
-        from: process.env.EMAIL_USER,
+        from: `"Student Result System" <${process.env.EMAIL_USER}>`,
         to: options.email,
         subject: options.subject,
         text: options.message,
-        html: options.html,
+        html: options.html || `<p>${options.message}</p>`,
     };
 
     await transporter.sendMail(mailOptions);

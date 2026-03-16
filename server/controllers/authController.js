@@ -33,12 +33,23 @@ exports.requestOTP = async(req, res) => {
 
         // 5. Send OTP via Email
         const message = `Your OTP for registration is: ${otpIndex}. It expires in 5 minutes.`;
+        const html = `
+            <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
+                <h2 style="color: #4ea0f0;">Registration OTP</h2>
+                <p>Thank you for registering with the Student Result Summarization System.</p>
+                <p>Your OTP for registration is: <strong style="font-size: 20px; color: #4ea0f0;">${otpIndex}</strong></p>
+                <p>This OTP will expire in 5 minutes.</p>
+                <hr style="border: 0; border-top: 1px solid #eee;" />
+                <p style="font-size: 12px; color: #777;">If you did not request this, please ignore this email.</p>
+            </div>
+        `;
 
         try {
             await sendEmail({
                 email: email,
-                subject: 'Student Result Summarization System - Registration OTP',
+                subject: 'Registration OTP - Student Result System',
                 message: message,
+                html: html
             });
 
             res.status(200).json({ message: 'OTP sent to email.' });
@@ -167,12 +178,23 @@ exports.forgotPassword = async(req, res) => {
 
         // 4. Send Email
         const message = `Your OTP to reset your password is: ${otpIndex}. It expires in 5 minutes.`;
+        const html = `
+            <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
+                <h2 style="color: #4ea0f0;">Password Reset OTP</h2>
+                <p>We received a request to reset your password for the Student Result Summarization System.</p>
+                <p>Your OTP to reset your password is: <strong style="font-size: 20px; color: #4ea0f0;">${otpIndex}</strong></p>
+                <p>This OTP will expire in 5 minutes.</p>
+                <hr style="border: 0; border-top: 1px solid #eee;" />
+                <p style="font-size: 12px; color: #777;">If you did not request this, please ignore this email.</p>
+            </div>
+        `;
 
         try {
             await sendEmail({
                 email: email,
-                subject: 'Student Result Summarization System - Password Reset OTP',
+                subject: 'Password Reset OTP - Student Result System',
                 message: message,
+                html: html
             });
 
             res.status(200).json({ message: 'Password reset OTP sent to your email.' });
