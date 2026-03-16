@@ -1,18 +1,120 @@
 import axios from "axios";
 
-/*
-Backend API base URL
-Change if server port changes
-*/
-
 const API = "http://localhost:5000/api";
 
 /*
 Fetch lecturer details from backend
-Example endpoint:
-GET /api/lecturer/:id
+Endpoint: GET /api/user/details (Private)
 */
+export const getLecturerDetails = () => {
+    const token = localStorage.getItem("token");
+    return axios.get(`${API}/user/details`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+};
 
-export const getLecturerDetails = (id) => {
-  return axios.get(`${API}/lecturer/${id}`);
+/*
+Fetch course codes for the logged-in lecturer
+*/
+export const getCourseCodes = () => {
+    const token = localStorage.getItem("token");
+    return axios.get(`${API}/subjects/my-course-codes`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
+
+/*
+Fetch batches for a specific course
+*/
+export const getBatches = (courseCode) => {
+    const token = localStorage.getItem("token");
+    return axios.get(`${API}/subjects/my-batches`, {
+        params: { courseCode },
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
+
+/*
+Fetch the detailed incourse results for a subject
+*/
+export const getIncourseResults = (subjectId) => {
+    const token = localStorage.getItem("token");
+    return axios.get(`${API}/final-results/incourse-list`, {
+        params: { subject: subjectId },
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
+
+/*
+Utility to get subject details by code and batch
+*/
+export const getSubjectByCodeAndBatch = (courseCode, batch) => {
+    const token = localStorage.getItem("token");
+    return axios.get(`${API}/subjects`, {
+        params: { courseCode, batch },
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
+
+/*
+Create a new subject
+*/
+export const createSubject = (subjectData) => {
+    const token = localStorage.getItem("token");
+    return axios.post(`${API}/subjects`, subjectData, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
+
+/*
+Save or update incourse results for a student
+*/
+export const saveIncourseResult = (resultData) => {
+    const token = localStorage.getItem("token");
+    return axios.post(`${API}/incourse/save`, resultData, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
+
+/*
+Get all incourse results for a specific subject
+*/
+export const getIncourseResultsBySubject = (subjectId) => {
+    const token = localStorage.getItem("token");
+    return axios.get(`${API}/incourse`, {
+        params: { subject: subjectId },
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
+
+/*
+Update lecturer profile fields
+*/
+export const updateLecturerProfile = (profileData) => {
+    const token = localStorage.getItem("token");
+    return axios.put(`${API}/user/update-profile`, profileData, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
+
+/*
+Change password for logged-in lecturer
+*/
+export const changeLecturerPassword = (passwordData) => {
+    const token = localStorage.getItem("token");
+    return axios.post(`${API}/auth/change-password`, passwordData, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
+
+/*
+Save or update final result (end exam mark)
+*/
+export const saveFinalResult = (resultData) => {
+    const token = localStorage.getItem("token");
+    return axios.post(`${API}/final-results/save`, resultData, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
 };

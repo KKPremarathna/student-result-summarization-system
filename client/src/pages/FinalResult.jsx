@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LecturerLayout from "../components/LecturerLayout.jsx";
+import { getCourseCodes, getBatches, getSubjectByCodeAndBatch, getIncourseResults, saveFinalResult } from "../services/lecturerApi";
 import "../styles/FinalResult.css";
 import {
   Save,
@@ -10,19 +11,114 @@ import {
   ChevronRight,
   GraduationCap,
   ClipboardCheck,
-  User
+  User,
+  Edit2,
+  Lock,
+  Loader2,
+  AlertCircle,
+  CheckCircle2
 } from "lucide-react";
 
 function FinalResult() {
-  const [rows, setRows] = useState([
-    { eNumber: "E001", incourse: "25", endExam: "50", grade: "A" },
-    { eNumber: "E002", incourse: "20", endExam: "40", grade: "B" },
-  ]);
+  const [courseCodes, setCourseCodes] = useState([]);
+  const [batches, setBatches] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [selectedBatch, setSelectedBatch] = useState("");
+  const [rows, setRows] = useState([]);
+  const [subjectId, setSubjectId] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [status, setStatus] = useState({ type: null, message: "" });
 
-  const handleInputChange = (index, field, value) => {
+  useEffect(() => {
+    fetchCourseCodes();
+  }, []);
+
+  const fetchCourseCodes = async () => {
+    try {
+      const res = await getCourseCodes();
+      setCourseCodes(res.data);
+    } catch (err) {
+      console.error("Failed to fetch course codes", err);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedCourse) fetchBatches(selectedCourse);
+    else {
+      setBatches([]);
+      setSelectedBatch("");
+    }
+  }, [selectedCourse]);
+
+  const fetchBatches = async (code) => {
+    try {
+      const res = await getBatches(code);
+      setBatches(res.data);
+      setSelectedBatch(""); // Reset batch when course changes
+    } catch (err) {
+      console.error("Failed to fetch batches", err);
+    }
+  };
+
+  const handleFetchResults = async () => {
+    if (!selectedCourse || !selectedBatch) return;
+    setLoading(true);
+    setStatus({ type: null, message: "" });
+    try {
+      const subRes = await getSubjectByCodeAndBatch(selectedCourse, selectedBatch);
+      if (subRes.data.length > 0) {
+        const sub = subRes.data[0];
+        setSubjectId(sub._id);
+        const res = await getIncourseResults(sub._id);
+        setRows(res.data.results);
+      } else {
+        setRows([]);
+        setStatus({ type: "error", message: "Subject not found." });
+      }
+    } catch (err) {
+      console.error("Failed to fetch results", err);
+      setStatus({ type: "error", message: "Failed to load results." });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (index, value) => {
     const newRows = [...rows];
-    newRows[index][field] = value;
+    newRows[index].endExamMark = value;
+    
+    // Auto-calculate final mark and grade locally for instant feedback
+    const incourseTotal = newRows[index].incourseTotal || 0;
+    const endMark = parseFloat(value) || 0;
+    // Assuming endExamWeight is 60 as per common pattern, or fetch from subject if available
+    // For simplicity, let's keep it locally updated after saving.
     setRows(newRows);
+  };
+
+  const handleSave = async () => {
+    setLoading(true);
+    let successCount = 0;
+    try {
+      for (const row of rows) {
+        if (row.endExamMark !== null && row.endExamMark !== undefined) {
+          await saveFinalResult({
+            subject: subjectId,
+            studentENo: row.studentENo,
+            endExamMark: parseFloat(row.endExamMark)
+          });
+          successCount++;
+        }
+      }
+      setStatus({ type: "success", message: `Successfully saved ${successCount} records.` });
+      setIsEditMode(false);
+      handleFetchResults(); // Refresh to get grades
+    } catch (err) {
+      console.error("Save failed", err);
+      setStatus({ type: "error", message: "Some records failed to save." });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -45,16 +141,29 @@ function FinalResult() {
           </div>
 
           <div className="fr-header__actions">
-            <button className="fr-btn fr-btn--outline">
-              <Save size={18} />
-              Save Draft
+            <button 
+              className={`fr-btn ${isEditMode ? 'fr-btn--outline' : 'fr-btn--primary'}`}
+              onClick={() => setIsEditMode(!isEditMode)}
+              disabled={loading || rows.length === 0}
+            >
+              {isEditMode ? <Lock size={18} /> : <Edit2 size={18} />}
+              {isEditMode ? "Lock Editing" : "Edit Marks"}
             </button>
-            <button className="fr-btn fr-btn--primary">
-              <Send size={18} />
-              Submit to Senate
-            </button>
+            {isEditMode && (
+              <button className="fr-btn fr-btn--primary" onClick={handleSave} disabled={loading}>
+                <Save size={18} />
+                Save Changes
+              </button>
+            )}
           </div>
         </div>
+
+        {status.message && (
+          <div className={`fr-card fr-status-bar ${status.type}`}>
+            {status.type === "success" ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+            <span>{status.message}</span>
+          </div>
+        )}
 
         {/* Filters Card */}
         <div className="fr-card">
@@ -72,11 +181,17 @@ function FinalResult() {
                 Course Code
               </label>
               <select
-                defaultValue="CS101"
+                value={selectedCourse}
+                onChange={(e) => setSelectedCourse(e.target.value)}
                 className="fr-select"
+                disabled={isEditMode || loading}
               >
-                <option value="CS101">CS101 - Introduction to Programming</option>
-                <option value="CS102">CS102 - Data Structures</option>
+                <option value="">Select Course</option>
+                {courseCodes.map(item => (
+                  <option key={item.courseCode} value={item.courseCode}>
+                    {item.courseCode} - {item.courseName}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -86,12 +201,21 @@ function FinalResult() {
                 Batch
               </label>
               <select
-                defaultValue="2021"
+                value={selectedBatch}
+                onChange={(e) => setSelectedBatch(e.target.value)}
                 className="fr-select"
+                disabled={!selectedCourse || isEditMode || loading}
               >
-                <option value="2021">Batch 2021 (Regular)</option>
-                <option value="2022">Batch 2022 (Junior)</option>
+                <option value="">Select Batch</option>
+                {batches.map(batch => <option key={batch} value={batch}>{batch}</option>)}
               </select>
+            </div>
+
+            <div className="fr-field" style={{ justifyContent: 'flex-end' }}>
+               <button className="fr-btn fr-btn--primary" onClick={handleFetchResults} disabled={loading || isEditMode}>
+                  {loading ? <Loader2 className="animate-spin" size={18} /> : <Table size={18} />}
+                  Load Students
+               </button>
             </div>
           </div>
         </div>
@@ -109,62 +233,61 @@ function FinalResult() {
                 </tr>
               </thead>
               <tbody className="fr-tbody">
-                {rows.map((row, index) => (
-                  <tr key={index} className="fr-row">
-                    <td className="fr-td">
-                      <div className="fr-enumber-cell">
-                        <div className="fr-enumber-icon">
-                          <User size={16} />
-                        </div>
-                        <input
-                          type="text"
-                          value={row.eNumber}
-                          onChange={(e) => handleInputChange(index, 'eNumber', e.target.value)}
-                          className="fr-input fr-input--transparent"
-                        />
-                      </div>
-                    </td>
-                    <td className="fr-td fr-td--center">
-                      <input
-                        type="text"
-                        value={row.incourse}
-                        onChange={(e) => handleInputChange(index, 'incourse', e.target.value)}
-                        className="fr-input fr-input--cell"
-                      />
-                    </td>
-                    <td className="fr-td fr-td--center">
-                      <input
-                        type="text"
-                        value={row.endExam}
-                        onChange={(e) => handleInputChange(index, 'endExam', e.target.value)}
-                        className="fr-input fr-input--cell"
-                      />
-                    </td>
-                    <td className="fr-td fr-td--center">
-                      <input
-                        type="text"
-                        value={row.grade}
-                        onChange={(e) => handleInputChange(index, 'grade', e.target.value)}
-                        className="fr-input fr-input--grade"
-                      />
+                {rows.length === 0 ? (
+                  <tr>
+                    <td colSpan="4" className="fr-td fr-td--center" style={{ padding: '4rem', opacity: 0.5 }}>
+                      Select Course & Batch to load student results
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  rows.map((row, index) => (
+                    <tr key={index} className="fr-row">
+                      <td className="fr-td">
+                        <div className="fr-enumber-cell">
+                          <div className="fr-enumber-icon">
+                            <User size={16} />
+                          </div>
+                          <span className="fr-enumber-text">{row.studentENo}</span>
+                        </div>
+                      </td>
+                      <td className="fr-td fr-td--center">
+                         <span className="fr-incourse-text">{row.incourseTotal?.toFixed(2) || "0.00"}</span>
+                      </td>
+                      <td className="fr-td fr-td--center">
+                        <input
+                          type="number"
+                          value={row.endExamMark ?? ""}
+                          onChange={(e) => handleInputChange(index, e.target.value)}
+                          disabled={!isEditMode || loading}
+                          className={`fr-input ${isEditMode ? 'fr-input--cell' : 'fr-input--transparent'}`}
+                          placeholder="-"
+                        />
+                      </td>
+                      <td className="fr-td fr-td--center">
+                        <span className={`fr-grade-badge ${row.grade === 'E' ? 'fail' : 'pass'}`}>
+                          {row.grade || "-"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </div>
 
         {/* Summary Footer */}
-        <div className="fr-info-bar">
-          <div className="fr-info-bar__icon-wrap">
-            <Table size={24} />
+        {rows.length > 0 && (
+          <div className="fr-info-bar">
+            <div className="fr-info-bar__icon-wrap">
+              <Table size={24} />
+            </div>
+            <div>
+              <p className="fr-info-bar__label">Quick Info</p>
+              <p className="fr-info-bar__text">Currently managing {rows.length} student records for the selected batch.</p>
+            </div>
           </div>
-          <div>
-            <p className="fr-info-bar__label">Quick Info</p>
-            <p className="fr-info-bar__text">Currently managing {rows.length} student records for the selected batch.</p>
-          </div>
-        </div>
+        )}
       </div>
     </LecturerLayout>
   );

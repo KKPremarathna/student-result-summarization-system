@@ -12,7 +12,7 @@ exports.getUserDetails = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        
+
         // Fetch subjects assigned to this user
         const subjects = await Subject.find({ createdBy: req.user.id });
 
@@ -27,7 +27,21 @@ exports.getUserDetails = async (req, res) => {
 // @route   PUT /api/user/update-profile
 // @access  Private
 exports.updateProfile = async (req, res) => {
-    const { profilePicture, oldPassword, newPassword, title, position, faculty, university, department, firstName, lastName, phone, dob } = req.body;
+    const {
+        title,
+        position,
+        faculty,
+        university,
+        department,
+        firstName,
+        lastName,
+        phone,
+        dob,
+        profilePicture,
+        oldPassword,
+        newPassword,
+        lecturerId
+    } = req.body;
 
     try {
         const user = await User.findById(req.user.id);
@@ -36,8 +50,10 @@ exports.updateProfile = async (req, res) => {
         }
 
         let updatedFields = {};
-        
+
         // 1. Update Profile Fields if provided
+        if (firstName !== undefined) updatedFields.firstName = firstName;
+        if (lastName !== undefined) updatedFields.lastName = lastName;
         if (profilePicture !== undefined) updatedFields.profilePicture = profilePicture;
         if (title !== undefined) updatedFields.title = title;
         if (position !== undefined) updatedFields.position = position;
@@ -48,6 +64,8 @@ exports.updateProfile = async (req, res) => {
         if (lastName !== undefined) updatedFields.lastName = lastName;
         if (phone !== undefined) updatedFields.phone = phone;
         if (dob !== undefined) updatedFields.dob = dob;
+        if (lecturerId !== undefined) updatedFields.lecturerId = lecturerId;
+
 
         // 2. Update Password if new password is provided
         if (newPassword) {
@@ -65,7 +83,6 @@ exports.updateProfile = async (req, res) => {
 
             return res.status(200).json({ success: true, message: 'Profile updated successfully', data: updatedUser });
         } else {
-            // Nothing to update, but user submitted the form
             return res.status(200).json({ success: true, message: 'No changes made', data: user });
         }
 

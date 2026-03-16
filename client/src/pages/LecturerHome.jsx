@@ -13,23 +13,50 @@ import {
   Bell,
   Search,
   LayoutDashboard,
-  Calendar
+  Calendar,
+  Loader2
 } from "lucide-react";
 
 function LecturerHome() {
   const [lecturer, setLecturer] = useState(null);
+  const [subjects, setSubjects] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await getLecturerDetails("123");
-        setLecturer(res.data);
+        const res = await getLecturerDetails();
+        if (res.data.success) {
+          setLecturer(res.data.data);
+          setSubjects(res.data.subjects || []);
+        }
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching lecturer details:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
   }, []);
+
+  const DEFAULT_AVATAR = "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix";
+
+  const handleImageError = (e) => {
+    e.target.src = DEFAULT_AVATAR;
+  };
+
+  if (loading) {
+    return (
+      <LecturerLayout>
+        <div className="lh-loading">
+          <Loader2 className="lh-loader-icon" />
+          <p>Loading dashboard...</p>
+        </div>
+      </LecturerLayout>
+    );
+  }
+
+  const fullName = lecturer ? `${lecturer.title || ""} ${lecturer.firstName} ${lecturer.lastName}` : "User Name";
 
   return (
     <LecturerLayout>
@@ -51,7 +78,7 @@ function LecturerHome() {
               </span>
             </div>
             <h1 className="lh-hero__title">
-              Welcome back, <span>{lecturer?.name || "Mrs K.B Ranathunga"}</span>..!
+              Welcome back, <span>{fullName}</span>..!
             </h1>
             <p className="lh-hero__subtitle">
               Your academic performance and subject management portal is up to date.
@@ -70,17 +97,18 @@ function LecturerHome() {
                 <div className="lh-avatar-glow"></div>
                 <div className="lh-avatar">
                   <img
-                    src={lecturer?.profileImage || profile}
+                    src={lecturer?.profilePicture || DEFAULT_AVATAR}
                     alt="Lecturer Profile"
                     className="lh-avatar__img"
+                    onError={handleImageError}
                   />
                 </div>
               </div>
 
-              <h2 className="lh-profile__name">{lecturer?.name || "User Name"}</h2>
+              <h2 className="lh-profile__name">{fullName}</h2>
               <div className="lh-profile__role">
                 <GraduationCap size={18} />
-                {lecturer?.position || "Senior Lecturer"}
+                {lecturer?.position || "Staff Member"}
               </div>
 
               <div className="lh-profile__info">
@@ -89,7 +117,7 @@ function LecturerHome() {
                     <LayoutDashboard size={18} />
                     <span>Faculty</span>
                   </div>
-                  <span className="lh-info-row__value">{lecturer?.faculty || "Faculty Of Engineering"}</span>
+                  <span className="lh-info-row__value">{lecturer?.faculty || "Not Specified"}</span>
                 </div>
 
                 <div className="lh-info-row">
@@ -122,7 +150,9 @@ function LecturerHome() {
                   <div className="lh-stat-card__icon">
                     <BookOpen size={28} />
                   </div>
-                  <span className="lh-stat-card__number">01</span>
+                  <span className="lh-stat-card__number">
+                    {subjects.length.toString().padStart(2, '0')}
+                  </span>
                 </div>
                 <h3 className="lh-stat-card__label">Total Subjects</h3>
                 <p className="lh-stat-card__sub">Modules Managed</p>
@@ -134,7 +164,7 @@ function LecturerHome() {
                   <div className="lh-stat-card__icon">
                     <Bell size={28} />
                   </div>
-                  <span className="lh-stat-card__number">04</span>
+                  <span className="lh-stat-card__number">00</span>
                 </div>
                 <h3 className="lh-stat-card__label">Recent Activities</h3>
                 <p className="lh-stat-card__sub">Pending Tasks</p>
@@ -160,15 +190,15 @@ function LecturerHome() {
               </div>
 
               <div className="lh-subjects-grid">
-                {lecturer?.subjects?.length > 0 ? (
-                  lecturer.subjects.map((subject, index) => (
+                {subjects.length > 0 ? (
+                  subjects.map((subject, index) => (
                     <div key={index} className="lh-subject-item">
                       <div className="lh-subject-item__initial">
-                        {subject.charAt(0)}
+                        {subject.courseCode?.charAt(0) || "S"}
                       </div>
                       <div>
-                        <h4 className="lh-subject-item__name">{subject}</h4>
-                        <p className="lh-subject-item__year">Academic Year 2024</p>
+                        <h4 className="lh-subject-item__name">{subject.courseName}</h4>
+                        <p className="lh-subject-item__year">{subject.courseCode} | {subject.batch}</p>
                       </div>
                     </div>
                   ))

@@ -1,5 +1,6 @@
 const Subject = require("../models/Subject");
 const IncourseResult = require("../models/IncourseResult");
+const { normalizeRegNo, extractRegNoFromEmail, generateRegNoRegex } = require("../utils/regUtils");
 
 function avg(arr) {
   if (!arr || arr.length === 0) return 0;
@@ -45,7 +46,8 @@ function validateMarks(marks, assessments) {
 // POST /api/incourse/save (upsert)
 exports.saveResult = async (req, res) => {
   try {
-    const { subject: subjectId, studentENo, assignments, quizzes, labs, mid } = req.body;
+    let { subject: subjectId, studentENo, assignments, quizzes, labs, mid } = req.body;
+    studentENo = normalizeRegNo(studentENo);
 
     if (!subjectId || !studentENo) {
       return res.status(400).json({ message: "subject and studentENo are required" });
@@ -56,7 +58,7 @@ exports.saveResult = async (req, res) => {
       return res.status(404).json({ message: "Subject not found or not yours" });
     }
 
-    const existing = await IncourseResult.findOne({ subject: subjectId, studentENo: studentENo.toUpperCase() });
+    const existing = await IncourseResult.findOne({ subject: subjectId, studentENo: studentENo });
 
     const marks = {
       assignments: assignments || (existing ? existing.assignments : []),
@@ -81,7 +83,7 @@ exports.saveResult = async (req, res) => {
       const result = await IncourseResult.create({
         subject: subjectId,
         createdBy: req.user._id,
-        studentENo: studentENo.toUpperCase(),
+        studentENo: studentENo,
         ...marks,
         incourseTotal
       });
@@ -127,9 +129,10 @@ exports.getResultByENo = async (req, res) => {
       return res.status(404).json({ message: "Subject not found or not yours" });
     }
 
+    const normENo = normalizeRegNo(studentENo);
     const result = await IncourseResult.findOne({
       subject: subjectId,
-      studentENo: studentENo.toUpperCase(),
+      studentENo: normENo,
       createdBy: req.user._id
     });
 
@@ -219,6 +222,70 @@ exports.deleteResult = async (req, res) => {
     });
     if (!deleted) return res.status(404).json({ message: "Result not found" });
     return res.json({ message: "Deleted", id: req.params.id });
+  } catch (e) {
+    return res.status(500).json({ message: e.message });
+  }
+};
+
+// GET /api/incourse/student/courses
+exports.getStudentCourses = async (req, res) => {
+  try {
+    let studentENo = normalizeRegNo(req.user.studentENo);
+    
+    // Fallback to email if studentENo is not set
+    if (!studentENo) {
+        studentENo = extractRegNoFromEmail(req.user.email);
+    }
+
+    if (!studentENo) {
+      return res.status(400).json({ message: "Could not identify your registration number from profile or email" });
+    }
+
+    const regNoRegex = generateRegNoRegex(studentENo);
+
+    // Find all results for this student and populate subject details
+    const results = await IncourseResult.find({ studentENo: regNoRegex })
+      .populate("subject", "courseCode courseName batch assessments");
+
+    return res.json(results);
+  } catch (e) {
+    return res.status(500).json({ message: e.message });
+  }
+};
+
+// GET /api/incourse/student/my-result?courseCode=CS301
+exports.getStudentResult = async (req, res) => {
+  try {
+    const { courseCode } = req.query;
+    let studentENo = normalizeRegNo(req.user.studentENo);
+
+    // Fallback to email if studentENo is not set
+    if (!studentENo) {
+        studentENo = extractRegNoFromEmail(req.user.email);
+    }
+
+    if (!courseCode || !studentENo) {
+      return res.status(400).json({ message: "courseCode and identifiable registration number are required" });
+    }
+
+    const regNoRegex = generateRegNoRegex(studentENo);
+
+    // Find the student's result for the given course code
+    const results = await IncourseResult.find({ studentENo: regNoRegex })
+      .populate({
+        path: "subject",
+        match: { courseCode: courseCode.toUpperCase() },
+        select: "courseCode courseName batch assessments"
+      });
+
+    // Filter out results where subject didn't match the courseCode
+    const result = results.find(r => r.subject !== null);
+
+    if (!result) {
+      return res.status(404).json({ message: "No result found for this course" });
+    }
+
+    return res.json(result);
   } catch (e) {
     return res.status(500).json({ message: e.message });
   }

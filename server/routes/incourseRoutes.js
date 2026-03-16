@@ -11,26 +11,29 @@ const {
   getStudentENos,
   getResultById,
   updateResult,
-  deleteResult
+  deleteResult,
+  getStudentCourses,
+  getStudentResult
 } = require("../controllers/incourseController");
 
 // Must be logged in
 router.use(authMiddleware);
 
-// Lecturer-only for all routes
-router.use(requireRole("lecturer"));
-
 // Save (upsert — creates or updates)
-router.post("/save", saveResult);
+router.post("/save", requireRole("lecturer"), saveResult);
 
 // Search helpers (must be BEFORE /:id)
-router.get("/by-eno", getResultByENo);
-router.get("/enos", getStudentENos);
+router.get("/by-eno", requireRole("lecturer"), getResultByENo);
+router.get("/enos", requireRole("lecturer"), getStudentENos);
 
 // Standard CRUD
-router.get("/", getResults);
-router.get("/:id", getResultById);
-router.put("/:id", updateResult);
-router.delete("/:id", deleteResult);
+router.get("/", requireRole("lecturer"), getResults);
+router.get("/:id", requireRole("lecturer"), getResultById);
+router.put("/:id", requireRole("lecturer"), updateResult);
+router.delete("/:id", requireRole("lecturer"), deleteResult);
+
+// Student-specific routes
+router.get("/student/courses", requireRole("student"), getStudentCourses);
+router.get("/student/my-result", requireRole("student"), getStudentResult);
 
 module.exports = router;

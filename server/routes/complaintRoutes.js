@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { 
   createComplaint, 
-  getLecturerComplaints, 
+  getMyComplaints, 
   updateComplaint, 
   deleteComplaint 
 } = require('../controllers/complaintController');
@@ -12,7 +12,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 router.use(authMiddleware);
 
 router.post('/', createComplaint);
-router.get('/my-complaints', getLecturerComplaints);
+router.get('/my-complaints', getMyComplaints);
 router.put('/:id', updateComplaint);
 router.delete('/:id', deleteComplaint);
 

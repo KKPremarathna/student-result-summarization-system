@@ -1,7 +1,16 @@
 /* Sidebar dashboard */
 .sidebar {
-    background-color: var(--bg-dark) !important; /* User specified sage teal */
+
+    background-color: var(--bg-dark) !important;
+    /* User specified sage teal */
     min-height: calc(100vh - 80px);
+
+    background-color: #4F7C82 !important;
+    /* User specified sage teal */
+    height: calc(100vh - 80px);
+    position: sticky;
+    top: 80px;
+
     transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     overflow-x: hidden;
     overflow-y: auto;
@@ -12,12 +21,14 @@
 .sidebar-toggle-container {
     padding: 20px;
     display: flex;
-    justify-content: center; /* Center the toggle icon */
+    justify-content: center;
+    /* Center the toggle icon */
     transition: all 0.3s ease;
 }
 
 .sidebar.open .sidebar-toggle-container {
-    justify-content: flex-end; /* Align right when open */
+    justify-content: flex-end;
+    /* Align right when open */
 }
 
 .sidebar-toggle {
@@ -40,13 +51,15 @@
 }
 
 .sidebar.closed {
-    width: 65px; /* Mini sidebar width */
+    width: 65px;
+    /* Mini sidebar width */
     padding: 0;
 }
 
-.sidebar.closed ul, 
+.sidebar.closed ul,
 .sidebar.closed .sidebar-section {
-    display: none; /* Hide everything else when closed */
+    display: none;
+    /* Hide everything else when closed */
 }
 
 
@@ -59,36 +72,70 @@
 
 .sidebar li {
     margin: 5px 0;
+    position: relative;
+    overflow: hidden;
 }
 
 .sidebar li a {
     display: block;
-    color: #ffffff; /* pure white for better contrast on teal */
+    color: #ffffff;
     text-decoration: none;
-    padding: 12px 25px;
-    font-size: 13px;
-    font-weight: 700;
+    padding: 14px 25px;
+    font-size: 14px;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 1px;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 2;
 }
 
 .sidebar li a:hover {
-    background-color: var(--sidebar-hover);
     color: white;
 }
 
 .sidebar-section {
-    color: #d1e8d0; /* Lighter sage for header on teal bg */
-    font-size: 11px;
-    font-weight: 800;
-    padding: 20px 25px 5px 25px;
-    letter-spacing: 1.5px;
+    color: #E5F3F5;
+    /* Much lighter for better visibility */
+    font-size: 0.85rem;
+    font-weight: 900;
+    padding: 25px 25px 10px 25px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
     cursor: default;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 10px;
 }
 
-.sidebar li:hover, .sidebar li a:hover {
-    background-color: var(--sidebar-hover); /* Darker teal hover */
-    color: var(--sidebar-text); /* Keep it white */
-    border-left: 4px solid var(--primary); /* Teal accent bar */
+.sidebar li:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    /* Subtle hover background */
+}
+
+/* Active Link Highlighting */
+.sidebar li.active {
+    background: rgba(255, 255, 255, 0.15);
+    border-left: 4px solid #ffffff;
+}
+
+.sidebar li.active a {
+    color: #ffffff;
+    font-weight: 900;
+}
+
+/* Hover Animations */
+.sidebar li::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    transition: left 0.3s ease;
+    z-index: 1;
+}
+
+.sidebar li:hover::after {
+    left: 0;
 }

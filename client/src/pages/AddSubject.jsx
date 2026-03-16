@@ -1,5 +1,6 @@
 import { useState } from "react";
 import LecturerLayout from "../components/LecturerLayout.jsx";
+import { createSubject } from "../services/lecturerApi.js";
 import "../styles/AddSubject.css";
 import {
   PlusCircle,
@@ -12,29 +13,74 @@ import {
 } from "lucide-react";
 
 function AddSubject() {
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ type: "", text: "" });
   const [subjectDetails, setSubjectDetails] = useState({
     courseCode: "",
     batch: "",
     courseName: "",
     credit: "",
-    assignments: "",
-    labs: "",
-    quizzes: "",
-    percentAssignments: "",
-    percentLabs: "",
-    percentQuizzes: "",
-    percentMid: "",
-    percentEndExam: "",
+    assignments: "0",
+    labs: "0",
+    quizzes: "0",
+    percentAssignments: "0",
+    percentLabs: "0",
+    percentQuizzes: "0",
+    percentMid: "0",
+    percentEndExam: "0",
   });
 
   const handleChange = (e) => {
     setSubjectDetails({ ...subjectDetails, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Subject Details:", subjectDetails);
-    // Here you can call backend API to save subject details
+    setLoading(true);
+    setMessage({ type: "", text: "" });
+
+    // Format data for backend
+    const formattedData = {
+      courseCode: subjectDetails.courseCode.toUpperCase(),
+      courseName: subjectDetails.courseName,
+      batch: subjectDetails.batch,
+      credit: Number(subjectDetails.credit),
+      assessments: {
+        assignmentCount: Number(subjectDetails.assignments),
+        labCount: Number(subjectDetails.labs),
+        quizCount: Number(subjectDetails.quizzes),
+        assignmentWeight: Number(subjectDetails.percentAssignments),
+        labWeight: Number(subjectDetails.percentLabs),
+        quizWeight: Number(subjectDetails.percentQuizzes),
+        midWeight: Number(subjectDetails.percentMid),
+        endExamWeight: Number(subjectDetails.percentEndExam)
+      }
+    };
+
+    try {
+      await createSubject(formattedData);
+      setMessage({ type: "success", text: "Subject registered successfully!" });
+      // Reset form
+      setSubjectDetails({
+        courseCode: "",
+        batch: "",
+        courseName: "",
+        credit: "",
+        assignments: "0",
+        labs: "0",
+        quizzes: "0",
+        percentAssignments: "0",
+        percentLabs: "0",
+        percentQuizzes: "0",
+        percentMid: "0",
+        percentEndExam: "0",
+      });
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || "Failed to register subject.";
+      setMessage({ type: "error", text: errorMsg });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -54,6 +100,12 @@ function AddSubject() {
             Add New Subject
           </h2>
         </div>
+
+        {message.text && (
+          <div className={`as-alert as-alert--${message.type}`}>
+            {message.text}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="as-form">
 
@@ -116,6 +168,8 @@ function AddSubject() {
                   placeholder="3"
                   className="as-input"
                   required
+                  min="0"
+                  step="0.5"
                 />
               </div>
             </div>
@@ -141,6 +195,7 @@ function AddSubject() {
                   placeholder="No. of items"
                   className="as-input"
                   required
+                  min="0"
                 />
               </div>
 
@@ -154,6 +209,7 @@ function AddSubject() {
                   placeholder="No. of items"
                   className="as-input"
                   required
+                  min="0"
                 />
               </div>
 
@@ -167,6 +223,7 @@ function AddSubject() {
                   placeholder="No. of items"
                   className="as-input"
                   required
+                  min="0"
                 />
               </div>
             </div>
@@ -200,6 +257,8 @@ function AddSubject() {
                       placeholder="0"
                       className="as-input as-input--percent"
                       required
+                      min="0"
+                      max="100"
                     />
                     <span className="as-percent-symbol">%</span>
                   </div>
@@ -213,9 +272,10 @@ function AddSubject() {
             <button
               type="submit"
               className="as-submit-btn"
+              disabled={loading}
             >
               <ClipboardList size={24} />
-              Register Subject
+              {loading ? "Registering..." : "Register Subject"}
             </button>
           </div>
         </form>
