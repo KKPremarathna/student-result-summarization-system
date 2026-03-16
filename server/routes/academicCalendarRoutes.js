@@ -13,19 +13,10 @@ const {
 const authMiddleware = require('../middleware/authMiddleware');
 const requireRole = require('../middleware/requireRole');
 
-const storage = multer.diskStorage({
-    destination: function(req, file, cb) {
-        const dir = './uploads/calendars';
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
-        }
-        cb(null, dir);
-    },
-    filename: function(req, file, cb) {
-        cb(null, `calendar-${Date.now()}${path.extname(file.originalname)}`);
-    }
-});
+// Set up Multer storage (in memory)
+const storage = multer.memoryStorage();
 
+// File filter to only allow PDFs
 const fileFilter = (req, file, cb) => {
     if (file.mimetype === 'application/pdf') {
         cb(null, true);

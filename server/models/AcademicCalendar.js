@@ -11,7 +11,11 @@ const AcademicCalendarSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    filePath: {
+    fileUrl: {
+        type: String,
+        required: true
+    },
+    supabasePath: {
         type: String,
         required: true
     },

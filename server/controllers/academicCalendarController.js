@@ -1,5 +1,5 @@
 const AcademicCalendar = require('../models/AcademicCalendar');
-const fs = require('fs');
+const supabase = require('../config/supabase');
 const path = require('path');
 
 // Upload a new Academic Calendar (PDF)
@@ -12,14 +12,36 @@ exports.uploadCalendar = async(req, res) => {
         const { title, year } = req.body;
 
         if (!title || !year) {
-            fs.unlinkSync(req.file.path);
             return res.status(400).json({ message: 'Title and year are required.' });
         }
+
+        const fileName = `calendar-${Date.now()}${path.extname(req.file.originalname)}`;
+        const filePath = `calendars/${fileName}`;
+
+        const { data, error } = await supabase.storage
+            .from('academic-calendars')
+            .upload(filePath, req.file.buffer, {
+                contentType: 'application/pdf',
+                upsert: false
+            });
+
+        if (error) {
+            console.error('Supabase Upload Error:', error);
+            return res.status(500).json({ 
+                message: 'Failed to upload to cloud storage.', 
+                error: error.message 
+            });
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+            .from('academic-calendars')
+            .getPublicUrl(filePath);
 
         const calendar = await AcademicCalendar.create({
             title,
             year,
-            filePath: req.file.path,
+            fileUrl: publicUrl,
+            supabasePath: filePath,
             uploadedBy: req.user._id
         });
 
@@ -30,9 +52,6 @@ exports.uploadCalendar = async(req, res) => {
         });
     } catch (error) {
         console.error("Upload Calendar Error:", error);
-        if (req.file && req.file.path && fs.existsSync(req.file.path)) {
-            fs.unlinkSync(req.file.path);
-        }
         res.status(500).json({ message: 'Server Error' });
     }
 };
@@ -61,8 +80,13 @@ exports.deleteCalendar = async(req, res) => {
             return res.status(404).json({ message: 'Calendar not found.' });
         }
 
-        if (fs.existsSync(calendar.filePath)) {
-            fs.unlinkSync(calendar.filePath);
+        const { error } = await supabase.storage
+            .from('academic-calendars')
+            .remove([calendar.supabasePath]);
+
+        if (error) {
+            console.error('Supabase Deletion Error:', error);
+            return res.status(500).json({ message: 'Failed to delete from cloud storage.' });
         }
 
         await AcademicCalendar.deleteOne({ _id: req.params.id });
