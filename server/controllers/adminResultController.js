@@ -36,15 +36,15 @@ exports.addBatchResults = async(req, res) => {
             grade: item.grade.toUpperCase(),
         }));
 
-        const bulkOps = formattedResults.map(r => ({
+        const bulkOps = formattedResults.map(res => ({
             updateOne: {
                 filter: {
-                    courseCode: r.courseCode,
-                    batch: r.batch,
-                    semester: r.semester,
-                    studentRegNum: r.studentRegNum
+                    courseCode: res.courseCode,
+                    batch: res.batch,
+                    semester: res.semester,
+                    studentRegNum: res.studentRegNum
                 },
-                update: { $set: r },
+                update: { $set: res },
                 upsert: true
             }
         }));
@@ -64,7 +64,7 @@ exports.addBatchResults = async(req, res) => {
     }
 };
 
-// Update a single final result grade
+// Update a single final result
 exports.updateResult = async(req, res) => {
     try {
         const { id } = req.params;

@@ -1,4 +1,5 @@
 const AllowedEmail = require('../models/AllowedEmail');
+const User = require('../models/User');
 const { convertRegNumToEmail, generateEmailsFromRange, isValidEmail } = require('../utils/regUtils');
 
 // Delete a single allowed email using reg num

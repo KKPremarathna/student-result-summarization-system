@@ -37,7 +37,7 @@ function StudentList() {
     setLoadingAllowed(true);
     setAllowedError("");
     try {
-      const res = await fetch(`${API_BASE}/students/allowed`, { headers: authHeaders });
+      const res = await fetch(`${API_BASE}/allowed-emails?role=student`, { headers: authHeaders });
       const data = await res.json();
       if (res.ok) {
         setAllowedEmails(data.data);
@@ -56,7 +56,7 @@ function StudentList() {
     setLoadingRegistered(true);
     setRegisteredError("");
     try {
-      const res = await fetch(`${API_BASE}/students/registered`, { headers: authHeaders });
+      const res = await fetch(`${API_BASE}/registered-users?role=student`, { headers: authHeaders });
       const data = await res.json();
       if (res.ok) {
         setRegisteredStudents(data.data);
@@ -81,38 +81,35 @@ function StudentList() {
     setShowRegistered((prev) => !prev);
   };
 
+  // Helper to extract regNum from email (e.g., 2021e140@eng.jfn.ac.lk -> 2021/E/140)
+  const extractRegNumFromEmail = (email) => {
+    if (!email) return "";
+    const prefix = email.split("@")[0];
+    const year = prefix.substring(0, 4);
+    const num = prefix.substring(5); // skips the 'e'
+    return `${year}/E/${num}`;
+  };
+
   // Delete allowed email
   const handleDeleteAllowed = async (id, email) => {
     if (!window.confirm(`Remove "${email}" from allowed list?`)) return;
+    
+    const regNum = extractRegNumFromEmail(email);
+    if (!regNum) {
+      showToast("Could not determine registration number for deletion.", "error");
+      return;
+    }
+
     try {
-      const res = await fetch(`${API_BASE}/students/allowed/${id}`, {
+      const res = await fetch(`${API_BASE}/delete-allowed-email`, {
         method: "DELETE",
         headers: authHeaders,
+        body: JSON.stringify({ regNum }),
       });
       const data = await res.json();
       if (res.ok) {
         setAllowedEmails((prev) => prev.filter((e) => e._id !== id));
         showToast("Allowed email removed successfully.");
-      } else {
-        showToast(data.message || "Delete failed.", "error");
-      }
-    } catch {
-      showToast("Network error during delete.", "error");
-    }
-  };
-
-  // Delete registered student
-  const handleDeleteRegistered = async (id, email) => {
-    if (!window.confirm(`Delete registered student "${email}"? This cannot be undone.`)) return;
-    try {
-      const res = await fetch(`${API_BASE}/students/registered/${id}`, {
-        method: "DELETE",
-        headers: authHeaders,
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setRegisteredStudents((prev) => prev.filter((s) => s._id !== id));
-        showToast("Student account deleted successfully.");
       } else {
         showToast(data.message || "Delete failed.", "error");
       }
@@ -284,7 +281,6 @@ function StudentList() {
                             <th>#</th>
                             <th>Full Name</th>
                             <th>Email Address</th>
-                            <th>Action</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -295,16 +291,6 @@ function StudentList() {
                                 {student.firstName} {student.lastName}
                               </td>
                               <td className="sl-td-email">{student.email}</td>
-                              <td>
-                                <button
-                                  className="sl-delete-btn sl-delete-btn--danger"
-                                  onClick={() =>
-                                    handleDeleteRegistered(student._id, student.email)
-                                  }
-                                >
-                                  Delete
-                                </button>
-                              </td>
                             </tr>
                           ))}
                         </tbody>

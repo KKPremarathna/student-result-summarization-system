@@ -1,23 +1,10 @@
 const AllowedEmail = require('../models/AllowedEmail');
 const User = require('../models/User');
-
-// @desc    Get all allowed emails
-// @route   GET /api/admin/allowed-emails
-// @access  Private (Admin Only)
-exports.getAllowedEmails = async (req, res) => {
-    try {
-        const allowedEmails = await AllowedEmail.find();
-        res.status(200).json({ success: true, data: allowedEmails });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
-    }
-};
 const { convertRegNumToEmail, generateEmailsFromRange, isValidEmail } = require('../utils/regUtils');
 
 // Add a single allowed email from reg num
 
-exports.addAllowedEmail = async (req, res) => {
+exports.addAllowedEmail = async(req, res) => {
     try {
         if (!req.body) {
             return res.status(400).json({ message: 'Request body is missing. Please ensure you are sending JSON data with Content-Type: application/json' });
@@ -55,7 +42,7 @@ exports.addAllowedEmail = async (req, res) => {
 };
 
 // Add bulk allowed emails from reg num range
-exports.addBulkAllowedEmails = async (req, res) => {
+exports.addBulkAllowedEmails = async(req, res) => {
     try {
         if (!req.body) {
             return res.status(400).json({ message: 'Request body is missing. Please ensure you are sending JSON data with Content-Type: application/json' });
@@ -102,7 +89,7 @@ exports.addBulkAllowedEmails = async (req, res) => {
 };
 
 // Add a lecturer allowed email directly
-exports.addLecturerEmail = async (req, res) => {
+exports.addLecturerEmail = async(req, res) => {
     try {
         if (!req.body) {
             return res.status(400).json({ message: 'Request body is missing' });
@@ -138,13 +125,21 @@ exports.addLecturerEmail = async (req, res) => {
     }
 };
 
-
-// @desc    Get all allowed emails for students only
-// @route   GET /api/admin/students/allowed
-// @access  Private (Admin Only)
-exports.getStudentAllowedEmails = async (req, res) => {
+// Get allowed emails
+exports.getAllowedEmails = async(req, res) => {
     try {
-        const allowedEmails = await AllowedEmail.find({ role: 'student' }).sort({ createdAt: -1 });
+        const { role, department } = req.query;
+        const filter = {};
+
+        if (role) {
+            filter.role = role;
+        }
+
+        if (role === 'lecturer' && department) {
+            filter.department = department;
+        }
+
+        const allowedEmails = await AllowedEmail.find(filter).sort({ createdAt: -1 });
         res.status(200).json({ success: true, data: allowedEmails });
     } catch (error) {
         console.error(error);
@@ -152,81 +147,21 @@ exports.getStudentAllowedEmails = async (req, res) => {
     }
 };
 
-// @desc    Delete an allowed email by MongoDB id
-// @route   DELETE /api/admin/students/allowed/:id
-// @access  Private (Admin Only)
-exports.deleteAllowedEmailById = async (req, res) => {
+// Get registered users
+exports.getRegisteredUsers = async(req, res) => {
     try {
-        const { id } = req.params;
-        const result = await AllowedEmail.findByIdAndDelete(id);
-        if (!result) {
-            return res.status(404).json({ message: 'Allowed email not found' });
+        const { role, department } = req.query;
+        if (!role) {
+            return res.status(400).json({ message: 'Please provide a role (student or lecturer)' });
         }
-        res.status(200).json({ success: true, message: 'Allowed email deleted successfully' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
-    }
-};
 
-// @desc    Get all registered students from users collection
-// @route   GET /api/admin/students/registered
-// @access  Private (Admin Only)
-exports.getRegisteredStudents = async (req, res) => {
-    try {
-        const students = await User.find({ role: 'student' }).select('-password').sort({ createdAt: -1 });
-        res.status(200).json({ success: true, data: students });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
-    }
-};
-
-// @desc    Delete a registered student user by id
-// @route   DELETE /api/admin/students/registered/:id
-// @access  Private (Admin Only)
-exports.deleteRegisteredStudentById = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const result = await User.findByIdAndDelete(id);
-        if (!result) {
-            return res.status(404).json({ message: 'Student user not found' });
+        const filter = { role };
+        if (role === 'lecturer' && department) {
+            filter.department = department;
         }
-        res.status(200).json({ success: true, message: 'Student deleted successfully' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
-    }
-};
 
-// @desc    Get all registered lecturers, optionally filtered by department
-// @route   GET /api/admin/lecturers/registered?department=xxx
-// @access  Private (Admin Only)
-exports.getRegisteredLecturers = async (req, res) => {
-    try {
-        const filter = { role: 'lecturer' };
-        if (req.query.department) {
-            filter.department = req.query.department;
-        }
-        const lecturers = await User.find(filter).select('-password').sort({ createdAt: -1 });
-        res.status(200).json({ success: true, data: lecturers });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
-    }
-};
-
-// @desc    Delete a registered lecturer user by id
-// @route   DELETE /api/admin/lecturers/registered/:id
-// @access  Private (Admin Only)
-exports.deleteRegisteredLecturerById = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const result = await User.findOneAndDelete({ _id: id, role: 'lecturer' });
-        if (!result) {
-            return res.status(404).json({ message: 'Lecturer not found' });
-        }
-        res.status(200).json({ success: true, message: 'Lecturer deleted successfully' });
+        const users = await User.find(filter).select('-password').sort({ createdAt: -1 });
+        res.status(200).json({ success: true, data: users });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });

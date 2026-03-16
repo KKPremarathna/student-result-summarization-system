@@ -1,45 +1,80 @@
 /**
- * Normalizes a registration number by removing slashes and converting to uppercase.
- * Example: "2021/E/001" -> "2021E001"
- * @param {string} regNo 
- * @returns {string} normalized registration number
+ * Converts a student registration number to an email address.
+ * @param {string} regNum
+ * @returns {string}
  */
-const normalizeRegNo = (regNo) => {
-    if (!regNo) return "";
-    return regNo.replace(/\//g, "").toUpperCase().trim();
-};
+const convertRegNumToEmail = (regNum) => {
+    if (!regNum) return null;
 
-/**
- * Extracts and normalizes the registration number from a university email.
- * Example: "2022e500@eng.jfn.ac.lk" -> "2022E500"
- * @param {string} email 
- * @returns {string} normalized regNo or empty string
- */
-const extractRegNoFromEmail = (email) => {
-    if (!email || !email.includes("@")) return "";
-    const prefix = email.split("@")[0];
-    // Basic check to see if it looks like a regNo (starts with year digits)
-    if (/^\d{4}/.test(prefix)) {
-        return prefix.toUpperCase();
+    // format: 20XX/E/xxx
+    const regExp = /^20\d{2}\/E\/\d{3}$/;
+    if (!regExp.test(regNum)) {
+        throw new Error('Invalid registration number format. Expected 20XX/E/xxx (e.g., 2021/E/140)');
     }
-    return "";
+
+    const parts = regNum.split('/');
+    const year = parts[0];
+    const num = parts[2];
+
+    return `${year}e${num}@eng.jfn.ac.lk`;
 };
 
 /**
- * Generates a regex pattern to match a regNo with or without slashes.
- * Example: "2022E500" -> /^2022\/?E\/?500$/i
+ * array of emails from a range of registration numbers.
+ * @param {string} startRegNum
+ * @param {string} endRegNum
+ * @returns {string[]}
  */
-const generateRegNoRegex = (regNo) => {
-    const normalized = normalizeRegNo(regNo);
-    if (!normalized) return null;
-    
-    // Create a pattern like 2021/?E/?001
-    // This assumes the format is Year(4) Char(1) Number(3+)
-    const year = normalized.substring(0, 4);
-    const middle = normalized.substring(4, 5);
-    const rest = normalized.substring(5);
-    
-    return new RegExp(`^${year}/?${middle}/?${rest}$`, "i");
+
+function generateEmailsFromRange(startRegNum, endRegNum) {
+    const regExp = /^20\d{2}\/E\/\d{3}$/;
+
+    if (!regExp.test(startRegNum) || !regExp.test(endRegNum)) {
+        throw new Error('Invalid registration number format. Expected 20XX/E/xxx (e.g., 2021/E/140)');
+    }
+
+    const startParts = startRegNum.split('/');
+    const endParts = endRegNum.split('/');
+
+    if (startParts[0] !== endParts[0]) {
+        throw new Error('Start and end registration numbers must be from the same year');
+    }
+
+    const year = startParts[0];
+    const startNum = parseInt(startParts[2], 10);
+    const endNum = parseInt(endParts[2], 10);
+
+    if (isNaN(startNum) || isNaN(endNum)) {
+        throw new Error('Registration number must end with a numeric value');
+    }
+
+    if (startNum > endNum) {
+        throw new Error('Start registration number must be less than or equal to end registration number');
+    }
+
+    const emails = [];
+    for (let i = startNum; i <= endNum; i++) {
+        const paddingLength = startParts[2].length;
+        const formattedNum = i.toString().padStart(paddingLength, '0');
+        emails.push(`${year}e${formattedNum}@eng.jfn.ac.lk`);
+    }
+
+    return emails;
+}
+
+const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
 };
 
-module.exports = { normalizeRegNo, extractRegNoFromEmail, generateRegNoRegex };
+const isValidRegNum = (regNum) => {
+    const regExp = /^20\d{2}\/E\/\d{3}$/;
+    return regExp.test(regNum);
+};
+
+module.exports = {
+    convertRegNumToEmail,
+    generateEmailsFromRange,
+    isValidEmail,
+    isValidRegNum,
+};

@@ -35,8 +35,9 @@ function LectureList() {
     setLoading(true);
     setError("");
     try {
-      const params = dept ? `?department=${encodeURIComponent(dept)}` : "";
-      const res = await fetch(`${API_BASE}/lecturers/registered${params}`, {
+      const roleParam = "role=lecturer";
+      const deptParam = dept ? `&department=${encodeURIComponent(dept)}` : "";
+      const res = await fetch(`${API_BASE}/registered-users?${roleParam}${deptParam}`, {
         headers: authHeaders,
       });
       const data = await res.json();
@@ -64,24 +65,11 @@ function LectureList() {
     fetchLecturers(department);
   };
 
-  const handleDelete = async (id, name) => {
-    if (!window.confirm(`Delete lecturer "${name}"? This cannot be undone.`)) return;
-    try {
-      const res = await fetch(`${API_BASE}/lecturers/registered/${id}`, {
-        method: "DELETE",
-        headers: authHeaders,
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setLecturers((prev) => prev.filter((l) => l._id !== id));
-        showToast("Lecturer deleted successfully.");
-      } else {
-        showToast(data.message || "Delete failed.", "error");
-      }
-    } catch {
-      showToast("Network error during delete.", "error");
-    }
-  };
+  // We are removing registered user deletion as per instructions.
+  // This component seems to only show registered lecturers.
+  // If the user wants to delete ALLOWED emails for lecturers, that would be in a different place or a different section.
+  // The current code has a handleDelete that calls /lecturers/registered/${id}.
+  // We'll remove this as registered users shouldn't be deleted.
 
   return (
     <div className="lecturelist-page">
@@ -216,7 +204,6 @@ function LectureList() {
                         <th>Full Name</th>
                         <th>Email Address</th>
                         <th>Department</th>
-                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -234,16 +221,6 @@ function LectureList() {
                             ) : (
                               <span className="ll-dept-none">—</span>
                             )}
-                          </td>
-                          <td>
-                            <button
-                              className="ll-delete-btn"
-                              onClick={() =>
-                                handleDelete(lec._id, `${lec.firstName} ${lec.lastName}`)
-                              }
-                            >
-                              Delete
-                            </button>
                           </td>
                         </tr>
                       ))}
