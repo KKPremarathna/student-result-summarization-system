@@ -168,7 +168,7 @@ function LectureList() {
                   {loading ? (
                     <span className="ll-btn-spinner" />
                   ) : (
-                    <>🔍 View</>
+                    <>View</>
                   )}
                 </button>
 
@@ -178,7 +178,7 @@ function LectureList() {
                     onClick={() => fetchLecturers(department)}
                     title="Refresh"
                   >
-                    ↻ Refresh
+                    Refresh
                   </button>
                 )}
               </div>
@@ -206,7 +206,6 @@ function LectureList() {
               <div className="ll-table-wrapper">
                 {lecturers.length === 0 ? (
                   <div className="ll-empty">
-                    <span className="ll-empty-icon">👨‍🏫</span>
                     <p>No registered lecturers found{department ? ` in ${department}` : ""}.</p>
                   </div>
                 ) : (
@@ -243,7 +242,7 @@ function LectureList() {
                                 handleDelete(lec._id, `${lec.firstName} ${lec.lastName}`)
                               }
                             >
-                              🗑 Delete
+                              Delete
                             </button>
                           </td>
                         </tr>

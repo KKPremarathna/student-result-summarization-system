@@ -137,27 +137,27 @@ function StudentList() {
           <ul className="sidebar-menu">
             <li>
               <Link to="/AdminHome">
-                <span className="sidebar-icon"></span>Admin Home
+                Admin Home
               </Link>
             </li>
             <li className="active">
               <Link to="/AddUser">
-                <span className="sidebar-icon"></span>Add User
+                Add User
               </Link>
             </li>
             <li>
               <Link to="/AdminComplaint">
-                <span className="sidebar-icon"></span>Complaint
+                Complaint
               </Link>
             </li>
             <li>
               <Link to="/AdminResults">
-                <span className="sidebar-icon"></span>Results
+                Results
               </Link>
             </li>
             <li>
               <Link to="/AdminProfile">
-                <span className="sidebar-icon"></span>Profile
+                Profile
               </Link>
             </li>
           </ul>
@@ -173,7 +173,6 @@ function StudentList() {
             <div className="sl-section">
               <div className="sl-section-header">
                 <div className="sl-section-header-left">
-                  <span className="sl-section-icon">🎓</span>
                   <div>
                     <h2 className="sl-section-title">Allowed Student Emails</h2>
                     <p className="sl-section-sub">
@@ -183,7 +182,7 @@ function StudentList() {
                   </div>
                 </div>
                 <button className="sl-refresh-btn" onClick={fetchAllowedEmails} title="Refresh">
-                  ↻ Refresh
+                  Refresh
                 </button>
               </div>
 
@@ -261,7 +260,7 @@ function StudentList() {
                     </div>
                   </div>
                   <button className="sl-refresh-btn" onClick={fetchRegisteredStudents} title="Refresh">
-                    ↻ Refresh
+                    Refresh
                   </button>
                 </div>
 

@@ -54,7 +54,7 @@ function AdminHome() {
           <div className="admin-main-content">
             <div className="welcome-section">
               <div className="welcome-profile">
-                <div className="profile-avatar">👤</div>
+                <div className="profile-avatar"></div>
                 <div className="welcome-text">
                   <h1>Welcome back,</h1>
                   <h2>{user.firstName} {user.lastName}</h2>

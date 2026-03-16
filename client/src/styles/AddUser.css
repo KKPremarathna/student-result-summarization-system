@@ -13,24 +13,46 @@
 .adduser-main {
   flex: 1;
   padding: 3rem 4rem;
-  background: linear-gradient(135deg, #F8FAFC 0%, var(--primary-light) 40%, #E2EFF1 100%);
+  position: relative;
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
-  overflow-y: auto;
+  overflow: hidden; /* Ensure blur doesnt bleed out */
 }
 
+.adduser-main::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: inherit; /* This will inherit from the inline style on the tag */
+  background-size: cover;
+  background-position: left center;
+  background-repeat: no-repeat;
+  filter: blur(8px);
+  z-index: 1;
+}
 
 .adduser-main-content {
-  max-width: 1000px;
+  position: relative;
+  z-index: 2; /* Bring content above the blurred background */
+  max-width: 400px;
   width: 100%;
+  margin-right: 8%;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 35px;
+  border-radius: 24px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
 }
 
 .action-buttons {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 3rem;
-  justify-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
 }
 
 .action-btn-link {

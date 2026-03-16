@@ -88,7 +88,7 @@ function AddStudentModal({ courseCode, onCommit, onCancel, existingRegs }) {
 
         {/* Tabs */}
         <div className="ar-tabs">
-          {[["bulk", "👥 Bulk Entry"], ["range", "⟩ Range"], ["individual", "👤 Individual"]].map(([key, label]) => (
+          {[["bulk", "Bulk Entry"], ["range", "Range"], ["individual", "Individual"]].map(([key, label]) => (
             <button
               key={key}
               className={`ar-tab ${tab === key ? "ar-tab--active" : ""}`}
@@ -271,7 +271,7 @@ function Results() {
       });
       const data = await res.json();
       if (res.ok) {
-        showToast(data.message || "Results saved successfully! 🎉");
+        showToast(data.message || "Results saved successfully!");
         // Reload to get IDs
         await loadExisting();
       } else {
@@ -343,7 +343,7 @@ function Results() {
                 <p className="ar-page-sub">Enter course details and add student grades</p>
               </div>
               <button className="ar-load-btn" onClick={loadExisting} title="Load existing results from DB">
-                ↓ Load Existing
+                Load Existing
               </button>
             </div>
 
@@ -376,7 +376,7 @@ function Results() {
                 <span className="ar-row-count">{rows.length} student{rows.length !== 1 ? "s" : ""}</span>
               </div>
               <button className="ar-add-student-btn" onClick={() => setShowModal(true)}>
-                👤+ Add Students
+                Add Students
               </button>
             </div>
 
