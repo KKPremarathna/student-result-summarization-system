@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import LecturerLayout from "../components/LecturerLayout.jsx";
-import { getLecturerDetails } from "../services/lecturerApi.js";
+import { getLecturerDetails, deleteSubject } from "../services/lecturerApi.js";
 import profile from '../assets/profile.png';
 import dashboardBg from '../assets/dashboard-bg.png';
 import "../styles/LecturerHome.css";
@@ -14,7 +14,9 @@ import {
   Search,
   LayoutDashboard,
   Calendar,
-  Loader2
+  Loader2,
+  Edit2,
+  Trash2
 } from "lucide-react";
 
 function LecturerHome() {
@@ -23,21 +25,35 @@ function LecturerHome() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await getLecturerDetails();
-        if (res.data.success) {
-          setLecturer(res.data.data);
-          setSubjects(res.data.subjects || []);
-        }
-      } catch (error) {
-        console.error("Error fetching lecturer details:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await getLecturerDetails();
+      if (res.data.success) {
+        setLecturer(res.data.data);
+        setSubjects(res.data.subjects || []);
+      }
+    } catch (error) {
+      console.error("Error fetching lecturer details:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteSubject = async (id, name) => {
+    if (window.confirm(`Are you sure you want to delete "${name}"? This will also remove associated incourse and final marks.`)) {
+      try {
+        await deleteSubject(id);
+        fetchData(); // Refresh list
+      } catch (err) {
+        console.error("Error deleting subject:", err);
+        alert("Failed to delete subject.");
+      }
+    }
+  };
 
   const DEFAULT_AVATAR = "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix";
 
@@ -196,9 +212,21 @@ function LecturerHome() {
                       <div className="lh-subject-item__initial">
                         {subject.courseCode?.charAt(0) || "S"}
                       </div>
-                      <div>
+                      <div className="lh-subject-item__info">
                         <h4 className="lh-subject-item__name">{subject.courseName}</h4>
                         <p className="lh-subject-item__year">{subject.courseCode} | {subject.batch}</p>
+                      </div>
+                      <div className="lh-subject-item__actions">
+                        <Link to={`/lecturer/edit-subject/${subject._id}`} className="lh-subject-action lh-subject-action--edit" title="Edit Subject Weights">
+                          <Edit2 size={16} />
+                        </Link>
+                        <button 
+                          className="lh-subject-action lh-subject-action--delete" 
+                          onClick={() => handleDeleteSubject(subject._id, subject.courseName)}
+                          title="Delete Subject"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                     </div>
                   ))

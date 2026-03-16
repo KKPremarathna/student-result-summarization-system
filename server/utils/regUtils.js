@@ -42,4 +42,13 @@ const generateRegNoRegex = (regNo) => {
     return new RegExp(`^${year}/?${middle}/?${rest}$`, "i");
 };
 
-module.exports = { normalizeRegNo, extractRegNoFromEmail, generateRegNoRegex };
+/**
+ * Validates a registration number format (20XX/E/XXX).
+ * @param {string} regNo 
+ * @returns {boolean}
+ */
+const isValidRegNum = (regNo) => {
+    return /^\d{4}\/?[A-Z]\/?\d{3,4}$/i.test(regNo);
+};
+
+module.exports = { normalizeRegNo, extractRegNoFromEmail, generateRegNoRegex, isValidRegNum };

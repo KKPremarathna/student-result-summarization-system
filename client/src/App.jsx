@@ -51,6 +51,7 @@ function App() {
         <Route path="/lecturer/home" element={<LecturerHome />} />
         <Route path="/lecturer/results" element={<ViewResult />} />
         <Route path="/lecturer/addsubject" element={< AddSubject />} />
+        <Route path="/lecturer/edit-subject/:id" element={< AddSubject />} />
         <Route path="/lecturer/addincourse" element={< AddIncourse />} />
         <Route path="/lecturer/pending" element={< PendingResult />} />
         <Route path="/lecturer/final" element={< FinalResult />} />

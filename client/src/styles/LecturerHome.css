@@ -440,6 +440,10 @@
   color: white;
 }
 
+.lh-subject-item__info {
+  flex: 1;
+}
+
 .lh-subject-item__name {
   font-weight: 700;
   color: #0B2E33;
@@ -455,6 +459,51 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin: 0;
+}
+
+.lh-subject-item__actions {
+  display: flex;
+  gap: 0.5rem;
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all 0.3s ease;
+}
+
+.lh-subject-item:hover .lh-subject-item__actions {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.lh-subject-action {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lh-subject-action--edit {
+  background: rgba(184, 227, 233, 0.4);
+  color: #4F7C82;
+}
+
+.lh-subject-action--edit:hover {
+  background: #4F7C82;
+  color: white;
+}
+
+.lh-subject-action--delete {
+  background: rgba(255, 0, 0, 0.05);
+  color: #ff4d4d;
+}
+
+.lh-subject-action--delete:hover {
+  background: #ff4d4d;
+  color: white;
 }
 
 /* ── Empty state ──────────────────────────────── */

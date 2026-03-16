@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import LecturerLayout from "../components/LecturerLayout.jsx";
-import { createSubject } from "../services/lecturerApi.js";
+import { createSubject, getSubjectById, updateSubject } from "../services/lecturerApi.js";
 import "../styles/AddSubject.css";
 import {
   PlusCircle,
@@ -13,6 +14,9 @@ import {
 } from "lucide-react";
 
 function AddSubject() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const isEditMode = !!id;
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [subjectDetails, setSubjectDetails] = useState({
@@ -29,6 +33,35 @@ function AddSubject() {
     percentMid: "0",
     percentEndExam: "0",
   });
+
+  useEffect(() => {
+    if (isEditMode) {
+      const fetchSubject = async () => {
+        try {
+          const res = await getSubjectById(id);
+          const s = res.data;
+          setSubjectDetails({
+            courseCode: s.courseCode,
+            batch: s.batch,
+            courseName: s.courseName,
+            credit: s.credit.toString(),
+            assignments: s.assessments?.assignmentCount?.toString() || "0",
+            labs: s.assessments?.labCount?.toString() || "0",
+            quizzes: s.assessments?.quizCount?.toString() || "0",
+            percentAssignments: s.assessments?.assignmentWeight?.toString() || "0",
+            percentLabs: s.assessments?.labWeight?.toString() || "0",
+            percentQuizzes: s.assessments?.quizWeight?.toString() || "0",
+            percentMid: s.assessments?.midWeight?.toString() || "0",
+            percentEndExam: s.assessments?.endExamWeight?.toString() || "0",
+          });
+        } catch (err) {
+          console.error("Error fetching subject:", err);
+          setMessage({ type: "error", text: "Failed to load subject details." });
+        }
+      };
+      fetchSubject();
+    }
+  }, [id, isEditMode]);
 
   const handleChange = (e) => {
     setSubjectDetails({ ...subjectDetails, [e.target.name]: e.target.value });
@@ -58,25 +91,31 @@ function AddSubject() {
     };
 
     try {
-      await createSubject(formattedData);
-      setMessage({ type: "success", text: "Subject registered successfully!" });
-      // Reset form
-      setSubjectDetails({
-        courseCode: "",
-        batch: "",
-        courseName: "",
-        credit: "",
-        assignments: "0",
-        labs: "0",
-        quizzes: "0",
-        percentAssignments: "0",
-        percentLabs: "0",
-        percentQuizzes: "0",
-        percentMid: "0",
-        percentEndExam: "0",
-      });
+      if (isEditMode) {
+        await updateSubject(id, formattedData);
+        setMessage({ type: "success", text: "Subject updated successfully!" });
+        setTimeout(() => navigate("/lecturer/home"), 2000);
+      } else {
+        await createSubject(formattedData);
+        setMessage({ type: "success", text: "Subject registered successfully!" });
+        // Reset form
+        setSubjectDetails({
+          courseCode: "",
+          batch: "",
+          courseName: "",
+          credit: "",
+          assignments: "0",
+          labs: "0",
+          quizzes: "0",
+          percentAssignments: "0",
+          percentLabs: "0",
+          percentQuizzes: "0",
+          percentMid: "0",
+          percentEndExam: "0",
+        });
+      }
     } catch (err) {
-      const errorMsg = err.response?.data?.message || "Failed to register subject.";
+      const errorMsg = err.response?.data?.message || `Failed to ${isEditMode ? 'update' : 'register'} subject.`;
       setMessage({ type: "error", text: errorMsg });
     } finally {
       setLoading(false);
@@ -93,11 +132,11 @@ function AddSubject() {
             <LayoutDashboard size={14} />
             <span>Lecturer Portal</span>
             <ChevronRight size={14} />
-            <span className="as-breadcrumb__current">Course Management</span>
+            <span className="as-breadcrumb__current">{isEditMode ? "Edit Subject" : "Course Management"}</span>
           </div>
           <h2 className="as-title">
             <PlusCircle className="as-title__icon" size={32} />
-            Add New Subject
+            {isEditMode ? "Edit Subject" : "Add New Subject"}
           </h2>
         </div>
 
@@ -275,7 +314,7 @@ function AddSubject() {
               disabled={loading}
             >
               <ClipboardList size={24} />
-              {loading ? "Registering..." : "Register Subject"}
+              {loading ? (isEditMode ? "Updating..." : "Registering...") : (isEditMode ? "Update Subject" : "Register Subject")}
             </button>
           </div>
         </form>

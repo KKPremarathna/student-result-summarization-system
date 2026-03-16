@@ -5,7 +5,8 @@ import {
   getBatches, 
   getSubjectByCodeAndBatch,
   getIncourseResultsBySubject,
-  saveIncourseResult
+  saveIncourseResult,
+  deleteIncourseResult
 } from "../services/lecturerApi.js";
 import "../styles/Addincourse.css";
 import {
@@ -51,6 +52,7 @@ function AddIncourse() {
   const [tempList, setTempList] = useState([]);
   const [inputType, setInputType] = useState("bulk"); // "bulk", "individual", or "range"
   const [isEditMode, setIsEditMode] = useState(false);
+  const [deletedResultIds, setDeletedResultIds] = useState([]);
 
   // Fetch initial course codes
   useEffect(() => {
@@ -126,6 +128,7 @@ function AddIncourse() {
         const fetchedResults = res.data.results || [];
         fetchedResults.sort((a, b) => a.studentENo.localeCompare(b.studentENo));
         setResults(fetchedResults);
+        setDeletedResultIds([]); // Reset deletions on fresh load
       }
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -157,6 +160,13 @@ function AddIncourse() {
     setMessage({ type: "", text: "" });
     
     try {
+      // 1. Delete rows marked for removal
+      for (const id of deletedResultIds) {
+        await deleteIncourseResult(id);
+      }
+      setDeletedResultIds([]);
+
+      // 2. Save remaining rows
       let successCount = 0;
       for (const res of results) {
         // If student exists in results but has no marks yet, it's a new entry
@@ -276,6 +286,10 @@ function AddIncourse() {
   };
 
   const deleteResultRow = (index) => {
+    const rowToDelete = results[index];
+    if (rowToDelete._id) {
+      setDeletedResultIds(prev => [...prev, rowToDelete._id]);
+    }
     const newResults = results.filter((_, i) => i !== index);
     setResults(newResults);
   };
