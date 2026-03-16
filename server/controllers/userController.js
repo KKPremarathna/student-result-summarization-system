@@ -27,7 +27,19 @@ exports.getUserDetails = async (req, res) => {
 // @route   PUT /api/user/update-profile
 // @access  Private
 exports.updateProfile = async (req, res) => {
-    const { profilePicture, oldPassword, newPassword, title, position, faculty, university, department } = req.body;
+    const { 
+        firstName, 
+        lastName, 
+        profilePicture, 
+        oldPassword, 
+        newPassword, 
+        title, 
+        position, 
+        faculty, 
+        university, 
+        department,
+        lecturerId
+    } = req.body;
 
     try {
         const user = await User.findById(req.user.id);
@@ -38,12 +50,15 @@ exports.updateProfile = async (req, res) => {
         let updatedFields = {};
         
         // 1. Update Profile Fields if provided
+        if (firstName !== undefined) updatedFields.firstName = firstName;
+        if (lastName !== undefined) updatedFields.lastName = lastName;
         if (profilePicture !== undefined) updatedFields.profilePicture = profilePicture;
         if (title !== undefined) updatedFields.title = title;
         if (position !== undefined) updatedFields.position = position;
         if (faculty !== undefined) updatedFields.faculty = faculty;
         if (university !== undefined) updatedFields.university = university;
         if (department !== undefined) updatedFields.department = department;
+        if (lecturerId !== undefined) updatedFields.lecturerId = lecturerId;
 
         // 2. Update Password if both old & new are provided
         if (oldPassword && newPassword) {
@@ -68,7 +83,6 @@ exports.updateProfile = async (req, res) => {
 
             return res.status(200).json({ success: true, message: 'Profile updated successfully', data: updatedUser });
         } else {
-            // Nothing to update, but user submitted the form
             return res.status(200).json({ success: true, message: 'No changes made', data: user });
         }
 

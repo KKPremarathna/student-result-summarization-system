@@ -50,6 +50,10 @@ exports.getIncourseList = async (req, res) => {
     const combined = incourseResults.map((ir) => ({
       incourseResultId: ir._id,
       studentENo: ir.studentENo,
+      assignments: ir.assignments,
+      quizzes: ir.quizzes,
+      labs: ir.labs,
+      mid: ir.mid,
       incourseTotal: ir.incourseTotal,
       endExamMark: finalMap[ir.studentENo]?.endExamMark ?? null,
       finalMark: finalMap[ir.studentENo]?.finalMark ?? null,
