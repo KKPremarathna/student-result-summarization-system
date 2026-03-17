@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Setting.css";
 import Navbar from "../components/InnerNavbar";
-import bgImage from "../assets/images/admin.jpg"; // Re-using background or use a generic one if it exists
+import bgImage from "../assets/images/admin.jpg"; 
 import { Link } from "react-router-dom";
 import axios from "axios";
 
@@ -13,6 +13,7 @@ function Setting() {
     lastName: "",
     email: "",
     department: "",
+    role: "",
     phone: "",
     profilePicture: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
   });
@@ -40,6 +41,7 @@ function Setting() {
             lastName: user.lastName || "",
             email: user.email || "",
             department: user.department || "",
+            role: user.role || "",
             phone: user.phone || "",
             profilePicture: user.profilePicture || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
           });
@@ -105,15 +107,28 @@ function Setting() {
       <Navbar />
       
       <div className="setting-content">
-        <aside className="setting-sidebar">
-           <ul className="sidebar-menu">
-               <li><Link to="/viewresult">View Result</Link></li>
-               <li><Link to="/addsubject">Add Subject</Link></li>
-               <li><Link to="/incourse">Incourse</Link></li>
-               <li><Link to="/finalresult">Final Result</Link></li>
-               <li className="active"><Link to="/setting">Setting</Link></li>
-               <li><Link to="/pendingresult">Pending Result</Link></li>
-           </ul>
+        <aside className="sidebar">
+          <div className="sidebar-title">Management</div>
+          <ul className="sidebar-menu">
+            {userData.role === "admin" ? (
+              <>
+                <li><Link to="/AdminHome"><span className="sidebar-icon"></span>Admin Home</Link></li>
+                <li><Link to="/AddUser"><span className="sidebar-icon"></span>Add User</Link></li>
+                <li><Link to="/AdminComplaint"><span className="sidebar-icon"></span>Complaint</Link></li>
+                <li><Link to="/AdminResults"><span className="sidebar-icon"></span>Results</Link></li>
+                <li><Link to="/AdminProfile"><span className="sidebar-icon"></span>Profile</Link></li>
+              </>
+            ) : (
+              <>
+                <li><Link to="/lecturer/results">View Result</Link></li>
+                <li><Link to="/lecturer/addsubject">Add Subject</Link></li>
+                <li><Link to="/lecturer/addincourse">Incourse</Link></li>
+                <li><Link to="/lecturer/final">Final Result</Link></li>
+                <li className="active"><Link to="/setting">Setting</Link></li>
+                <li><Link to="/lecturer/pending">Pending Result</Link></li>
+              </>
+            )}
+          </ul>
         </aside>
 
         <main className="setting-main" style={{ backgroundImage: `url(${bgImage})` }}>
