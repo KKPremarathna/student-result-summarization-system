@@ -12,7 +12,7 @@ import LectureList from "./pages/LectureList";
 import Complaint from "./pages/AdminComplaint";
 import Results from "./pages/AdminResults";
 import AdminProfile from "./pages/AdminProfile";
-import FloatingProfile from "./components/FloatingProfile";
+
 import Setting from "./pages/Setting";
 
 //lecture pages
@@ -48,7 +48,7 @@ import StudentProfile from "./pages/StudentProfile.jsx";
 function App() {
   return (
     <BrowserRouter>
-      <FloatingProfile />
+
       <Routes>
 
         <Route path="/" element={<Home />} />
