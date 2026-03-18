@@ -61,42 +61,29 @@ function App() {
         
         {/* Auth Routes */}
         <Route path="/signin" element={<SignIn />} />
-        <Route path="/SignIn" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/SignUp" element={<SignUp />} />
 
         {/* Protected Admin Routes */}
-        <Route path="/AdminHome" element={<ProtectedRoute allowedRoles={['admin']}><AdminHome /></ProtectedRoute>} />
         <Route path="/adminhome" element={<ProtectedRoute allowedRoles={['admin']}><AdminHome /></ProtectedRoute>} />
         
-        <Route path="/AddUser" element={<ProtectedRoute allowedRoles={['admin']}><AddUser /></ProtectedRoute>} />
         <Route path="/adduser" element={<ProtectedRoute allowedRoles={['admin']}><AddUser /></ProtectedRoute>} />
         
-        <Route path="/AddStudent" element={<ProtectedRoute allowedRoles={['admin']}><AddStudent /></ProtectedRoute>} />
         <Route path="/addstudent" element={<ProtectedRoute allowedRoles={['admin']}><AddStudent /></ProtectedRoute>} />
         
-        <Route path="/StudentList" element={<ProtectedRoute allowedRoles={['admin']}><StudentList /></ProtectedRoute>} />
         <Route path="/studentlist" element={<ProtectedRoute allowedRoles={['admin']}><StudentList /></ProtectedRoute>} />
         
-        <Route path="/AddLecture" element={<ProtectedRoute allowedRoles={['admin']}><AddLecture /></ProtectedRoute>} />
         <Route path="/addlecture" element={<ProtectedRoute allowedRoles={['admin']}><AddLecture /></ProtectedRoute>} />
         
-        <Route path="/LectureList" element={<ProtectedRoute allowedRoles={['admin']}><LectureList /></ProtectedRoute>} />
         <Route path="/lecturelist" element={<ProtectedRoute allowedRoles={['admin']}><LectureList /></ProtectedRoute>} />
         
-        <Route path="/AdminComplaint" element={<ProtectedRoute allowedRoles={['admin']}><Complaint /></ProtectedRoute>} />
         <Route path="/admincomplaint" element={<ProtectedRoute allowedRoles={['admin']}><Complaint /></ProtectedRoute>} />
         
-        <Route path="/AdminResults" element={<ProtectedRoute allowedRoles={['admin']}><Results /></ProtectedRoute>} />
         <Route path="/adminresults" element={<ProtectedRoute allowedRoles={['admin']}><Results /></ProtectedRoute>} />
         
-        <Route path="/AdminProfile" element={<ProtectedRoute allowedRoles={['admin']}><AdminProfile /></ProtectedRoute>} />
         <Route path="/adminprofile" element={<ProtectedRoute allowedRoles={['admin']}><AdminProfile /></ProtectedRoute>} />
         
         <Route path="/adminresetpassword" element={<ProtectedRoute allowedRoles={['admin']}><ResetPassword /></ProtectedRoute>} />
-        <Route path="/AdminResetPassword" element={<ProtectedRoute allowedRoles={['admin']}><ResetPassword /></ProtectedRoute>} />
         
-        <Route path="/Setting" element={<ProtectedRoute allowedRoles={['admin', 'lecturer']}><Setting /></ProtectedRoute>} />
         <Route path="/setting" element={<ProtectedRoute allowedRoles={['admin', 'lecturer']}><Setting /></ProtectedRoute>} />
 
         {/* Protected Lecturer Routes */}

@@ -45,11 +45,11 @@ function Signin() {
         // Role-based redirection
         setTimeout(() => {
           if (user.role === "admin") {
-            navigate("/AdminHome");
+            navigate("/adminhome");
           } else if (user.role === "lecturer") {
             navigate("/lecturer/home");
           } else if (user.role === "student") {
-            navigate("/home");
+            navigate("/student/home");
           } else {
             navigate("/"); // Default fallback
           }
@@ -131,7 +131,7 @@ function Signin() {
 
             <p className="signup-text">
               Don't have an Account ?{" "}
-              <Link to="/SignUp" className="signup-link">
+              <Link to="/signup" className="signup-link">
                 Create One
               </Link>
             </p>

@@ -88,7 +88,7 @@ function Signup() {
       });
       if (response.data.success) {
         setMessage({ type: "success", text: "Account created successfully! Redirecting..." });
-        setTimeout(() => navigate("/SignIn"), 2000);
+        setTimeout(() => navigate("/signin"), 2000);
       }
     } catch (error) {
       setMessage({
@@ -233,7 +233,7 @@ function Signup() {
 
             <p className="signin-text">
               Already have an Account ?{" "}
-              <Link to="/SignIn" className="signin-link">
+              <Link to="/signin" className="signin-link">
                 Sign In
               </Link>
             </p>

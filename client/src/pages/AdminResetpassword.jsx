@@ -30,11 +30,11 @@ function ResetPassword() {
         <aside className="sidebar">
           <div className="sidebar-title">Management</div>
           <ul className="sidebar-menu">
-            <li><Link to="/AdminHome"><span className="sidebar-icon"></span>Admin Home</Link></li>
-            <li><Link to="/AddUser"><span className="sidebar-icon"></span>Add User</Link></li>
-            <li><Link to="/AdminComplaint"><span className="sidebar-icon"></span>Complaint</Link></li>
-            <li><Link to="/AdminResults"><span className="sidebar-icon"></span>Results</Link></li>
-            <li><Link to="/AdminProfile"><span className="sidebar-icon"></span>Profile</Link></li>
+            <li><Link to="/adminhome"><span className="sidebar-icon"></span>Admin Home</Link></li>
+            <li><Link to="/adduser"><span className="sidebar-icon"></span>Add User</Link></li>
+            <li><Link to="/admincomplaint"><span className="sidebar-icon"></span>Complaint</Link></li>
+            <li><Link to="/adminresults"><span className="sidebar-icon"></span>Results</Link></li>
+            <li><Link to="/adminprofile"><span className="sidebar-icon"></span>Profile</Link></li>
           </ul>
         </aside>
 

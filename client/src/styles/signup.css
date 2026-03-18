@@ -1,45 +1,50 @@
 .signup-page {
   min-height: 100vh;
-  background: linear-gradient(90deg, #b0c9ce 0%, #3e5e65 50%, #1a3636 100%); /* Precisely matched gradient */
+  background-color: var(--bg-main);
   display: flex;
   flex-direction: column;
 }
 
-
 .signup-container {
   flex: 1;
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 2rem;
+  align-items: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, rgba(147, 177, 181, 0.1) 0%, rgba(184, 227, 233, 0.05) 100%);
 }
 
 .signup-card {
-  background: #ffffff;
   width: 100%;
-  max-width: 650px; /* Minimized width while keeping grid readable */
-  padding: 3.5rem 3rem;
-  border-radius: 24px;
-  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.4);
-  animation: fadeIn 0.8s ease-out;
+  max-width: 650px;
+  background: white;
+  padding: 4rem;
+  border-radius: 40px;
+  box-shadow: 0 30px 80px rgba(11, 46, 51, 0.15);
+  border: 1px solid rgba(184, 227, 233, 0.4);
+  animation: signUpFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+@keyframes signUpFadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 .signup-header {
   text-align: center;
-  margin-bottom: 4rem;
+  margin-bottom: 3.5rem;
 }
 
 .signup-title {
   font-size: 3rem;
-  font-weight: 800;
-  color: #1a3636;
-  margin-bottom: 1.5rem;
+  font-weight: 900;
+  color: var(--bg-dark);
+  margin-bottom: 0.75rem;
   letter-spacing: -1.5px;
 }
 
 .signup-subtitle {
-  color: #5d7c7c;
+  color: var(--text-muted);
   font-size: 1.15rem;
   font-weight: 500;
 }
@@ -53,87 +58,66 @@
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-
-.signup-form input {
-  width: 100%;
-  height: 4rem;
-  background: #f0f7f8;
-  border: none;
-  border-radius: 12px;
-  padding: 0 1.5rem;
-  font-size: 1rem;
-  font-family: var(--font-main);
-  transition: all var(--transition-normal);
-  color: #1a3636;
-}
-
-.signup-form input::placeholder {
-  color: #8fa9a9;
-}
-
-.signup-form input:focus {
-  outline: none;
-  background: #ffffff;
-  box-shadow: 0 0 0 2px var(--primary-light);
-}
-
-.password-wrapper {
-  position: relative;
-}
-
-.eye-icon {
-  position: absolute;
-  right: 1.25rem;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  font-size: 1.25rem;
-  opacity: 0.4;
+  gap: 1.25rem;
 }
 
 .form-group-date {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  width: 100%;
 }
 
 .date-label {
   font-size: 0.85rem;
-  color: #1a3636;
-  font-weight: 700;
+  font-weight: 800;
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
   margin-left: 0.5rem;
-  opacity: 0.8;
 }
 
-.signup-form input[type="date"] {
-  color-scheme: light;
+.signup-form input {
+  width: 100%;
+  padding: 1.15rem 1.5rem;
+  border: 2px solid #F1F5F9;
+  border-radius: 16px;
+  background-color: #F8FAFC;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1E293B;
+  transition: all 0.3s ease;
 }
 
-/* OTP Section Styling */
+.signup-form input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background-color: white;
+}
+
+/* OTP Section */
 .otp-section {
-  background: rgba(184, 227, 233, 0.1);
+  background-color: #F8FBFC;
   padding: 2rem;
-  border-radius: 12px;
-  border: 1px dashed #93b1b5;
+  border-radius: 24px;
+  border: 1px dashed var(--primary-light);
   margin: 1rem 0;
 }
 
 .otp-label {
+  font-size: 0.9rem;
   font-weight: 800;
-  color: #4f7c82;
+  color: var(--bg-dark);
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  font-size: 0.85rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
+  text-align: center;
 }
 
 .otp-row {
   display: flex;
-  gap: 1.5rem;
+  flex-direction: column;
   align-items: center;
+  gap: 1.5rem;
 }
 
 .otp-boxes {
@@ -142,110 +126,83 @@
 }
 
 .otp-input {
-  width: 45px !important;
-  height: 50px !important;
+  width: 50px !important;
+  height: 60px;
   text-align: center;
-  font-weight: 800;
+  font-size: 1.5rem !important;
+  font-weight: 900 !important;
   padding: 0 !important;
-  border-radius: 8px !important;
-  background: white !important;
-  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  border: 2px solid #E2E8F0 !important;
+}
+
+.otp-input:focus {
+  border-color: var(--primary) !important;
+  background-color: white !important;
 }
 
 .send-otp-btn {
-  background: #4f7c82;
-  color: white;
-  border: none;
-  height: 50px;
-  padding: 0 1.5rem;
-  border-radius: 8px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  padding: 0.75rem 2rem;
+  background-color: white;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  font-weight: 800;
   cursor: pointer;
-  white-space: nowrap;
-  transition: background var(--transition-fast);
+  transition: all 0.2s;
 }
 
 .send-otp-btn:hover {
-  background: #1a3636;
-}
-
-.otp-actions {
-  margin-top: 1.5rem;
-  display: flex;
-  justify-content: center;
-}
-
-.verify-btn {
-  background: transparent;
-  color: #1a3636;
-  border: 2px solid #1a3636;
-  height: 45px;
-  padding: 0 2.5rem;
-  border-radius: 40px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.verify-btn:hover {
-  background: #1a3636;
+  background-color: var(--primary);
   color: white;
 }
 
-/* Submit Section */
 .signup-btn {
   width: 100%;
-  height: 5rem;
-  background: #4a6b6f;
+  padding: 1.25rem;
+  background-color: var(--bg-dark);
   color: white;
   border: none;
-  border-radius: 40px;
+  border-radius: 20px;
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 900;
   cursor: pointer;
-  transition: all var(--transition-normal);
-  box-shadow: 0 10px 20px rgba(74, 107, 111, 0.3);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 15px 30px rgba(11, 46, 51, 0.25);
   margin-top: 1.5rem;
 }
 
-.signup-btn:hover {
-  background: #1a3636;
-  transform: translateY(-2px);
-  box-shadow: 0 15px 25px rgba(26, 54, 54, 0.4);
+.signup-btn:hover:not(:disabled) {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(11, 46, 51, 0.35);
 }
 
 .signin-text {
   text-align: center;
-  color: #5d7c7c;
-  font-size: 1.1rem;
-  font-weight: 500;
   margin-top: 2.5rem;
+  color: var(--text-muted);
+  font-weight: 600;
 }
 
 .signin-link {
-  color: #1a3636;
-  font-weight: 700;
+  color: var(--primary);
+  font-weight: 900;
   text-decoration: none;
   margin-left: 0.5rem;
 }
 
-@media (max-width: 768px) {
-  .signup-card {
-    padding: 3rem 1.5rem;
-    border-radius: 0;
-  }
+@media (max-width: 640px) {
   .form-grid {
     grid-template-columns: 1fr;
   }
-  .otp-row {
-    flex-direction: column;
-    align-items: stretch;
+  .signup-card {
+    padding: 2.5rem;
   }
   .otp-boxes {
-    justify-content: center;
+    gap: 0.4rem;
+  }
+  .otp-input {
+    width: 40px !important;
+    height: 50px;
   }
 }

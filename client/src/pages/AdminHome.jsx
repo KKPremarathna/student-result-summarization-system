@@ -18,31 +18,31 @@ function AdminHome() {
           <div className="sidebar-title">Management</div>
           <ul className="sidebar-menu">
             <li className="active">
-              <Link to="/AdminHome">
+              <Link to="/adminhome">
                 <span className="sidebar-icon"></span>
                 Admin Home
               </Link>
             </li>
             <li>
-              <Link to="/AddUser">
+              <Link to="/adduser">
                 <span className="sidebar-icon"></span>
                 Add User
               </Link>
             </li>
             <li>
-              <Link to="/AdminComplaint">
+              <Link to="/admincomplaint">
                 <span className="sidebar-icon"></span>
                 Complaint
               </Link>
             </li>
             <li >
-              <Link to="/AdminResults">
+              <Link to="/adminresults">
                 <span className="sidebar-icon"></span>
                 Results
               </Link>
             </li>
             <li>
-              <Link to="/AdminProfile">
+              <Link to="/adminprofile">
                 <span className="sidebar-icon"></span>
                 Profile
               </Link>

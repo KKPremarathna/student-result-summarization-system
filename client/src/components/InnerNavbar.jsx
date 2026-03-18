@@ -20,7 +20,7 @@ function InnerNavbar() {
   const userString = localStorage.getItem("user");
   const user = userString ? JSON.parse(userString) : null;
 
-  const authPaths = ["/signin", "/signup", "/SignIn", "/SignUp"];
+  const authPaths = ["/signin", "/signup"];
   const isAuthPage = authPaths.includes(location.pathname);
   const showUserActions = user && !isAuthPage;
 
@@ -28,7 +28,7 @@ function InnerNavbar() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setIsProfileOpen(false);
-    navigate("/SignIn");
+    navigate("/signin");
   };
 
   const markAsRead = () => {

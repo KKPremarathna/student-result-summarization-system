@@ -65,6 +65,11 @@ function LectureList() {
     fetchLecturers(department);
   };
 
+  // We are removing registered user deletion as per instructions.
+  // This component seems to only show registered lecturers.
+  // If the user wants to delete ALLOWED emails for lecturers, that would be in a different place or a different section.
+  // The current code has a handleDelete that calls /lecturers/registered/${id}.
+  // We'll remove this as registered users shouldn't be deleted.
 
   return (
     <div className="lecturelist-page">
@@ -80,11 +85,31 @@ function LectureList() {
         <aside className="sidebar">
           <div className="sidebar-title">Management</div>
           <ul className="sidebar-menu">
-            <li><Link to="/AdminHome"><span className="sidebar-icon"></span>Admin Home</Link></li>
-            <li className="active"><Link to="/AddUser"><span className="sidebar-icon"></span>Add User</Link></li>
-            <li><Link to="/AdminComplaint"><span className="sidebar-icon"></span>Complaint</Link></li>
-            <li><Link to="/AdminResults"><span className="sidebar-icon"></span>Results</Link></li>
-            <li><Link to="/AdminProfile"><span className="sidebar-icon"></span>Profile</Link></li>
+            <li>
+              <Link to="/adminhome">
+                <span className="sidebar-icon"></span>Admin Home
+              </Link>
+            </li>
+            <li className="active">
+              <Link to="/adduser">
+                <span className="sidebar-icon"></span>Add User
+              </Link>
+            </li>
+            <li>
+              <Link to="/admincomplaint">
+                <span className="sidebar-icon"></span>Complaint
+              </Link>
+            </li>
+            <li>
+              <Link to="/adminresults">
+                <span className="sidebar-icon"></span>Results
+              </Link>
+            </li>
+            <li>
+              <Link to="/adminprofile">
+                <span className="sidebar-icon"></span>Profile
+              </Link>
+            </li>
           </ul>
         </aside>
 

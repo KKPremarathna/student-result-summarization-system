@@ -1,14 +1,15 @@
 .home-page {
-  min-height: 100vh;
-  background-color: var(--bg-dark);
-  overflow-x: hidden;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .hero-section {
-  position: relative;
+  width: 100%;
   height: 100vh;
   background-size: cover;
   background-position: center;
+  position: relative;
   display: flex;
   flex-direction: column;
 }
@@ -19,11 +20,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    135deg, 
-    rgba(11, 46, 51, 0.85) 0%, 
-    rgba(79, 124, 130, 0.45) 100%
-  );
+  background: rgba(0, 0, 0, 0.4);
+  /* Subtle overlay from image */
   z-index: 1;
 }
 
@@ -35,128 +33,60 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 0 2rem;
+  color: white;
   text-align: center;
+  padding: 2rem;
+}
+
+.hero-content .title {
+  font-size: 7rem;
+  font-weight: 900;
+  margin-bottom: 1.5rem;
+  font-family: var(--font-heading);
+  letter-spacing: -2px;
+  animation: fadeIn 1s ease-out;
+  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.hero-content h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  opacity: 0.9;
   animation: fadeIn 1.2s ease-out;
 }
 
-.hero-badge {
-  background: rgba(184, 227, 233, 0.1);
-  backdrop-filter: blur(10px);
-  padding: 0.6rem 1.5rem;
-  border-radius: 100px;
-  border: 1px solid rgba(184, 227, 233, 0.2);
-  color: var(--primary-light);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  margin-bottom: 2rem;
-}
-
-.title {
-  font-size: 8rem;
-  font-weight: 800;
-  color: white;
-  margin-bottom: 0.5rem;
-  letter-spacing: -4px;
-  line-height: 1;
-  text-shadow: 0 20px 40px rgba(0,0,0,0.3);
-}
-
-.subtitle {
+.hero-content p {
   font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--primary-light);
-  margin-bottom: 2rem;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  opacity: 0.9;
-}
-
-.hero-desc {
-  max-width: 650px;
-  font-size: 1.25rem;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 4rem;
-  line-height: 1.6;
-}
-
-.cta-container {
-  width: 100%;
+  font-weight: 500;
+  opacity: 0.8;
   max-width: 600px;
+  line-height: 1.6;
+  animation: fadeIn 1.4s ease-out;
 }
 
-.glass-input-group {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  padding: 0.75rem;
-  border-radius: 100px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  gap: 1rem;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-  transition: all var(--transition-normal);
-}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
 
-.glass-input-group:focus-within {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(184, 227, 233, 0.3);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.3), var(--shadow-glow);
-  transform: translateY(-5px);
-}
-
-.glass-input-group input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  padding: 0 2rem;
-  color: white;
-  font-size: 1rem;
-  font-family: var(--font-main);
-  outline: none;
-}
-
-.glass-input-group input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.gold-btn {
-  background: var(--primary-light);
-  color: var(--bg-dark);
-  border: none;
-  padding: 1rem 2.5rem;
-  border-radius: 100px;
-  font-weight: 800;
-  font-size: 0.95rem;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-}
-
-.gold-btn:hover {
-  background: white;
-  transform: scale(1.05);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 768px) {
-  .title {
+  .hero-content .title {
     font-size: 4rem;
-    letter-spacing: -2px;
   }
-  .subtitle {
+
+  .hero-content h2 {
+    font-size: 1.5rem;
+  }
+
+  .hero-content p {
     font-size: 1rem;
-    letter-spacing: 2px;
-  }
-  .glass-input-group {
-    flex-direction: column;
-    border-radius: var(--radius-md);
-    padding: 1rem;
-  }
-  .gold-btn {
-    width: 100%;
-    border-radius: var(--radius-sm);
   }
 }
