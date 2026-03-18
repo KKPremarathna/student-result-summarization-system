@@ -23,7 +23,7 @@ import LecturerHome from "./pages/LecturerHome";
 import ViewResult from "./pages/ViewResult";
 import AddSubject from "./pages/AddSubject";
 import AddIncourse from "./pages/Addincourse";
-import PendingResult from "./pages/PendingResult";
+import LecturerComplaints from "./pages/LecturerComplaints";
 import FinalResult from "./pages/FinalResult";
 import LecturerSetting from "./pages/LecturerSetting";
 
@@ -91,7 +91,7 @@ function App() {
         <Route path="/lecturer/results" element={<ProtectedRoute allowedRoles={['lecturer']}><ViewResult /></ProtectedRoute>} />
         <Route path="/lecturer/addsubject" element={<ProtectedRoute allowedRoles={['lecturer']}><AddSubject /></ProtectedRoute>} />
         <Route path="/lecturer/addincourse" element={<ProtectedRoute allowedRoles={['lecturer']}><AddIncourse /></ProtectedRoute>} />
-        <Route path="/lecturer/pending" element={<ProtectedRoute allowedRoles={['lecturer']}><PendingResult /></ProtectedRoute>} />
+        <Route path="/lecturer/complaints" element={<ProtectedRoute allowedRoles={['lecturer']}><LecturerComplaints /></ProtectedRoute>} />
         <Route path="/lecturer/final" element={<ProtectedRoute allowedRoles={['lecturer']}><FinalResult /></ProtectedRoute>} />
         <Route path="/lecturer/setting" element={<ProtectedRoute allowedRoles={['lecturer']}><LecturerSetting /></ProtectedRoute>} />
 

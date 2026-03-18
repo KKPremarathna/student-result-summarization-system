@@ -128,3 +128,23 @@ export const saveFinalResult = (resultData) => {
         headers: { Authorization: `Bearer ${token}` }
     });
 };
+
+/*
+Fetch complaints for the logged-in lecturer
+*/
+export const getLecturerComplaints = () => {
+    const token = localStorage.getItem("token");
+    return axios.get(`${API}/complaints/my-complaints`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
+
+/*
+Create a complaint (e.g. to admin)
+*/
+export const createComplaint = (complaintData) => {
+    const token = localStorage.getItem("token");
+    return axios.post(`${API}/complaints`, complaintData, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
