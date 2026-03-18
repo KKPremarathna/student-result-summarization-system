@@ -264,19 +264,7 @@ const IncourseMarks = () => {
           )
         )}
 
-        {/* Bottom Actions */}
-        <div className="im-footer">
-          <div className="im-hint">
-            <Info size={16} />
-            <span>If you find any discrepancy in your marks, please submit a complaint.</span>
-          </div>
-          <Link to="/student/complaints">
-            <button className="im-complaint-btn">
-              <MessageSquare size={18} />
-              Submit Complaint
-            </button>
-          </Link>
-        </div>
+        {/* No footer here anymore - moved to dedicated page */}
       </div>
     </StudentLayout>
   );

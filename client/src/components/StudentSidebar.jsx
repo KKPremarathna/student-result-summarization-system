@@ -21,6 +21,7 @@ function StudentSidebar({ isOpen, toggleSidebar }) {
           <li><Link to="/student/home">Student Home</Link></li>
           <li><Link to="/student/subject-wise">Subject-wise Result</Link></li>
           <li><Link to="/student/student-wise">Student-wise Result</Link></li>
+          <li><Link to="/student/complaints">My Complaints</Link></li>
           <li><Link to="/student/profile">Profile Settings</Link></li>
         </ul>
       </div>
