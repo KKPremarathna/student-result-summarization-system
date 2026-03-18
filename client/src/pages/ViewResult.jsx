@@ -9,6 +9,7 @@ import {
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import "../styles/ViewResult.css";
+import { formatRegNo } from "../utils/regUtils";
 import {
   FileDown,
   Filter,
@@ -93,14 +94,15 @@ function ViewResult() {
         // 2. Get Results
         const res = await getIncourseResults(subject._id);
         const fetchedResults = res.data.results || [];
+        const formattedResults = fetchedResults.map(r => ({ ...r, studentENo: formatRegNo(r.studentENo) }));
         
         // 3. Filter by E Registration Number if provided
         if (eNumberFilter) {
-          setResults(fetchedResults.filter(r => 
+          setResults(formattedResults.filter(r => 
             r.studentENo.toLowerCase().includes(eNumberFilter.toLowerCase())
           ));
         } else {
-          setResults(fetchedResults);
+          setResults(formattedResults);
         }
       } else {
         alert("Subject configuration not found");

@@ -25,7 +25,7 @@ import {
   Eye,
   EyeOff
 } from "lucide-react";
-import { extractRegNoFromEmail, formatRegNo } from "../utils/regUtils";
+import { extractRegNoFromEmail, formatRegNo, isValidRegNum } from "../utils/regUtils";
 
 function StudentProfile() {
   const [userData, setUserData] = useState({
@@ -100,6 +100,13 @@ function StudentProfile() {
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
+    
+    // Strict E-Number Validation
+    if (editForm.studentENo && editForm.studentENo !== "N/A" && !isValidRegNum(editForm.studentENo)) {
+      setStatus({ type: "error", message: "Invalid E-Number. Must be in the format 2XXX/E/XXX" });
+      return;
+    }
+
     setLoading(true);
     try {
       await updateStudentProfile(editForm);

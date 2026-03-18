@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import LecturerLayout from "../components/LecturerLayout.jsx";
 import { getCourseCodes, getBatches, getSubjectByCodeAndBatch, getIncourseResults, saveFinalResult } from "../services/lecturerApi";
 import "../styles/FinalResult.css";
+import { formatRegNo } from "../utils/regUtils";
 import {
   Save,
   Send,
@@ -71,7 +72,8 @@ function FinalResult() {
         const sub = subRes.data[0];
         setSubjectId(sub._id);
         const res = await getIncourseResults(sub._id);
-        setRows(res.data.results);
+        const fetchedResults = res.data.results || [];
+        setRows(fetchedResults.map(r => ({ ...r, studentENo: formatRegNo(r.studentENo) })));
       } else {
         setRows([]);
         setStatus({ type: "error", message: "Subject not found." });

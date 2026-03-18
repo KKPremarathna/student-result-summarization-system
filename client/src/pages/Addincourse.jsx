@@ -25,6 +25,7 @@ import {
   X,
   Calendar
 } from "lucide-react";
+import { formatRegNo, isValidRegNum } from "../utils/regUtils";
 
 function AddIncourse() {
   const [courseCodes, setCourseCodes] = useState([]);
@@ -125,8 +126,11 @@ function AddIncourse() {
         const res = await getIncourseResultsBySubject(subject._id);
         
         // Ensure we have a row for every student index if needed, 
-        // but typically the backend provides the list for that subject
-        const fetchedResults = res.data.results || [];
+        // format E-numbers coming from DB to maintain UI consistency and prevent duplicates
+        const fetchedResults = (res.data.results || []).map(r => ({
+          ...r,
+          studentENo: formatRegNo(r.studentENo)
+        }));
         fetchedResults.sort((a, b) => a.studentENo.localeCompare(b.studentENo));
         setResults(fetchedResults);
       }
@@ -199,19 +203,23 @@ function AddIncourse() {
     // Split by newlines, commas, or spaces and normalize
     const rawList = studentInput.split(/[\n,\s]+/).map(s => s.trim().toUpperCase()).filter(s => s !== "");
 
-    // Simple E-number validation (e.g., 2020/E/001)
-    const validENumberFormat = /^\d{4}\/[A-Z]\/\d{3}$/;
+    const newENumbers = [];
+    let hasError = false;
 
-    const newENumbers = rawList.filter(eno => {
-      if (!validENumberFormat.test(eno)) {
-        setMessage({ type: "error", text: `Invalid format: ${eno}. Use 20XX/E/XXX` });
-        return false;
+    for (let rawEno of rawList) {
+      if (!isValidRegNum(rawEno)) {
+        setMessage({ type: "error", text: `Invalid format: ${rawEno}. Use exactly 2XXX/E/XXX` });
+        hasError = true;
+        continue;
       }
-      if (tempList.includes(eno) || results.some(r => r.studentENo === eno)) {
-        return false; // Skip duplicates
+      
+      const eno = formatRegNo(rawEno);
+      if (!tempList.includes(eno) && !results.some(r => r.studentENo === eno) && !newENumbers.includes(eno)) {
+        newENumbers.push(eno);
       }
-      return true;
-    });
+    }
+
+    if (hasError && newENumbers.length === 0) return;
 
     const updatedTempList = [...tempList, ...newENumbers];
     updatedTempList.sort((a, b) => a.localeCompare(b));
@@ -223,12 +231,12 @@ function AddIncourse() {
   const handleAddRangeStudents = () => {
     if (!rangeStart.trim() || !rangeEnd.trim()) return;
 
-    const validENumberFormat = /^(\d{4}\/[A-Z]\/)(\d{3})$/;
-    const startMatch = rangeStart.toUpperCase().match(validENumberFormat);
-    const endMatch = rangeEnd.toUpperCase().match(validENumberFormat);
+    const validRangeFormat = /^(2\d{3}\/?E\/?)(\d{3,})$/i;
+    const startMatch = rangeStart.toUpperCase().match(validRangeFormat);
+    const endMatch = rangeEnd.toUpperCase().match(validRangeFormat);
 
     if (!startMatch || !endMatch) {
-      setMessage({ type: "error", text: "Invalid range format. Use 20XX/E/XXX" });
+      setMessage({ type: "error", text: "Invalid range format. Use exactly 2XXX/E/XXX" });
       return;
     }
 
@@ -250,8 +258,9 @@ function AddIncourse() {
 
     const newENumbers = [];
     for (let i = startNum; i <= endNum; i++) {
-      const eno = `${prefix}${String(i).padStart(3, '0')}`;
-      if (!tempList.includes(eno) && !results.some(r => r.studentENo === eno)) {
+      const rawEno = `${prefix}${String(i).padStart(3, '0')}`;
+      const eno = formatRegNo(rawEno);
+      if (!tempList.includes(eno) && !results.some(r => r.studentENo === eno) && !newENumbers.includes(eno)) {
         newENumbers.push(eno);
       }
     }

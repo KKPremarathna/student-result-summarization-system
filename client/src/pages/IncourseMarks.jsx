@@ -72,7 +72,11 @@ const IncourseMarks = () => {
     setError("");
     try {
       const res = await getSubjectIncourseMarks(courseCode);
-      setResultsData(res.data);
+      const data = res.data;
+      if (data.results) {
+        data.results = data.results.map(r => ({ ...r, studentENo: formatRegNo(r.studentENo) }));
+      }
+      setResultsData(data);
     } catch (err) {
       console.error("Failed to fetch subject marks", err);
       setError(err.response?.data?.message || "Failed to fetch marks for this course.");
@@ -100,7 +104,7 @@ const IncourseMarks = () => {
 
   const assessments = resultsData?.subject?.assessments || {};
   const allResults = resultsData?.results || [];
-  const myENo = resultsData?.myENo || studentInfo.eNumber;
+  const myENo = formatRegNo(resultsData?.myENo || studentInfo.eNumber);
 
   return (
     <StudentLayout>

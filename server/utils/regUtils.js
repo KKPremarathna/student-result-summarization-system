@@ -18,8 +18,8 @@ const normalizeRegNo = (regNo) => {
 const extractRegNoFromEmail = (email) => {
     if (!email || !email.includes("@")) return "";
     const prefix = email.split("@")[0];
-    // Basic check to see if it looks like a regNo (starts with year digits)
-    if (/^\d{4}/.test(prefix)) {
+    // Strict check: must start with 2 and have 3 digits, then optional slash, 'e'/'E', optional slash, and at least 3 digits.
+    if (/^2\d{3}\/?e\/?\d{3,}$/i.test(prefix)) {
         return prefix.toUpperCase();
     }
     return "";
@@ -50,8 +50,8 @@ const generateRegNoRegex = (regNo) => {
  */
 const isValidRegNum = (regNo) => {
     if (!regNo) return false;
-    // Regex matches 2021/E/001 or 2021E001
-    const regex = /^(\d{4}\/[A-Z]\/\d{3,})|(\d{4}[A-Z]\d{3,})$/i;
+    // Strictly must match 2XXX(optional slash)E(optional slash)XXX (or more numbers)
+    const regex = /^2\d{3}\/?E\/?\d{3,}$/i;
     return regex.test(regNo.trim());
 };
 
