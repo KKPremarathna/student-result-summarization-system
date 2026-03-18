@@ -235,19 +235,19 @@ const IncourseMarks = () => {
                         <td className="im-td-batch">{row.studentENo}</td>
                         {/* Data for Assignments */}
                         {Array.from({ length: assessments.assignmentCount || 0 }).map((_, i) => (
-                          <td key={`ad-${i}`}>{row.assignments?.[i] ?? "-"}</td>
+                          <td key={`ad-${i}`}>{row.assignments?.[i] ?? "AB"}</td>
                         ))}
                         {/* Data for Quizzes */}
                         {Array.from({ length: assessments.quizCount || 0 }).map((_, i) => (
-                          <td key={`qd-${i}`}>{row.quizzes?.[i] ?? "-"}</td>
+                          <td key={`qd-${i}`}>{row.quizzes?.[i] ?? "AB"}</td>
                         ))}
                         {/* Data for Labs */}
                         {Array.from({ length: assessments.labCount || 0 }).map((_, i) => (
-                          <td key={`ld-${i}`}>{row.labs?.[i] ?? "-"}</td>
+                          <td key={`ld-${i}`}>{row.labs?.[i] ?? "AB"}</td>
                         ))}
                         {/* Mid-term */}
                         {assessments.midWeight > 0 && (
-                          <td className="im-td-bold">{row.mid ?? "-"}</td>
+                          <td className="im-td-bold">{row.mid ?? "AB"}</td>
                         )}
                         {/* Total */}
                         <td className="im-td-total">{row.incourseTotal ?? "0.0"}</td>

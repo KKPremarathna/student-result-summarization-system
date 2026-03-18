@@ -5,15 +5,20 @@ const { isValidRegNum } = require("../utils/regUtils");
 const PDFDocument = require("pdfkit-table");
 const { normalizeRegNo, extractRegNoFromEmail, generateRegNoRegex } = require("../utils/regUtils");
 
-function calcGrade(mark) {
+function calcGrade(mark, midExamMark, endExamMark) {
+  if (midExamMark == null || midExamMark === "" || endExamMark == null || endExamMark === "") {
+    return "I";
+  }
   if (mark >= 85) return "A+";
-  if (mark >= 70) return "A";
-  if (mark >= 65) return "A-";
-  if (mark >= 60) return "B+";
-  if (mark >= 55) return "B";
-  if (mark >= 50) return "B-";
-  if (mark >= 45) return "C+";
-  if (mark >= 40) return "C";
+  if (mark >= 80) return "A";
+  if (mark >= 75) return "A-";
+  if (mark >= 70) return "B+";
+  if (mark >= 65) return "B";
+  if (mark >= 60) return "B-";
+  if (mark >= 55) return "C+";
+  if (mark >= 50) return "C";
+  if (mark >= 45) return "C-";
+  if (mark >= 40) return "D+";
   if (mark >= 35) return "D";
   return "E";
 }
@@ -86,10 +91,10 @@ exports.saveResult = async (req, res) => {
     if (!isValidRegNum(studentENo)) {
       return res.status(400).json({ message: "Invalid registration number format. Expected 20XX/E/XXX" });
     }
-    if (endExamMark === undefined || endExamMark === null) {
+    if (endExamMark === undefined) {
       return res.status(400).json({ message: "endExamMark is required" });
     }
-    if (typeof endExamMark !== "number" || endExamMark < 0 || endExamMark > 100) {
+    if (endExamMark !== null && (typeof endExamMark !== "number" || endExamMark < 0 || endExamMark > 100)) {
       return res.status(400).json({ message: "endExamMark must be a number between 0 and 100" });
     }
 
@@ -109,8 +114,10 @@ exports.saveResult = async (req, res) => {
 
     // finalMark = incourseTotal + endExamMark × (endExamWeight / 100)
     const endExamWeight = subject.assessments.endExamWeight || 0;
-    const finalMark = Math.round((incourseResult.incourseTotal + endExamMark * (endExamWeight / 100)) * 100) / 100;
-    const grade = calcGrade(finalMark);
+    const finalMark = endExamMark !== null 
+      ? Math.round((incourseResult.incourseTotal + endExamMark * (endExamWeight / 100)) * 100) / 100
+      : null;
+    const grade = calcGrade(finalMark, incourseResult.mid, endExamMark);
 
     const existing = await FinalResult.findOne({
       subject: subjectId,
@@ -202,8 +209,8 @@ exports.updateResult = async (req, res) => {
     const existing = await FinalResult.findOne({ _id: req.params.id, createdBy: req.user._id });
     if (!existing) return res.status(404).json({ message: "Final result not found" });
 
-    const endExamMark = req.body.endExamMark ?? existing.endExamMark;
-    if (typeof endExamMark !== "number" || endExamMark < 0 || endExamMark > 100) {
+    const endExamMark = req.body.endExamMark !== undefined ? req.body.endExamMark : existing.endExamMark;
+    if (endExamMark !== null && (typeof endExamMark !== "number" || endExamMark < 0 || endExamMark > 100)) {
       return res.status(400).json({ message: "endExamMark must be between 0 and 100" });
     }
 
@@ -214,8 +221,10 @@ exports.updateResult = async (req, res) => {
     const incourseTotal = incourseResult ? incourseResult.incourseTotal : existing.incourseTotal;
 
     const endExamWeight = subject.assessments.endExamWeight || 0;
-    const finalMark = Math.round((incourseTotal + endExamMark * (endExamWeight / 100)) * 100) / 100;
-    const grade = calcGrade(finalMark);
+    const finalMark = endExamMark !== null 
+      ? Math.round((incourseTotal + endExamMark * (endExamWeight / 100)) * 100) / 100
+      : null;
+    const grade = calcGrade(finalMark, incourseResult ? incourseResult.mid : null, endExamMark);
 
     const updated = await FinalResult.findByIdAndUpdate(
       req.params.id,
@@ -458,7 +467,7 @@ exports.getStudentFinalResults = async (req, res) => {
       "A+": 0, "A": 0, "A-": 0,
       "B+": 0, "B": 0, "B-": 0,
       "C+": 0, "C": 0, "C-": 0,
-      "D+": 0, "D": 0, "E": 0
+      "D+": 0, "D": 0, "E": 0, "I": 0
     };
 
     results.forEach(r => {
@@ -506,7 +515,8 @@ exports.getSubjectAnalytics = async (req, res) => {
     const gradeDistribution = {
       "A+": 0, "A": 0, "A-": 0,
       "B+": 0, "B": 0, "B-": 0,
-      "C+": 0, "C": 0, "D": 0, "E": 0
+      "C+": 0, "C": 0, "C-": 0,
+      "D+": 0, "D": 0, "E": 0, "I": 0
     };
 
     let passed = 0;

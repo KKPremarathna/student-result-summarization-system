@@ -103,14 +103,17 @@ function FinalResult() {
     let successCount = 0;
     try {
       for (const row of rows) {
-        if (row.endExamMark !== null && row.endExamMark !== undefined) {
-          await saveFinalResult({
-            subject: subjectId,
-            studentENo: row.studentENo,
-            endExamMark: parseFloat(row.endExamMark)
-          });
-          successCount++;
+        let finalEndExamMark = null;
+        if (row.endExamMark !== undefined && row.endExamMark !== null && row.endExamMark !== "") {
+          finalEndExamMark = parseFloat(row.endExamMark);
+          if (isNaN(finalEndExamMark)) finalEndExamMark = null;
         }
+        await saveFinalResult({
+          subject: subjectId,
+          studentENo: row.studentENo,
+          endExamMark: finalEndExamMark
+        });
+        successCount++;
       }
       setStatus({ type: "success", message: `Successfully saved ${successCount} records.` });
       setIsEditMode(false);
@@ -263,7 +266,7 @@ function FinalResult() {
                           onChange={(e) => handleInputChange(index, e.target.value)}
                           disabled={!isEditMode || loading}
                           className={`fr-input ${isEditMode ? 'fr-input--cell' : 'fr-input--transparent'}`}
-                          placeholder="-"
+                          placeholder="AB"
                         />
                       </td>
                       <td className="fr-td fr-td--center">

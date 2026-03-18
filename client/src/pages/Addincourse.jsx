@@ -491,7 +491,7 @@ function AddIncourse() {
                               type="number"
                               value={r.assignments?.[i] ?? ""}
                               onChange={(e) => handleMarkChange(rowIndex, "assignments", e.target.value, i)}
-                              placeholder="-"
+                              placeholder="AB"
                               className="aic-cell-input"
                               min="0"
                               max="100"
@@ -507,7 +507,7 @@ function AddIncourse() {
                               type="number"
                               value={r.quizzes?.[i] ?? ""}
                               onChange={(e) => handleMarkChange(rowIndex, "quizzes", e.target.value, i)}
-                              placeholder="-"
+                              placeholder="AB"
                               className="aic-cell-input"
                               min="0"
                               max="100"
@@ -523,7 +523,7 @@ function AddIncourse() {
                               type="number"
                               value={r.labs?.[i] ?? ""}
                               onChange={(e) => handleMarkChange(rowIndex, "labs", e.target.value, i)}
-                              placeholder="-"
+                              placeholder="AB"
                               className="aic-cell-input"
                               min="0"
                               max="100"
@@ -537,7 +537,7 @@ function AddIncourse() {
                             type="number"
                             value={r.mid ?? ""}
                             onChange={(e) => handleMarkChange(rowIndex, "mid", e.target.value)}
-                            placeholder="-"
+                            placeholder="AB"
                             className="aic-cell-input aic-cell-input--mid"
                             min="0"
                             max="100"

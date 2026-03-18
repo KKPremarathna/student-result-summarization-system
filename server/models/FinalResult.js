@@ -20,8 +20,8 @@ const FinalResultSchema = new mongoose.Schema(
 
     studentENo:    { type: String, required: true, trim: true, uppercase: true },
     incourseTotal: { type: Number, required: true },
-    endExamMark:   { type: Number, required: true, min: 0, max: 100 },
-    finalMark:     { type: Number, required: true },
+    endExamMark:   { type: Number, min: 0, max: 100 },
+    finalMark:     { type: Number },
     grade:         { type: String, required: true },
     
     // Admin editable fields (after senate approval)

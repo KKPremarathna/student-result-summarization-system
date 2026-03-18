@@ -4,7 +4,7 @@ import Navbar from "../components/InnerNavbar";
 import { Link } from "react-router-dom";
 
 const API_BASE = "http://localhost:5000/api/admin";
-const GRADES = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D", "E", "AB"];
+const GRADES = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "E", "I"];
 
 // ── Reg-num helper (client-side mirror) ────────────────────────────────────
 const REG_PATTERN = /^20\d{2}\/E\/\d{3}$/i;

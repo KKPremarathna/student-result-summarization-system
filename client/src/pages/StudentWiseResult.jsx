@@ -106,7 +106,7 @@ const StudentWiseResult = () => {
     let failed = 0;
     const distribution = {
       'A+': 0, 'A': 0, 'A-': 0, 'B+': 0, 'B': 0, 'B-': 0,
-      'C+': 0, 'C': 0, 'C-': 0, 'D+': 0, 'D': 0, 'E': 0
+      'C+': 0, 'C': 0, 'C-': 0, 'D+': 0, 'D': 0, 'E': 0, 'I': 0
     };
 
     filtered.forEach(r => {

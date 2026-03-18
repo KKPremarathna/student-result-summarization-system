@@ -278,24 +278,24 @@ function ViewResult() {
                       {/* Assignments */}
                       {[...Array(structure.assignments)].map((_, i) => (
                         <td key={`a-${i}`} className="vr-td vr-td--data">
-                          {r.assignments && r.assignments[i] !== undefined ? r.assignments[i] : "-"}
+                          {r.assignments && r.assignments[i] !== undefined && r.assignments[i] !== null ? r.assignments[i] : "AB"}
                         </td>
                       ))}
                       {/* Quizzes */}
                       {[...Array(structure.quizzes)].map((_, i) => (
                         <td key={`q-${i}`} className="vr-td vr-td--data">
-                          {r.quizzes && r.quizzes[i] !== undefined ? r.quizzes[i] : "-"}
+                          {r.quizzes && r.quizzes[i] !== undefined && r.quizzes[i] !== null ? r.quizzes[i] : "AB"}
                         </td>
                       ))}
                       {/* Labs */}
                       {[...Array(structure.labs)].map((_, i) => (
                         <td key={`l-${i}`} className="vr-td vr-td--data">
-                          {r.labs && r.labs[i] !== undefined ? r.labs[i] : "-"}
+                          {r.labs && r.labs[i] !== undefined && r.labs[i] !== null ? r.labs[i] : "AB"}
                         </td>
                       ))}
-                      <td className="vr-td vr-td--mid">{r.mid ?? "-"}</td>
+                      <td className="vr-td vr-td--mid">{r.mid ?? "AB"}</td>
                       <td className="vr-td vr-td--incourse">{r.incourseTotal?.toFixed(1)}</td>
-                      <td className="vr-td vr-td--mid">{r.endExamMark ?? "-"}</td>
+                      <td className="vr-td vr-td--mid">{r.endExamMark ?? "AB"}</td>
                       <td className="vr-td vr-td--center">
                         <span className="vr-badge vr-badge--done">
                           {r.finalMark ?? "-"}
