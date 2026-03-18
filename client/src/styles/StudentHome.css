@@ -1,413 +1,256 @@
-/* StudentHomeDashboard.css - Winter Chill Theme */
+/* StudentHome.css - Premium Dashboard (Winter Chill Modern) */
 
-.sh-dashboard {
+.sh-container-premium {
+  min-height: calc(100vh - 10rem);
   display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  padding-bottom: 2.5rem;
-}
-
-/* ── Hero ─────────────────────────────────────── */
-.sh-hero {
-  position: relative;
-  overflow: hidden;
-  border-radius: 1.5rem;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  height: 24rem;
-}
-
-.sh-hero__bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.7s ease;
-}
-
-.sh-hero:hover .sh-hero__bg {
-  transform: scale(1.05);
-}
-
-.sh-hero__overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to right, rgba(11, 46, 51, 1) 20%, rgba(11, 46, 51, 0.7) 50%, transparent 100%);
-  display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 4rem;
-  color: white;
-}
-
-.sh-hero__content {
-  flex: 1;
-  max-width: 60%;
-  display: flex;
-  flex-direction: column;
   justify-content: center;
-  z-index: 2;
+  padding: 2rem;
+  background: radial-gradient(circle at top right, rgba(79, 124, 130, 0.05) 0%, transparent 60%);
 }
 
-.sh-hero__meta {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.sh-hero__badge {
-  padding: 0.375rem 1rem;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.sh-hero__date {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.875rem;
-}
-
-.sh-hero__title {
-  font-size: 3rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  margin: 0 0 0.5rem 0;
-  color: #B8E3E9;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
-  line-height: 1.15;
-}
-
-.sh-hero__title span {
-  color: #B8E3E9;
-}
-
-.sh-hero__subtitle {
-  font-size: 1.125rem;
-  color: rgba(255, 255, 255, 0.9);
-  max-width: 40rem;
-  font-weight: 500;
-  line-height: 1.6;
-  margin: 0;
-}
-
-/* ── Hero Student Image ──────────────────────── */
-.sh-hero__image-wrap {
-  flex: 0 0 40%;
-  height: 100%;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  position: relative;
-  z-index: 1;
-}
-
-.sh-hero__student-img {
-  width: auto;
-  height: 100%;
-  object-fit: contain;
-  filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.4)) saturate(1.1);
-  pointer-events: none;
-  
-  /* Simple fade at the bottom and left to blend with content */
-  -webkit-mask-image: linear-gradient(to top, transparent 0%, black 20%), linear-gradient(to right, transparent 0%, black 20%);
-  -webkit-mask-composite: source-in;
-  mask-image: linear-gradient(to top, transparent 0%, black 20%), linear-gradient(to right, transparent 0%, black 20%);
-  mask-composite: intersect;
-  
-  transition: transform 0.8s ease;
-  transform: scale(1.02);
-  transform-origin: bottom right;
-}
-
-/* ── Dashboard grid ───────────────────────────── */
-.sh-grid {
+.sh-grid-premium {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
-  align-items: start;
+  grid-template-columns: 400px 1fr;
+  gap: 2.5rem;
+  width: 100%;
+  max-width: 1200px;
+  align-items: flex-start;
 }
 
-@media (min-width: 1024px) {
-  .sh-grid {
-    grid-template-columns: 4fr 8fr;
+@media (max-width: 1024px) {
+  .sh-grid-premium {
+    grid-template-columns: 1fr;
+    max-width: 600px;
   }
 }
 
-/* ── Profile column ───────────────────────────── */
-.sh-profile-col {
+/* ── Main Profile Card (Left) ─────────────────── */
+.sh-card-main {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid white;
+  border-radius: 3rem;
+  padding: 3rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2.5rem;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+  animation: slideInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ── Generic card ─────────────────────────────── */
-.sh-card {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid white;
-  border-radius: 2.5rem;
-  padding: 2.5rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
-.sh-card--center {
+.sh-avatar-section {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  gap: 1.25rem;
 }
 
-/* ── Avatar ───────────────────────────────────── */
-.sh-avatar-wrap {
-  position: relative;
-  margin-bottom: 2rem;
-}
-
-.sh-avatar-glow {
-  position: absolute;
-  inset: -4px;
-  background: linear-gradient(to top right, #4F7C82, #B8E3E9);
+.sh-avatar-ring {
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
-  filter: blur(8px);
-  opacity: 0.4;
-  transition: opacity 0.5s;
+  padding: 8px;
+  background: white;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
 }
 
-.sh-avatar-wrap:hover .sh-avatar-glow {
-  opacity: 1;
-}
-
-.sh-avatar {
-  position: relative;
-  width: 10rem;
-  height: 10rem;
+.sh-avatar-bg {
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
+  background: #f0f4f8;
   overflow: hidden;
-  border: 4px solid white;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
-.sh-avatar__img {
+.sh-avatar-bg img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* ── Profile info ─────────────────────────────── */
-.sh-profile__name {
-  font-size: 1.875rem;
+.sh-student-name {
+  font-size: 2rem;
   font-weight: 900;
   color: #0B2E33;
-  margin: 0 0 0.25rem 0;
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
-.sh-profile__role {
+.sh-index-badge {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #4F7C82;
-  font-weight: 700;
-  font-size: 0.875rem;
+  background: rgba(184, 227, 233, 0.3);
+  color: #0B2E33;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 2rem;
-  background: rgba(184, 227, 233, 0.2);
-  padding: 0.375rem 1rem;
-  border-radius: 9999px;
 }
 
-.sh-profile__info {
-  width: 100%;
+.sh-info-stack {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
-.sh-info-row {
+.sh-info-item-wide {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 1rem;
-  background: rgba(184, 227, 233, 0.1);
-  border-radius: 1rem;
-  border: 1px solid rgba(184, 227, 233, 0.2);
+  align-items: center;
 }
 
-.sh-info-row__key {
+.sh-info-label-wrap {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   color: #4F7C82;
+  font-size: 0.95rem;
   font-weight: 700;
-  font-size: 0.875rem;
 }
 
-.sh-info-row__value {
+.sh-info-value-wide {
+  font-size: 1.1rem;
+  font-weight: 850;
   color: #0B2E33;
-  font-weight: 800;
-  font-size: 0.9rem;
+  text-transform: capitalize;
 }
 
-.sh-profile__actions {
-  margin-top: 2rem;
-  display: flex;
-  gap: 0.75rem;
-  width: 100%;
+.sh-settings-btn-wrap {
+  margin-top: 1rem;
+  align-self: flex-start;
 }
 
 .sh-settings-btn {
-  flex: 1;
   background: #0B2E33;
   color: white;
-  padding: 0.75rem;
-  border-radius: 0.75rem;
-  font-weight: 700;
   border: none;
-  cursor: pointer;
+  padding: 0.85rem 1.75rem;
+  border-radius: 1rem;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: background 0.2s, transform 0.2s;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  gap: 0.75rem;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 20px rgba(11, 46, 51, 0.2);
 }
 
 .sh-settings-btn:hover {
-  background: #1a454c;
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  filter: brightness(1.1);
 }
 
-/* ── Right column ─────────────────────────────── */
-.sh-right-col {
+/* ── Action Cards (Right) ─────────────────────── */
+.sh-actions-grid {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  animation: slideInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ── Stats/Action cards ────────────────────────── */
-.sh-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.sh-action-card-link {
+  text-decoration: none;
+}
+
+.sh-action-card {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 2.5rem;
+  border-radius: 2.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.sh-action-card.teal {
+  background: #4F7C82;
   color: white;
 }
 
-.sh-stat-card {
-  border-radius: 2rem;
-  padding: 2rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-  position: relative;
-  overflow: hidden;
-  text-decoration: none;
-  transition: transform 0.3s;
-}
-
-.sh-stat-card:hover {
-  transform: translateY(-5px);
-}
-
-.sh-stat-card--teal {
-  background: #4F7C82;
-}
-
-.sh-stat-card--dark {
+.sh-action-card.dark {
   background: #0B2E33;
+  color: white;
 }
 
-.sh-stat-card__top {
+.sh-action-card:hover {
+  transform: scale(1.02) translateX(10px);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+}
+
+.sh-action-icon-wrap {
+  width: 4rem;
+  height: 4rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 1.25rem;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-  position: relative;
-  z-index: 1;
-}
-
-.sh-stat-card__icon {
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 1rem;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-.sh-stat-card__number {
-  color: rgba(255, 255, 255, 0.6);
-  font-weight: 900;
-  font-size: 2.5rem;
-}
-
-.sh-stat-card__label {
-  font-size: 1.5rem;
-  font-weight: 800;
-  margin: 0 0 0.25rem 0;
-  position: relative;
-  z-index: 1;
-}
-
-.sh-stat-card__sub {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin: 0;
-  position: relative;
-  z-index: 1;
-}
-
-.sh-stat-card__blob {
-  position: absolute;
-  right: -1rem;
-  bottom: -1rem;
-  width: 8rem;
-  height: 8rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 50%;
-  transition: transform 0.7s;
-}
-
-.sh-stat-card:hover .sh-stat-card__blob {
-  transform: scale(1.5);
-}
-
-
-/* ── Empty state ──────────────────────────────── */
-.sh-empty-state {
-  padding: 3rem;
-  display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  background: rgba(184, 227, 233, 0.1);
-  border-radius: 1.5rem;
-  border: 2px dashed rgba(184, 227, 233, 0.3);
+  backdrop-filter: blur(10px);
 }
 
-.sh-empty-state__icon {
-  color: #B8E3E9;
-  margin-bottom: 1rem;
+.sh-action-content {
+  flex: 1;
 }
 
-.sh-empty-state__text {
-  color: #0B2E33;
+.sh-action-title {
+  font-size: 1.75rem;
   font-weight: 900;
-  font-size: 1.25rem;
-  font-style: italic;
-  opacity: 0.5;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.01em;
+}
+
+.sh-action-subtitle {
+  font-size: 0.85rem;
+  font-weight: 800;
+  opacity: 0.8;
+  letter-spacing: 0.05em;
   margin: 0;
+}
+
+.sh-action-corner-icon {
+  position: absolute;
+  right: -10px;
+  bottom: -10px;
+  opacity: 0.1;
+  transform: rotate(-15deg);
+}
+
+.sh-mini-chart-mock {
+  width: 100px;
+  height: 60px;
+  background: linear-gradient(to top, white 20%, transparent 80%);
+  mask-image: linear-gradient(to right, black 20%, transparent 20%, transparent 25%, black 25%, black 45%, transparent 45%, transparent 50%, black 50%, black 70%, transparent 70%, transparent 75%, black 75%);
+}
+
+.sh-op-icon { width: 120px; height: 120px; }
+
+/* ── Loading ─────────────────────────────────── */
+.sh-loading {
+  height: calc(100vh - 10rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0B2E33;
 }

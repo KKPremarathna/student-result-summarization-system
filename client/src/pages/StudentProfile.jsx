@@ -83,7 +83,7 @@ function StudentProfile() {
         lastName: data.lastName || "",
         email: data.email || "",
         faculty: data.faculty || "Faculty of Engineering",
-        studentENo: data.studentENo || "",
+        studentENo: data.studentENo || "N/A",
         degree: data.degree || "B.Sc. (Hons) in Engineering"
       };
       setUserData(profile);
@@ -161,7 +161,7 @@ function StudentProfile() {
 
         <div className="st-layout">
 
-          {/* Profile Card */}
+          {/* Sidebar - Profile Card */}
           <div className="st-sidebar">
             <div className="st-profile-card">
               <div className="st-avatar-wrap">
@@ -215,16 +215,17 @@ function StudentProfile() {
               </div>
             )}
 
-            {/* Personal Information Card */}
+            {/* Unified Information Card */}
             <div className="st-card">
               <div className="st-card__header">
                 <div className="st-card__icon-wrap">
                   <Fingerprint size={24} />
                 </div>
-                <h3 className="st-card__title">Personal Information</h3>
+                <h3 className="st-card__title">Profile Information</h3>
               </div>
 
               <div className="st-info-list">
+                {/* Personal Section */}
                 <div className="st-info-row" onClick={openEditModal}>
                   <div>
                     <p className="st-info-row__label">
@@ -251,6 +252,7 @@ function StudentProfile() {
 
                 <div className="st-thin-divider" />
 
+                {/* Academic Section */}
                 <div className="st-info-row" onClick={openEditModal}>
                   <div>
                     <p className="st-info-row__label">

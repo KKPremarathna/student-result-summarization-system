@@ -1,158 +1,142 @@
-import { useEffect, useState } from "react";
-import StudentLayout from "../components/StudentLayout.jsx";
-import studentHero from "../assets/student-hero.png";
-import profile from '../assets/profile.png';
-import dashboardBg from '../assets/dashboard-bg.png';
-import "../styles/StudentHome.css";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import {
-  User,
-  BookOpen,
+import StudentLayout from "../components/StudentLayout.jsx";
+import "../styles/StudentHome.css";
+import { getStudentDetails } from "../services/studentApi";
+import { 
+  User, 
+  BookOpen, 
+  FileText, 
+  Settings, 
+  Loader2,
   GraduationCap,
-  Settings,
-  Bell,
-  LayoutDashboard,
-  Calendar,
-  FileText,
-  Search
+  Building2,
+  MapPin,
+  ChevronRight
 } from "lucide-react";
 
 function StudentHome() {
-  const [student, setStudent] = useState({
-    name: "User Name",
-    email: "2021e262@eng.jfn.ac.lk",
-    faculty: "Faculty Of Engineering",
-    university: "University Of Jaffna",
-    indexNo: "2021E262"
-  });
+  const [student, setStudent] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStudentData();
+  }, []);
+
+  const fetchStudentData = async () => {
+    try {
+      const res = await getStudentDetails();
+      const data = res.data.data;
+      setStudent({
+        name: `${data.firstName} ${data.lastName}`,
+        indexNo: data.studentENo || "2022e050",
+        faculty: data.faculty || "faculty of engineering",
+        university: "jaffna"
+      });
+    } catch (err) {
+      console.error("Home data fetch failed", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <StudentLayout>
+        <div className="sh-loading">
+          <Loader2 className="animate-spin" size={48} />
+        </div>
+      </StudentLayout>
+    );
+  }
 
   return (
     <StudentLayout>
-      <div className="sh-dashboard">
-
-        {/* Hero Section */}
-        <div className="sh-hero">
-          <img
-            src={dashboardBg}
-            alt="Dashboard Background"
-            className="sh-hero__bg"
-          />
-          <div className="sh-hero__overlay">
-            <div className="sh-hero__content">
-              <div className="sh-hero__meta">
-                <span className="sh-hero__badge">Student Dashboard</span>
-                <span className="sh-hero__date">
-                  <Calendar size={14} />
-                  {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                </span>
-              </div>
-              <h1 className="sh-hero__title">
-                Welcome back, <span>{student?.name}</span>..!
-              </h1>
-              <p className="sh-hero__subtitle">
-                Your academic performance and result summaries are up to date.
-                Check your subject-wise and overall results below.
-              </p>
-            </div>
-
-            {/* Student Hero Image on the right of the welcome banner */}
-            <div className="sh-hero__image-wrap">
-              <img
-                src={studentHero}
-                alt="Student Hero"
-                className="sh-hero__student-img"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Dashboard Content Grid */}
-        <div className="sh-grid">
-
-          {/* Left Column: Profile Card */}
-          <div className="sh-profile-col">
-            <div className="sh-card sh-card--center">
-              <div className="sh-avatar-wrap">
-                <div className="sh-avatar-glow"></div>
-                <div className="sh-avatar">
-                  <img
-                    src={profile}
-                    alt="Student Profile"
-                    className="sh-avatar__img"
+      <div className="sh-container-premium">
+        <div className="sh-grid-premium">
+          {/* Main Profile Card (Left) */}
+          <div className="sh-card-main">
+            <div className="sh-avatar-section">
+              <div className="sh-avatar-ring">
+                <div className="sh-avatar-bg">
+                  <img 
+                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${student?.name || 'Student'}`}
+                    alt="avatar" 
                   />
                 </div>
               </div>
-
-              <h2 className="sh-profile__name">{student?.name}</h2>
-              <div className="sh-profile__role">
-                <GraduationCap size={18} />
-                {student?.indexNo}
-              </div>
-
-              <div className="sh-profile__info">
-                <div className="sh-info-row">
-                  <div className="sh-info-row__key">
-                    <LayoutDashboard size={18} />
-                    <span>Faculty</span>
-                  </div>
-                  <span className="sh-info-row__value">{student?.faculty || "Faculty Of Engineering"}</span>
-                </div>
-
-                <div className="sh-info-row">
-                  <div className="sh-info-row__key">
-                    <User size={18} />
-                    <span>University</span>
-                  </div>
-                  <span className="sh-info-row__value">{student?.university || "University Of Jaffna"}</span>
-                </div>
-              </div>
-
-              <div className="sh-profile__actions">
-                <Link to="/student/profile">
-                  <button className="sh-settings-btn">
-                    <Settings size={18} />
-                    Settings
-                  </button>
-                </Link>
+              <h1 className="sh-student-name">{student?.name}</h1>
+              <div className="sh-index-badge">
+                <GraduationCap size={14} />
+                <span>{student?.indexNo}</span>
               </div>
             </div>
-          </div>
 
-          {/* Right Column */}
-          <div className="sh-right-col">
-
-            {/* Stats/Action Cards */}
-            <div className="sh-stats">
-              <Link to="/student/subject-wise" className="sh-stat-card sh-stat-card--teal">
-                <div className="sh-stat-card__top">
-                  <div className="sh-stat-card__icon">
-                    <BookOpen size={28} />
-                  </div>
-                  <span className="sh-stat-card__number">📊</span>
+            <div className="sh-info-stack">
+              <div className="sh-info-item-wide">
+                <div className="sh-info-label-wrap">
+                  <GraduationCap size={18} />
+                  <span>Index No</span>
                 </div>
-                <h3 className="sh-stat-card__label">Subject-wise Result</h3>
-                <p className="sh-stat-card__sub">Check Overall Summary of batch </p>
-                <div className="sh-stat-card__blob"></div>
-              </Link>
+                <span className="sh-info-value-wide">{student?.indexNo}</span>
+              </div>
 
-              <Link to="/student/student-wise" className="sh-stat-card sh-stat-card--dark">
-                <div className="sh-stat-card__top">
-                  <div className="sh-stat-card__icon">
-                    <FileText size={28} />
-                  </div>
-                  <span className="sh-stat-card__number">📄</span>
+              <div className="sh-info-item-wide">
+                <div className="sh-info-label-wrap">
+                  <Building2 size={18} />
+                  <span>Faculty</span>
                 </div>
-                <h3 className="sh-stat-card__label">Student-wise Result</h3>
-                <p className="sh-stat-card__sub">View Individual Performance</p>
-                <div className="sh-stat-card__blob"></div>
-              </Link>
+                <span className="sh-info-value-wide">{student?.faculty}</span>
+              </div>
+
+              <div className="sh-info-item-wide">
+                <div className="sh-info-label-wrap">
+                  <MapPin size={18} />
+                  <span>University</span>
+                </div>
+                <span className="sh-info-value-wide">{student?.university}</span>
+              </div>
             </div>
 
-
+            <Link to="/student/profile" className="sh-settings-btn-wrap">
+              <button className="sh-settings-btn">
+                <Settings size={18} />
+                <span>Settings</span>
+              </button>
+            </Link>
           </div>
 
+          {/* Action Cards (Right) */}
+          <div className="sh-actions-grid">
+            <Link to="/student/subject-wise" className="sh-action-card-link">
+              <div className="sh-action-card teal">
+                <div className="sh-action-icon-wrap">
+                  <BookOpen size={24} />
+                </div>
+                <div className="sh-action-content">
+                  <h3 className="sh-action-title">Subject-wise Result</h3>
+                  <p className="sh-action-subtitle">CHECK OVERALL SUMMARY OF BATCH</p>
+                </div>
+                <div className="sh-action-corner-icon">
+                   <div className="sh-mini-chart-mock" />
+                </div>
+              </div>
+            </Link>
+
+            <Link to="/student/student-wise" className="sh-action-card dark">
+              <div className="sh-action-icon-wrap">
+                <FileText size={24} />
+              </div>
+              <div className="sh-action-content">
+                <h3 className="sh-action-title">Student-wise Result</h3>
+                <p className="sh-action-subtitle">VIEW INDIVIDUAL PERFORMANCE</p>
+              </div>
+              <div className="sh-action-corner-icon">
+                 <FileText size={24} className="sh-op-icon" />
+              </div>
+            </Link>
+          </div>
         </div>
-
       </div>
     </StudentLayout>
   );
