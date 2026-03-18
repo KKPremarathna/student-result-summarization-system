@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../styles/AdminComplaint.css";
 import Navbar from "../components/InnerNavbar";
 import { Link } from "react-router-dom";
-import bgImage from "../assets/images/admin.jpg";
+
 
 function Complaint() {
   const [complaints, setComplaints] = useState([
@@ -39,33 +39,45 @@ function Complaint() {
       <Navbar />
 
       <div className="complaint-content">
-        <aside className="adduser-sidebar">
-                  <ul className="sidebar-menu">
-                      <li>
-                      <Link to="/adminhome"> Admin Home</Link>
-                      </li>
-                    <li >
-                      <Link to="/adduser">Add User</Link>
-                    </li>
-                    <li className="active">
-                      <Link to="/AdminComplaint">Complaint</Link>
-                    </li>
-                    <li>
-                      <Link to="/results">Results</Link>
-                    </li>
-                    <li>
-                      <Link to="/resetpassword">Reset Password</Link>
-                    </li>
-                  </ul>
-                </aside>
+        <aside className="sidebar">
+          <div className="sidebar-title">Management</div>
+          <ul className="sidebar-menu">
+            <li>
+              <Link to="/adminhome">
+                <span className="sidebar-icon"></span>
+                Admin Home
+              </Link>
+            </li>
+            <li>
+              <Link to="/adduser">
+                <span className="sidebar-icon"></span>
+                Add User
+              </Link>
+            </li>
+            <li className="active">
+              <Link to="/admincomplaint">
+                <span className="sidebar-icon"></span>
+                Complaint
+              </Link>
+            </li>
+            <li >
+              <Link to="/adminresults">
+                <span className="sidebar-icon"></span>
+                Results
+              </Link>
+            </li>
+            <li>
+              <Link to="/adminprofile">
+                <span className="sidebar-icon"></span>
+                Profile
+              </Link>
+            </li>
+          </ul>
+        </aside>
 
-        <main
-          className="complaint-main"
-          style={{ backgroundImage: `url(${bgImage})` }}
-        >
-          <div className="complaint-overlay"></div>
-
+        <main className="complaint-main">
           <div className="complaint-main-content">
+
             <h1>Complaints</h1>
 
             <div className="complaint-list">

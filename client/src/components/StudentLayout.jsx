@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Navbar from "./StudentNavbar.jsx";
+import Navbar from "./InnerNavbar.jsx";
 import Sidebar from "./StudentSidebar.jsx";
 import "../styles/LecturerLayout.css";
 

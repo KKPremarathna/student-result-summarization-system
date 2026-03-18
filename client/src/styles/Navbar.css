@@ -1,16 +1,21 @@
-/* Top navigation bar */
 .navbar {
+  width: 100%;
+  background: var(--bg-dark);
+  /* Dark background to match image */
+  height: 80px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #0B2E33 !important; /* Original dark teal */
-  padding: 10px 40px;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0 5rem;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-  height: 80px;
-  position: sticky;
-  top: 0;
+  position: relative;
+  /* changed from fixed to relative to avoid hiding content */
+}
+
+/* Specific styling for student navbar to ensure consistency */
+.navbar.student-navbar {
+  border-bottom: 1px solid var(--primary-light);
 }
 
 .logo-container {
@@ -21,84 +26,62 @@
 .logo {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 1.5rem;
 }
 
 .navbar-logo-img {
-  width: 50px; /* Small logo as requested */
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+  /* Matches image look with clean logo */
+  filter: brightness(0) invert(1) drop-shadow(0 0 5px rgba(184, 227, 233, 0.4));
 }
 
 .navbar-logo-text {
-  color: #ffffff;
-  font-size: 20px;
+  font-size: 2.1rem;
   font-weight: 800;
-  letter-spacing: 2px;
+  color: white;
+  /* White text from image */
+  font-family: var(--font-heading);
+  letter-spacing: -0.5px;
   margin: 0;
-  text-transform: uppercase;
 }
 
 .nav-links {
-  display: flex;
-  align-items: center; /* Center links and button vertically */
   list-style: none;
-  gap: 30px;
+  display: flex;
+  gap: 3.5rem;
+  align-items: center;
   margin: 0;
+  padding: 0;
 }
 
-.nav-links li {
-  color: #ffffff;
-  font-size: 18px;
-  font-weight: 700;
+.nav-links a {
+  text-decoration: none;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #93B1B5;
+  /* Arctic blue/grey from image links */
+  transition: all var(--transition-fast);
   text-transform: uppercase;
   letter-spacing: 1px;
-  cursor: pointer;
-  transition: all 0.3s;
-  font-family: var(--font-sans);
 }
 
-.nav-links li:hover {
-  color: var(--color-light);
+.nav-links a:hover {
+  color: white;
   transform: translateY(-1px);
 }
 
-/* Link specific styling */
-.nav-links li a {
-  text-decoration: none;
-  color: inherit;
+.nav-links li.active a {
+  color: white;
 }
 
-.nav-links li:hover,
-.nav-links li a:hover {
-  color: var(--primary); /* Sage green on hover */
-}
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 2rem;
+  }
 
-/* Logout Button Styles */
-.navbar-logout-btn {
-    background: transparent;
-    color: #ffffff;
-    border: 2px solid #FF4D4D;
-    padding: 0.5rem 1.25rem;
-    border-radius: 0.75rem;
-    font-weight: 800;
-    font-size: 0.875rem;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.navbar-logout-btn:hover {
-    background: #FF4D4D;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(255, 77, 77, 0.4);
-}
-
-.logout-item {
-    display: flex;
-    align-items: center;
+  .nav-links {
+    display: none;
+  }
 }

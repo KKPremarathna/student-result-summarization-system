@@ -1,9 +1,16 @@
 /* Sidebar dashboard */
 .sidebar {
-    background-color: #4F7C82 !important; /* User specified sage teal */
+
+    background-color: var(--bg-dark) !important;
+    /* User specified sage teal */
+    min-height: calc(100vh - 80px);
+
+    background-color: #4F7C82 !important;
+    /* User specified sage teal */
     height: calc(100vh - 80px);
     position: sticky;
     top: 80px;
+
     transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     overflow-x: hidden;
     overflow-y: auto;
@@ -14,12 +21,14 @@
 .sidebar-toggle-container {
     padding: 20px;
     display: flex;
-    justify-content: center; /* Center the toggle icon */
+    justify-content: center;
+    /* Center the toggle icon */
     transition: all 0.3s ease;
 }
 
 .sidebar.open .sidebar-toggle-container {
-    justify-content: flex-end; /* Align right when open */
+    justify-content: flex-end;
+    /* Align right when open */
 }
 
 .sidebar-toggle {
@@ -42,13 +51,15 @@
 }
 
 .sidebar.closed {
-    width: 65px; /* Mini sidebar width */
+    width: 65px;
+    /* Mini sidebar width */
     padding: 0;
 }
 
-.sidebar.closed ul, 
+.sidebar.closed ul,
 .sidebar.closed .sidebar-section {
-    display: none; /* Hide everything else when closed */
+    display: none;
+    /* Hide everything else when closed */
 }
 
 
@@ -84,7 +95,8 @@
 }
 
 .sidebar-section {
-    color: #E5F3F5; /* Much lighter for better visibility */
+    color: #E5F3F5;
+    /* Much lighter for better visibility */
     font-size: 0.85rem;
     font-weight: 900;
     padding: 25px 25px 10px 25px;
@@ -96,7 +108,8 @@
 }
 
 .sidebar li:hover {
-    background-color: rgba(255, 255, 255, 0.05); /* Subtle hover background */
+    background-color: rgba(255, 255, 255, 0.05);
+    /* Subtle hover background */
 }
 
 /* Active Link Highlighting */

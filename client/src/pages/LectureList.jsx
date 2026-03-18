@@ -1,141 +1,235 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "../styles/LectureList.css";
 import Navbar from "../components/InnerNavbar";
 import { Link } from "react-router-dom";
-import bgImage from "../assets/images/admin.jpg";
+
+const API_BASE = "http://localhost:5000/api/admin";
+
+const DEPARTMENTS = [
+  "Computer Engineering",
+  "Electrical Engineering",
+  "Civil Engineering",
+  "Mechanical Engineering",
+];
 
 function LectureList() {
   const [department, setDepartment] = useState("");
-  const [showTable, setShowTable] = useState(false);
+  const [lecturers, setLecturers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [hasFetched, setHasFetched] = useState(false);
+  const [toast, setToast] = useState({ visible: false, message: "", type: "success" });
 
-  const lectures = [
-    {
-      id: 1,
-      email: "drsugath@eng.jfn.ac.lk",
-      name: "Dr. Sugath Ekanayake",
-      department: "Civil",
-      phone: "077-8927187",
-    },
-    {
-      id: 2,
-      email: "amala@eng.jfn.ac.lk",
-      name: "Ms. Amala Perera",
-      department: "Computer",
-      phone: "071-3456789",
-    },
-    {
-      id: 3,
-      email: "nimal@eng.jfn.ac.lk",
-      name: "Mr. Nimal Raj",
-      department: "Electrical",
-      phone: "075-1122334",
-    },
-    {
-      id: 4,
-      email: "kavitha@eng.jfn.ac.lk",
-      name: "Mrs. Kavitha Silva",
-      department: "Civil",
-      phone: "078-6677889",
-    },
-  ];
+  const token = localStorage.getItem("token");
+  const authHeaders = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
 
-  const filteredLectures = department
-    ? lectures.filter((lec) => lec.department === department)
-    : [];
+  const showToast = (message, type = "success") => {
+    setToast({ visible: true, message, type });
+    setTimeout(() => setToast({ visible: false, message: "", type: "success" }), 3000);
+  };
+
+  const fetchLecturers = useCallback(async (dept) => {
+    setLoading(true);
+    setError("");
+    try {
+      const roleParam = "role=lecturer";
+      const deptParam = dept ? `&department=${encodeURIComponent(dept)}` : "";
+      const res = await fetch(`${API_BASE}/registered-users?${roleParam}${deptParam}`, {
+        headers: authHeaders,
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setLecturers(data.data);
+        setHasFetched(true);
+      } else {
+        setError(data.message || "Failed to load lecturers.");
+      }
+    } catch {
+      setError("Network error. Please check server connection.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Auto-fetch when department changes (if already loaded once)
+  useEffect(() => {
+    if (hasFetched) {
+      fetchLecturers(department);
+    }
+  }, [department]);
 
   const handleView = () => {
-    setShowTable(true);
+    fetchLecturers(department);
   };
+
+  // We are removing registered user deletion as per instructions.
+  // This component seems to only show registered lecturers.
+  // If the user wants to delete ALLOWED emails for lecturers, that would be in a different place or a different section.
+  // The current code has a handleDelete that calls /lecturers/registered/${id}.
+  // We'll remove this as registered users shouldn't be deleted.
 
   return (
     <div className="lecturelist-page">
       <Navbar />
 
+      {/* Toast */}
+      {toast.visible && (
+        <div className={`ll-toast ll-toast--${toast.type}`}>{toast.message}</div>
+      )}
+
       <div className="lecturelist-content">
-         <aside className="adduser-sidebar">
-                          <ul className="sidebar-menu">
-                              <li>
-                              <Link to="/adminhome"> Admin Home</Link>
-                              </li>
-                            <li className="active">
-                              <Link to="/adduser">Add User</Link>
-                            </li>
-                            <li>
-                              <Link to="/admincomplaint">Complaint</Link>
-                            </li>
-                            <li>
-                              <Link to="/adminresults">Results</Link>
-                            </li>
-                            <li>
-                              <Link to="/adminresetpassword">Reset Password</Link>
-                            </li>
-                          </ul>
-                        </aside>
+        {/* Sidebar */}
+        <aside className="sidebar">
+          <div className="sidebar-title">Management</div>
+          <ul className="sidebar-menu">
+            <li>
+              <Link to="/adminhome">
+                <span className="sidebar-icon"></span>Admin Home
+              </Link>
+            </li>
+            <li className="active">
+              <Link to="/adduser">
+                <span className="sidebar-icon"></span>Add User
+              </Link>
+            </li>
+            <li>
+              <Link to="/admincomplaint">
+                <span className="sidebar-icon"></span>Complaint
+              </Link>
+            </li>
+            <li>
+              <Link to="/adminresults">
+                <span className="sidebar-icon"></span>Results
+              </Link>
+            </li>
+            <li>
+              <Link to="/adminprofile">
+                <span className="sidebar-icon"></span>Profile
+              </Link>
+            </li>
+          </ul>
+        </aside>
 
-        <main
-          className="lecturelist-main"
-          style={{ backgroundImage: `url(${bgImage})` }}
-        >
-          <div className="lecturelist-overlay"></div>
-
+        {/* Main */}
+        <main className="lecturelist-main">
           <div className="lecturelist-main-content">
-            <h1>Lectures List</h1>
 
-            <div className="lecture-filter-row">
-              <label>Department:</label>
-
-              <select
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-              >
-                <option value="">Select Department</option>
-                <option value="Civil">Civil</option>
-                <option value="Computer">Computer</option>
-                <option value="Electrical">Electrical</option>
-                <option value="Mechanical">Mechanical</option>
-              </select>
-
-              <button className="view-btn" onClick={handleView}>
-                View
-              </button>
+            {/* Section Header */}
+            <div className="ll-section-header">
+              <div className="ll-header-left">
+                <span className="ll-header-icon"></span>
+                <div>
+                  <h1 className="ll-title">Registered Lecturers</h1>
+                  <p className="ll-subtitle">
+                    Browse and manage signed-up academic staff
+                  </p>
+                </div>
+              </div>
+              {hasFetched && (
+                <span className="ll-count-badge">
+                  {lecturers.length} lecturer{lecturers.length !== 1 ? "s" : ""}
+                </span>
+              )}
             </div>
 
-            {showTable && (
-              <div className="lecture-table-wrapper">
-                <table className="lecture-table">
-                  <thead>
-                    <tr>
-                      <th>Email</th>
-                      <th>Name</th>
-                      <th>Department</th>
-                      <th>Phone No</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredLectures.length > 0 ? (
-                      filteredLectures.map((lecture) => (
-                        <tr key={lecture.id}>
-                          <td>{lecture.email}</td>
-                          <td>{lecture.name}</td>
-                          <td>{lecture.department}</td>
-                          <td>{lecture.phone}</td>
-                          <td>
-                            <button className="delete-btn">Delete</button>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="5" className="no-data">
-                          No lectures found
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+            {/* Filter Row */}
+            <div className="ll-filter-card">
+              <div className="ll-filter-row">
+                <div className="ll-filter-group">
+                  <label className="ll-filter-label">Department</label>
+                  <select
+                    className="ll-filter-select"
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                  >
+                    <option value="">All Departments</option>
+                    {DEPARTMENTS.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <button className="ll-view-btn" onClick={handleView} disabled={loading}>
+                  {loading ? (
+                    <span className="ll-btn-spinner" />
+                  ) : (
+                    <>View</>
+                  )}
+                </button>
+
+                {hasFetched && (
+                  <button
+                    className="ll-refresh-btn"
+                    onClick={() => fetchLecturers(department)}
+                    title="Refresh"
+                  >
+                    Refresh
+                  </button>
+                )}
+              </div>
+
+              {!hasFetched && (
+                <p className="ll-hint">
+                  Select a department (or leave blank for all) and click <strong>View</strong> to load lecturers.
+                </p>
+              )}
+            </div>
+
+            {/* Error */}
+            {error && <div className="ll-alert ll-alert--error">{error}</div>}
+
+            {/* Loading */}
+            {loading && (
+              <div className="ll-spinner-wrap">
+                <div className="ll-spinner" />
+                <span>Loading lecturers…</span>
               </div>
             )}
+
+            {/* Table */}
+            {hasFetched && !loading && (
+              <div className="ll-table-wrapper">
+                {lecturers.length === 0 ? (
+                  <div className="ll-empty">
+                    <p>No registered lecturers found{department ? ` in ${department}` : ""}.</p>
+                  </div>
+                ) : (
+                  <table className="ll-table">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Full Name</th>
+                        <th>Email Address</th>
+                        <th>Department</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {lecturers.map((lec, idx) => (
+                        <tr key={lec._id}>
+                          <td className="ll-td-num">{idx + 1}</td>
+                          <td className="ll-td-name">
+                            {lec.title && <span className="ll-title-badge">{lec.title}</span>}
+                            {lec.firstName} {lec.lastName}
+                          </td>
+                          <td className="ll-td-email">{lec.email}</td>
+                          <td>
+                            {lec.department ? (
+                              <span className="ll-dept-badge">{lec.department}</span>
+                            ) : (
+                              <span className="ll-dept-none">—</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            )}
+
           </div>
         </main>
       </div>

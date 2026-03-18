@@ -27,23 +27,14 @@ function ResetPassword() {
       <Navbar />
 
       <div className="reset-content">
-        <aside className="reset-sidebar">
-
-          <h2 className="sidebar-title">Admin Home page</h2>
-
+        <aside className="sidebar">
+          <div className="sidebar-title">Management</div>
           <ul className="sidebar-menu">
-            <li>
-              <Link to="/adduser">Add User</Link>
-            </li>
-            <li>
-              <Link to="/admincomplaint">Complaint</Link>
-            </li>
-            <li>
-              <Link to="/adminresults">Results</Link>
-            </li>
-            <li className="active">
-              <Link to="/adminresetpassword">Reset Password</Link>
-            </li>
+            <li><Link to="/adminhome"><span className="sidebar-icon"></span>Admin Home</Link></li>
+            <li><Link to="/adduser"><span className="sidebar-icon"></span>Add User</Link></li>
+            <li><Link to="/admincomplaint"><span className="sidebar-icon"></span>Complaint</Link></li>
+            <li><Link to="/adminresults"><span className="sidebar-icon"></span>Results</Link></li>
+            <li><Link to="/adminprofile"><span className="sidebar-icon"></span>Profile</Link></li>
           </ul>
         </aside>
 

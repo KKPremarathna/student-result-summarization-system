@@ -19,13 +19,6 @@ function Home() {
           <h1 className="title">Academet</h1>
           <h2>Welcome to Academet !</h2>
           <p>A Secure Result Management And Analysis System</p>
-
-          <div className="email-box">
-            <input type="email" placeholder="Enter Your Email" />
-            <Link to="/signup">
-              <button>SignUp</button>
-            </Link>
-          </div>
         </div>
       </div>
     </div>
