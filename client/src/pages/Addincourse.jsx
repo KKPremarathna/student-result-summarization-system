@@ -411,6 +411,18 @@ function AddIncourse() {
                 onChange={(e) => setENumberSearch(e.target.value)}
               />
             </div>
+
+            {subjectInfo?.semester && (
+              <div className="aic-field">
+                <label className="aic-label">
+                  <Calendar size={14} />
+                  Semester
+                </label>
+                <div className="aic-read-only-box">
+                  {subjectInfo.semester}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

@@ -198,7 +198,7 @@ function LecturerHome() {
                       </div>
                       <div>
                         <h4 className="lh-subject-item__name">{subject.courseName}</h4>
-                        <p className="lh-subject-item__year">{subject.courseCode} | {subject.batch}</p>
+                        <p className="lh-subject-item__year">{subject.courseCode} | {subject.batch} | {subject.semester}</p>
                       </div>
                     </div>
                   ))

@@ -11,7 +11,7 @@ function calcTotalWeight(a = {}) {
 }
 
 function validateSubjectBody(body) {
-  const required = ["courseCode", "courseName", "batch", "credit"];
+  const required = ["courseCode", "courseName", "batch", "credit", "semester"];
   for (const f of required) {
     if (body[f] === undefined || body[f] === null || body[f] === "") {
       return `${f} is required`;
@@ -143,6 +143,7 @@ exports.updateSubject = async (req, res) => {
       courseCode: req.body.courseCode ?? existing.courseCode,
       courseName: req.body.courseName ?? existing.courseName,
       batch: req.body.batch ?? existing.batch,
+      semester: req.body.semester ?? existing.semester,
       credit: req.body.credit ?? existing.credit,
 
       assessments: {
