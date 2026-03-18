@@ -25,6 +25,7 @@ import {
   Eye,
   EyeOff
 } from "lucide-react";
+import { extractRegNoFromEmail, formatRegNo } from "../utils/regUtils";
 
 function StudentProfile() {
   const [userData, setUserData] = useState({
@@ -78,12 +79,13 @@ function StudentProfile() {
     try {
       const res = await getStudentDetails();
       const data = res.data.data;
+      const rawENo = data.studentENo || extractRegNoFromEmail(data.email);
       const profile = {
         firstName: data.firstName || "",
         lastName: data.lastName || "",
         email: data.email || "",
         faculty: data.faculty || "Faculty of Engineering",
-        studentENo: data.studentENo || "N/A",
+        studentENo: formatRegNo(rawENo) || "N/A",
         degree: data.degree || "B.Sc. (Hons) in Engineering"
       };
       setUserData(profile);

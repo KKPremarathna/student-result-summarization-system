@@ -31,11 +31,21 @@ export const getStudentGPA = async () => {
 };
 
 export const getMyIncourseSubjects = async () => {
-    return await axios.get(`${BASE_URL}/student/incourse/subjects`, getHeaders());
+    return await axios.get(`${BASE_URL}/incourse/student/courses`, getHeaders());
 };
 
 export const getMyIncourseMarks = async (courseCode) => {
-    return await axios.get(`${BASE_URL}/student/incourse/marks/${courseCode}`, getHeaders());
+    return await axios.get(`${BASE_URL}/incourse/student/my-result`, {
+        ...getHeaders(),
+        params: { courseCode }
+    });
+};
+
+export const getSubjectIncourseMarks = async (courseCode) => {
+    return await axios.get(`${BASE_URL}/incourse/student/subject-marks`, {
+        ...getHeaders(),
+        params: { courseCode }
+    });
 };
 
 /**

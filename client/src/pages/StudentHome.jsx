@@ -14,6 +14,7 @@ import {
   MapPin,
   ChevronRight
 } from "lucide-react";
+import { extractRegNoFromEmail, formatRegNo } from "../utils/regUtils";
 
 function StudentHome() {
   const [student, setStudent] = useState(null);
@@ -27,11 +28,12 @@ function StudentHome() {
     try {
       const res = await getStudentDetails();
       const data = res.data.data;
+      const rawENo = data.studentENo || extractRegNoFromEmail(data.email);
       setStudent({
         name: `${data.firstName} ${data.lastName}`,
-        indexNo: data.studentENo || "2022e050",
-        faculty: data.faculty || "faculty of engineering",
-        university: "jaffna"
+        indexNo: formatRegNo(rawENo) || "N/A",
+        faculty: data.faculty || "Faculty of Engineering",
+        university: "University of Jaffna"
       });
     } catch (err) {
       console.error("Home data fetch failed", err);
