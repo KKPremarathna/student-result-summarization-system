@@ -15,7 +15,7 @@ function Sidebar({ isOpen, toggleSidebar }) {
     { name: "View Results", path: "/lecturer/results" },
     { name: "Manage Subjects", path: "/lecturer/addsubject" },
     { name: "Incourse Marks", path: "/lecturer/addincourse" },
-    { name: "Pending Review", path: "/lecturer/pending" },
+    { name: "Complaints", path: "/lecturer/complaints" },
     { name: "Final Result", path: "/lecturer/final" },
     { name: "Profile Settings", path: "/lecturer/setting" },
   ];

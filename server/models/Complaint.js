@@ -9,12 +9,16 @@ const complaintSchema = new mongoose.Schema({
     studentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true,
+        required: false, // Optional for lecturer-to-admin complaints
     },
     subjectId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Subject',
-        required: true,
+        required: false, // Optional for lecturer-to-admin complaints
+    },
+    isAdminRecipient: {
+        type: Boolean,
+        default: false,
     },
     title: {
         type: String,

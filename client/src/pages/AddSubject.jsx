@@ -28,6 +28,7 @@ function AddSubject() {
     percentQuizzes: "0",
     percentMid: "0",
     percentEndExam: "0",
+    semester: "",
   });
 
   const handleChange = (e) => {
@@ -44,6 +45,7 @@ function AddSubject() {
       courseCode: subjectDetails.courseCode.toUpperCase(),
       courseName: subjectDetails.courseName,
       batch: subjectDetails.batch,
+      semester: subjectDetails.semester,
       credit: Number(subjectDetails.credit),
       assessments: {
         assignmentCount: Number(subjectDetails.assignments),
@@ -74,6 +76,7 @@ function AddSubject() {
         percentQuizzes: "0",
         percentMid: "0",
         percentEndExam: "0",
+        semester: "",
       });
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Failed to register subject.";
@@ -170,6 +173,19 @@ function AddSubject() {
                   required
                   min="0"
                   step="0.5"
+                />
+              </div>
+
+              <div className="as-field">
+                <label className="as-label">Semester</label>
+                <input
+                  type="text"
+                  name="semester"
+                  value={subjectDetails.semester}
+                  onChange={handleChange}
+                  placeholder="e.g. Semester 1"
+                  className="as-input"
+                  required
                 />
               </div>
             </div>

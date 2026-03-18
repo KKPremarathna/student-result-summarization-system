@@ -35,7 +35,7 @@ exports.getIncourseList = async (req, res) => {
     const finalFilter = { subject: subjectId, createdBy: req.user._id };
 
     if (req.query.studentENo) {
-      const eno = req.query.studentENo.toUpperCase();
+      const eno = normalizeRegNo(req.query.studentENo);
       incourseFilter.studentENo = eno;
       finalFilter.studentENo = eno;
     }
@@ -76,7 +76,8 @@ exports.getIncourseList = async (req, res) => {
 // POST /api/final-results/save (upsert)
 exports.saveResult = async (req, res) => {
   try {
-    const { subject: subjectId, studentENo, endExamMark } = req.body;
+    let { subject: subjectId, studentENo, endExamMark } = req.body;
+    studentENo = normalizeRegNo(studentENo);
 
     if (!subjectId || !studentENo) {
       return res.status(400).json({ message: "subject and studentENo are required" });
@@ -171,10 +172,12 @@ exports.getResults = async (req, res) => {
 // GET /api/final-results/by-eno?subject=<subjectId>&studentENo=2022/E/050
 exports.getResultByENo = async (req, res) => {
   try {
-    const { subject: subjectId, studentENo } = req.query;
+    let { subject: subjectId, studentENo } = req.query;
     if (!subjectId || !studentENo) {
       return res.status(400).json({ message: "subject and studentENo are required" });
     }
+
+    studentENo = normalizeRegNo(studentENo);
 
     if (!isValidRegNum(studentENo)) {
       return res.status(400).json({ message: "Invalid registration number format. Expected 20XX/E/XXX" });
@@ -229,7 +232,7 @@ exports.updateResult = async (req, res) => {
 // GET /api/final-results/summary?courseCode=<CS3042>&batch=<Y3S1>
 exports.getSummary = async (req, res) => {
   try {
-    const { courseCode, batch } = req.query;
+    let { courseCode, batch } = req.query;
     if (!courseCode || !batch) {
       return res.status(400).json({ message: "courseCode and batch query params are required" });
     }
@@ -245,12 +248,11 @@ exports.getSummary = async (req, res) => {
     }
 
     const subjectId = subject._id;
-
     const incourseFilter = { subject: subjectId, createdBy: req.user._id };
     const finalFilter = { subject: subjectId, createdBy: req.user._id };
 
     if (req.query.studentENo) {
-      const eno = req.query.studentENo.toUpperCase();
+      const eno = normalizeRegNo(req.query.studentENo);
       incourseFilter.studentENo = eno;
       finalFilter.studentENo = eno;
     }
@@ -309,7 +311,7 @@ exports.downloadPdf = async (req, res) => {
     const finalFilter = { subject: subjectId, createdBy: req.user._id };
 
     if (req.query.studentENo) {
-      const eno = req.query.studentENo.toUpperCase();
+      const eno = normalizeRegNo(req.query.studentENo);
       incourseFilter.studentENo = eno;
       finalFilter.studentENo = eno;
     }
