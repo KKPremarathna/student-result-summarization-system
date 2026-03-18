@@ -17,7 +17,7 @@ function HomeNavbar() {
       <nav className="home-navbar__links">
         <Link to="/">Home</Link>
         <Link to="/about">About</Link>
-        <Link to="/calendar">Academic Calendar</Link>
+
         <Link to="/signin">SignIn</Link>
         <Link to="/signup">SignUp</Link>
       </nav>
