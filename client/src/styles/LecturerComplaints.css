@@ -1,12 +1,19 @@
 .lc-page {
-  padding: 2rem;
+  padding: 0.75rem 1.5rem;
   max-width: 1200px;
   margin: 0 auto;
   animation: fadeIn 0.5s ease;
 }
 
 .lc-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+}
+
+.lc-header__main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
 }
 
 .lc-breadcrumb {
@@ -24,25 +31,27 @@
 }
 
 .lc-title {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #0f172a;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .lc-title__icon {
   color: #3b82f6;
+  width: 24px !important;
+  height: 24px !important;
 }
 
 /* Tabs */
 .lc-tabs {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
   border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.4rem;
 }
 
 .lc-tab {
@@ -133,6 +142,18 @@
   color: #64748b;
 }
 
+.lc-complaint-card__subject-inline {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #3b82f6;
+  background: #eff6ff;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  display: inline-block;
+  margin-top: 0.25rem;
+  border: 1px solid #dbeafe;
+}
+
 .lc-status-badge {
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
@@ -143,6 +164,11 @@
 .lc-status-badge.pending {
   background: #fef3c7;
   color: #92400e;
+}
+
+.lc-status-badge.in.progress {
+  background: #e0f2fe;
+  color: #0369a1;
 }
 
 .lc-status-badge.resolved {
@@ -179,6 +205,12 @@
   align-items: center;
 }
 
+.lc-complaint-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .lc-complaint-card__subject {
   font-size: 0.8rem;
   font-weight: 600;
@@ -186,6 +218,46 @@
   background: #eff6ff;
   padding: 0.2rem 0.6rem;
   border-radius: 4px;
+  width: fit-content;
+}
+
+.lc-complaint-card__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.lc-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+}
+
+.lc-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.lc-action-btn--process {
+  background: #3b82f6;
+}
+
+.lc-action-btn--process:hover {
+  background: #2563eb;
+}
+
+.lc-action-btn--resolve {
+  background: #10b981;
+}
+
+.lc-action-btn--resolve:hover {
+  background: #059669;
 }
 
 .lc-complaint-card__date {
@@ -199,37 +271,38 @@
 /* Report Form */
 .lc-form-card {
   background: white;
-  border-radius: 20px;
-  padding: 2.5rem;
+  border-radius: 12px;
+  padding: 1.5rem;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 15px -5px rgba(0, 0, 0, 0.05);
   max-width: 800px;
   margin: 0 auto;
 }
 
 .lc-form-title {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #0f172a;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .lc-form-subtitle {
   color: #64748b;
-  margin-bottom: 2rem;
+  font-size: 0.85rem;
+  margin-bottom: 1.25rem;
 }
 
 .lc-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .lc-field {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.35rem;
 }
 
 .lc-field--full {
@@ -246,10 +319,10 @@
 }
 
 .lc-input, .lc-select, .lc-textarea {
-  padding: 0.75rem 1rem;
+  padding: 0.6rem 0.8rem;
   border: 1.5px solid #e2e8f0;
-  border-radius: 10px;
-  font-size: 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
   transition: all 0.2s ease;
   background: #f8fafc;
 }
@@ -262,21 +335,22 @@
 }
 
 .lc-textarea {
-  min-height: 150px;
+  min-height: 100px;
   resize: vertical;
 }
 
 .lc-form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 2rem;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
 }
 
 .lc-btn {
-  padding: 0.75rem 1.5rem;
-  border-radius: 10px;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
   font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -325,10 +399,11 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  margin-bottom: 2rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  margin-bottom: 1.25rem;
   font-weight: 500;
+  font-size: 0.9rem;
 }
 
 .lc-status-bar.success {
