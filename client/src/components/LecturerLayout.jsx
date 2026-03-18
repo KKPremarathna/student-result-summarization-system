@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Navbar from "./LecturerNavbar.jsx";
+import InnerNavbar from "./InnerNavbar.jsx";
 import Sidebar from "./LecturerSidebar.jsx";
 import "../styles/LecturerLayout.css";
 
@@ -20,7 +20,7 @@ function LecturerLayout({ children }) {
     <div className="lecturer-layout">
 
       {/* Top Navbar with solid background */}
-      <Navbar toggleSidebar={toggleSidebar} />
+      <InnerNavbar toggleSidebar={toggleSidebar} />
 
       <div className="lecturer-layout__body">
 
