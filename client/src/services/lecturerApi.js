@@ -148,3 +148,13 @@ export const createComplaint = (complaintData) => {
         headers: { Authorization: `Bearer ${token}` }
     });
 };
+
+/*
+Update complaint status
+*/
+export const updateComplaintStatus = (complaintId, status) => {
+    const token = localStorage.getItem("token");
+    return axios.patch(`${API}/complaints/${complaintId}/status`, { status }, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
