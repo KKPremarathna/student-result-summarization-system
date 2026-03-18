@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Navbar from "./StudentNavbar.jsx";
+import InnerNavbar from "./InnerNavbar.jsx";
 import Sidebar from "./StudentSidebar.jsx";
 import "../styles/LecturerLayout.css";
 
@@ -19,7 +19,7 @@ function StudentLayout({ children }) {
   return (
     <div className="lecturer-layout student-layout">
       {/* Top Navbar */}
-      <Navbar toggleSidebar={toggleSidebar} />
+      <InnerNavbar toggleSidebar={toggleSidebar} />
 
       <div className="lecturer-layout__body">
         {/* Sidebar */}
