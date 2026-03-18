@@ -110,6 +110,16 @@ export const changeLecturerPassword = (passwordData) => {
 };
 
 /*
+Delete an incourse result record
+*/
+export const deleteIncourseResult = (id) => {
+    const token = localStorage.getItem("token");
+    return axios.delete(`${API}/incourse/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
+
+/*
 Save or update final result (end exam mark)
 */
 export const saveFinalResult = (resultData) => {
