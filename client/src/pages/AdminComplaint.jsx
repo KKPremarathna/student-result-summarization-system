@@ -1,37 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/AdminComplaint.css";
 import Navbar from "../components/InnerNavbar";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
+const API_BASE = "http://localhost:5000/api/admin";
 
 function Complaint() {
-  const [complaints, setComplaints] = useState([
-    {
-      id: 1,
-      title: "E21 Embedded System",
-      message: "Send final senate approved result to Dr. Sanjeewan",
-      isRead: false,
-    },
-    {
-      id: 2,
-      title: "E20 Computer Architecture",
-      message: "Please upload the corrected marks sheet",
-      isRead: true,
-    },
-    {
-      id: 3,
-      title: "E22 Signals and Systems",
-      message: "Need clarification about absent student records",
-      isRead: false,
-    },
-  ]);
+  const [complaints, setComplaints] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const handleReadToggle = (id) => {
-    setComplaints((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, isRead: !item.isRead } : item
-      )
-    );
+  const token = localStorage.getItem("token");
+  const authHeaders = { Authorization: `Bearer ${token}` };
+
+  const fetchComplaints = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${API_BASE}/complaints`, { headers: authHeaders });
+      if (res.data.success) {
+        setComplaints(res.data.data);
+      }
+    } catch (err) {
+      setError("Failed to fetch complaints");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchComplaints();
+  }, []);
+
+  const handleReadToggle = async (id, currentStatus) => {
+    const newStatus = currentStatus === "Resolved" ? "Pending" : "Resolved";
+    try {
+      const res = await axios.put(`${API_BASE}/complaints/${id}`, { status: newStatus }, { headers: authHeaders });
+      if (res.data.success) {
+        setComplaints((prev) =>
+          prev.map((item) =>
+            item._id === id ? { ...item, status: newStatus } : item
+          )
+        );
+      }
+    } catch (err) {
+      console.error("Error updating complaint status:", err);
+    }
   };
 
   return (
@@ -81,28 +96,41 @@ function Complaint() {
             <h1>Complaints</h1>
 
             <div className="complaint-list">
-              {complaints.map((item) => (
-                <div
-                  className={`complaint-card ${item.isRead ? "read" : ""}`}
-                  key={item.id}
-                >
-                  <div className="complaint-text">
-                    <p>
-                      <strong>+ {item.title} :</strong>
-                    </p>
-                    <p>{item.message}</p>
-                  </div>
+              {loading ? (
+                <div className="loading-spinner">Loading complaints...</div>
+              ) : error ? (
+                <div className="error-message">{error}</div>
+              ) : complaints.length === 0 ? (
+                <div className="no-complaints">No complaints found.</div>
+              ) : (
+                complaints.map((item) => (
+                  <div
+                    className={`complaint-card ${item.status === "Resolved" ? "read" : ""}`}
+                    key={item._id}
+                  >
+                    <div className="complaint-text">
+                      <p>
+                        <strong>+ {item.title} :</strong>
+                      </p>
+                      <p>{item.description}</p>
+                      <p className="complaint-meta">
+                        From: {item.studentId?.firstName} {item.studentId?.lastName} ({item.studentId?.studentENo}) <br />
+                        To: {item.lecturerId?.firstName} {item.lecturerId?.lastName} <br />
+                        Subject: {item.subjectId?.courseCode} - {item.subjectId?.courseName}
+                      </p>
+                    </div>
 
-                  <div className="complaint-read">
-                    <label>Mark As Read</label>
-                    <input
-                      type="checkbox"
-                      checked={item.isRead}
-                      onChange={() => handleReadToggle(item.id)}
-                    />
+                    <div className="complaint-read">
+                      <label>Mark As Resolved</label>
+                      <input
+                        type="checkbox"
+                        checked={item.status === "Resolved"}
+                        onChange={() => handleReadToggle(item._id, item.status)}
+                      />
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </main>
