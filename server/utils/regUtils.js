@@ -42,4 +42,17 @@ const generateRegNoRegex = (regNo) => {
     return new RegExp(`^${year}/?${middle}/?${rest}$`, "i");
 };
 
-module.exports = { normalizeRegNo, extractRegNoFromEmail, generateRegNoRegex };
+/**
+ * Validates a registration number format.
+ * Supports "2021/E/001" and "2021E001"
+ * @param {string} regNo 
+ * @returns {boolean} true if valid
+ */
+const isValidRegNum = (regNo) => {
+    if (!regNo) return false;
+    // Regex matches 2021/E/001 or 2021E001
+    const regex = /^(\d{4}\/[A-Z]\/\d{3,})|(\d{4}[A-Z]\d{3,})$/i;
+    return regex.test(regNo.trim());
+};
+
+module.exports = { normalizeRegNo, extractRegNoFromEmail, generateRegNoRegex, isValidRegNum };

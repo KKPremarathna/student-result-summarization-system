@@ -28,7 +28,8 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: rgba(255, 255, 255, 0.5); /* Ash color for secondary breadcrumb */
+  color: rgba(255, 255, 255, 0.5);
+  /* Ash color for secondary breadcrumb */
   font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -37,13 +38,15 @@
 }
 
 .fr-breadcrumb__current {
-  color: #ffffff; /* White for current breadcrumb */
+  color: #ffffff;
+  /* White for current breadcrumb */
 }
 
 .fr-title {
   font-size: 2.25rem;
   font-weight: 900;
-  color: #ffffff; /* White title */
+  color: #ffffff;
+  /* White title */
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -221,7 +224,8 @@
 
 .fr-table-scroll {
   overflow: auto;
-  max-height: 500px; /* Max 10 rows approx */
+  max-height: 500px;
+  /* Max 10 rows approx */
 }
 
 .fr-table-scroll::-webkit-scrollbar {
@@ -261,7 +265,7 @@
   text-align: left;
 }
 
-.fr-tbody tr + tr {
+.fr-tbody tr+tr {
   border-top: 1px solid rgba(184, 227, 233, 0.3);
 }
 
@@ -435,6 +439,13 @@
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

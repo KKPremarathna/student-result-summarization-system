@@ -110,11 +110,41 @@ export const changeLecturerPassword = (passwordData) => {
 };
 
 /*
+Delete an incourse result record
+*/
+export const deleteIncourseResult = (id) => {
+    const token = localStorage.getItem("token");
+    return axios.delete(`${API}/incourse/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
+
+/*
 Save or update final result (end exam mark)
 */
 export const saveFinalResult = (resultData) => {
     const token = localStorage.getItem("token");
     return axios.post(`${API}/final-results/save`, resultData, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
+
+/*
+Fetch complaints for the logged-in lecturer
+*/
+export const getLecturerComplaints = () => {
+    const token = localStorage.getItem("token");
+    return axios.get(`${API}/complaints/my-complaints`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
+
+/*
+Create a complaint (e.g. to admin)
+*/
+export const createComplaint = (complaintData) => {
+    const token = localStorage.getItem("token");
+    return axios.post(`${API}/complaints`, complaintData, {
         headers: { Authorization: `Bearer ${token}` }
     });
 };

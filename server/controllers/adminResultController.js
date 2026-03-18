@@ -7,16 +7,17 @@ const { isValidRegNum } = require('../utils/regUtils');
  */
 exports.addBatchResults = async(req, res) => {
     try {
-        const { courseCode, semester, batch, lectureId, results } = req.body;
+        let { courseCode, semester, batch, lectureId, results } = req.body;
 
         if (!courseCode || !semester || !batch || !lectureId || !results || !Array.isArray(results)) {
             return res.status(400).json({ message: 'Missing required fields or results array' });
         }
 
         // Validate all registration numbers first
-        for (const item of results) {
-            if (!isValidRegNum(item.regNum)) {
-                return res.status(400).json({ message: `Invalid registration number format: ${item.regNum}. Expected 20XX/E/xxx` });
+        for (let i=0; i < results.length; i++) {
+            results[i].regNum = normalizeRegNo(results[i].regNum);
+            if (!isValidRegNum(results[i].regNum)) {
+                return res.status(400).json({ message: `Invalid registration number format: ${results[i].regNum}. Expected 20XX/E/xxx` });
             }
         }
 
