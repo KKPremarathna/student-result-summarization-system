@@ -1,5 +1,6 @@
 const AdminResult = require('../models/AdminResult');
-const { isValidRegNum } = require('../utils/regUtils');
+const { isValidRegNum, normalizeRegNo } = require('../utils/regUtils');
+const { normalizeBatch } = require('../utils/batchUtils');
 
 /**
  * Add final results in batch
@@ -13,6 +14,8 @@ exports.addBatchResults = async(req, res) => {
             return res.status(400).json({ message: 'Missing required fields or results array' });
         }
 
+        const normalizedBatch = normalizeBatch(batch);
+
         // Validate all registration numbers first
         for (let i=0; i < results.length; i++) {
             results[i].regNum = normalizeRegNo(results[i].regNum);
@@ -24,7 +27,7 @@ exports.addBatchResults = async(req, res) => {
         const formattedResults = results.map(item => ({
             courseCode: courseCode.toUpperCase(),
             semester,
-            batch,
+            batch: normalizedBatch,
             lectureId,
             studentRegNum: item.regNum.toUpperCase(),
             grade: item.grade.toUpperCase(),
@@ -34,7 +37,7 @@ exports.addBatchResults = async(req, res) => {
             updateOne: {
                 filter: {
                     courseCode: res.courseCode,
-                    batch: res.batch,
+                    batch: normalizedBatch,
                     semester: res.semester,
                     studentRegNum: res.studentRegNum
                 },
@@ -69,7 +72,7 @@ exports.updateResult = async(req, res) => {
         if (lectureId) updateData.lectureId = lectureId;
         if (courseCode) updateData.courseCode = courseCode.toUpperCase();
         if (semester) updateData.semester = semester;
-        if (batch) updateData.batch = batch;
+        if (batch) updateData.batch = normalizeBatch(batch);
 
         const updated = await AdminResult.findByIdAndUpdate(
             id, { $set: updateData }, { new: true, runValidators: true }
@@ -116,7 +119,7 @@ exports.deleteSubjectResults = async(req, res) => {
 
         const result = await AdminResult.deleteMany({
             courseCode: courseCode.toUpperCase(),
-            batch,
+            batch: normalizeBatch(batch),
             semester
         });
 

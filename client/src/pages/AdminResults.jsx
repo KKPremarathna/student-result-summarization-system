@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { normalizeBatch } from "../utils/batchUtils";
 import "../styles/AdminResult.css";
 import Navbar from "../components/InnerNavbar";
 import { Link } from "react-router-dom";
@@ -263,11 +264,12 @@ function Results() {
 
     setSaving(true);
     try {
+      const normalizedBatch = normalizeBatch(batch);
       const results = rows.map((r) => ({ regNum: r.regNum, grade: r.grade }));
       const res = await fetch(`${API_BASE}/add-results`, {
         method: "POST",
         headers: authHeaders,
-        body: JSON.stringify({ courseCode, semester, batch, lecturerEmail, results }),
+        body: JSON.stringify({ courseCode, semester, batch: normalizedBatch, lecturerEmail, results }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -284,7 +286,8 @@ function Results() {
   const loadExisting = async () => {
     if (!courseCode || !semester || !batch) return;
     try {
-      const params = `?courseCode=${encodeURIComponent(courseCode)}&batch=${encodeURIComponent(batch)}&semester=${encodeURIComponent(semester)}`;
+      const normalizedBatch = normalizeBatch(batch);
+      const params = `?courseCode=${encodeURIComponent(courseCode)}&batch=${encodeURIComponent(normalizedBatch)}&semester=${encodeURIComponent(semester)}`;
       const res = await fetch(`${API_BASE}/get-results${params}`, { headers: authHeaders });
       const data = await res.json();
       if (res.ok) {
@@ -356,7 +359,7 @@ function Results() {
                 </div>
                 <div className="ar-field">
                   <label className="ar-label">Batch</label>
-                  <input className="ar-input" placeholder="e.g. 2021/22" value={batch} onChange={(e) => setBatch(e.target.value)} />
+                  <input className="ar-input" placeholder="e.g. E21/22" value={batch} onChange={(e) => setBatch(e.target.value)} />
                 </div>
                 <div className="ar-field">
                   <label className="ar-label">Semester</label>

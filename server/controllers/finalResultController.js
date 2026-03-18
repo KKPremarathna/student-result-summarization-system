@@ -4,6 +4,7 @@ const FinalResult = require("../models/FinalResult");
 const { isValidRegNum } = require("../utils/regUtils");
 const PDFDocument = require("pdfkit-table");
 const { normalizeRegNo, extractRegNoFromEmail, generateRegNoRegex } = require("../utils/regUtils");
+const { normalizeBatch } = require("../utils/batchUtils");
 
 function calcGrade(mark, midExamMark, endExamMark) {
   if (midExamMark == null || midExamMark === "" || endExamMark == null || endExamMark === "") {
@@ -245,7 +246,7 @@ exports.getSummary = async (req, res) => {
     if (!courseCode || !batch) {
       return res.status(400).json({ message: "courseCode and batch query params are required" });
     }
-
+    batch = normalizeBatch(batch);
     const subject = await Subject.findOne({ 
       courseCode: courseCode.toUpperCase(), 
       batch, 
@@ -303,10 +304,10 @@ exports.downloadPdf = async (req, res) => {
     if (!courseCode || !batch) {
       return res.status(400).json({ message: "courseCode and batch query params are required" });
     }
-
+    const normalizedBatch = normalizeBatch(batch);
     const subject = await Subject.findOne({ 
       courseCode: courseCode.toUpperCase(), 
-      batch, 
+      batch: normalizedBatch, 
       createdBy: req.user._id 
     });
 
@@ -501,10 +502,10 @@ exports.getSubjectAnalytics = async (req, res) => {
     if (!courseCode || !batch) {
       return res.status(400).json({ message: "courseCode and batch are required" });
     }
-
+    const normalizedBatch = normalizeBatch(batch);
     const subject = await Subject.findOne({ 
       courseCode: courseCode.toUpperCase(), 
-      batch 
+      batch: normalizedBatch 
     }).populate("createdBy", "firstName lastName title");
 
     if (!subject) return res.status(404).json({ message: "Subject not found" });

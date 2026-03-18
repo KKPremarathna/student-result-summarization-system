@@ -1,4 +1,5 @@
 const Subject = require("../models/Subject");
+const { normalizeBatch } = require("../utils/batchUtils");
 
 function calcTotalWeight(a = {}) {
   return (
@@ -55,6 +56,7 @@ exports.createSubject = async (req, res) => {
 
     const subject = await Subject.create({
       ...req.body,
+      batch: normalizeBatch(req.body.batch),
       createdBy: req.user._id
     });
 
@@ -140,14 +142,11 @@ exports.updateSubject = async (req, res) => {
     const merged = {
       createdBy: existing.createdBy,
 
-      courseCode: req.body.courseCode ?? existing.courseCode,
-      courseName: req.body.courseName ?? existing.courseName,
-      batch: req.body.batch ?? existing.batch,
-      semester: req.body.semester ?? existing.semester,
-      credit: req.body.credit ?? existing.credit,
-
+      ...existing.toObject(),
+      ...req.body,
+      batch: req.body.batch ? normalizeBatch(req.body.batch) : existing.batch,
       assessments: {
-        ...(existing.assessments?.toObject ? existing.assessments.toObject() : existing.assessments),
+        ...existing.assessments,
         ...(req.body.assessments || {})
       }
     };

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import LecturerLayout from "../components/LecturerLayout.jsx";
 import { createSubject } from "../services/lecturerApi.js";
+import { normalizeBatch } from "../utils/batchUtils";
 import "../styles/AddSubject.css";
 import {
   PlusCircle,
@@ -44,7 +45,7 @@ function AddSubject() {
     const formattedData = {
       courseCode: subjectDetails.courseCode.toUpperCase(),
       courseName: subjectDetails.courseName,
-      batch: subjectDetails.batch,
+      batch: normalizeBatch(subjectDetails.batch),
       semester: subjectDetails.semester,
       credit: Number(subjectDetails.credit),
       assessments: {
@@ -142,7 +143,7 @@ function AddSubject() {
                   name="batch"
                   value={subjectDetails.batch}
                   onChange={handleChange}
-                  placeholder="e.g. 2022"
+                  placeholder="e.g. E22"
                   className="as-input"
                   required
                 />
