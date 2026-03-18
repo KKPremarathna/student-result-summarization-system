@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/home";
 import SignUp from "./pages/signUp";
-import SignIn from "./pages/signIn"; 
+import SignIn from "./pages/signIn";
 import AdminHome from "./pages/AdminHome";
 import AddUser from "./pages/AddUser";
 import AddStudent from "./pages/AddStudent";
@@ -12,6 +12,7 @@ import Complaint from "./pages/AdminComplaint";
 import Results from "./pages/AdminResults";
 import ResetPassword from "./pages/AdminResetpassword";
 import Setting from "./pages/Setting";
+import AdminAcademicCalendar from "./pages/AdminAcademicCalendar";
 
 //lecture pages
 import LecturerHome from "./pages/LecturerHome.jsx";
@@ -21,6 +22,9 @@ import AddIncourse from "./pages/Addincourse.jsx";
 import PendingResult from "./pages/PendingResult.jsx";
 import FinalResult from "./pages/FinalResult.jsx";
 import LectureSetting from "./pages/LecturerSetting.jsx";
+import ViewAcademicCalendar from "./pages/ViewAcademicCalendar.jsx";
+
+
 
 //Student pages
 import StudentHome from "./pages/StudentHome.jsx";
@@ -46,6 +50,9 @@ function App() {
         <Route path="/AdminResults" element={<Results />} />
         <Route path="/adminresetpassword" element={<ResetPassword />} />
         <Route path="/setting" element={<Setting />} />
+        <Route path="/AdminCalendar" element={<AdminAcademicCalendar />} />
+        <Route path="/calendar" element={<ViewAcademicCalendar />} />
+
 
         {/* Lecturer Routes */}
         <Route path="/lecturer/home" element={<LecturerHome />} />
