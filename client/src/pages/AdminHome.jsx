@@ -1,12 +1,58 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/AdminHome.css";
 import "../styles/AdminNotification.css";
 import Navbar from "../components/InnerNavbar";
 import bgImage from "../assets/images/admin.jpg";
 import { Link } from "react-router-dom";
+import axios from "axios";
+
+const API_BASE = "http://localhost:5000/api/admin";
 
 function AdminHome() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const [stats, setStats] = useState({
+    totalStudents: 0,
+    totalLecturers: 0,
+    totalCourses: 0,
+    totalEmails: 0,
+    totalComplaints: 0
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const token = localStorage.getItem("token");
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      try {
+        setLoading(true);
+        // We can fetch these from the new endpoints and other existing ones
+        // For counts, we might need a dedicated stats endpoint or just check the length of returned arrays
+        // For now, let's fetch from the registered-users and allowed-emails
+        const [studentsRes, lecturersRes, emailsRes, complaintsRes, subjectsRes] = await Promise.all([
+          axios.get(`${API_BASE}/registered-users?role=student`, { headers }),
+          axios.get(`${API_BASE}/registered-users?role=lecturer`, { headers }),
+          axios.get(`${API_BASE}/allowed-emails`, { headers }),
+          axios.get(`${API_BASE}/complaints`, { headers }),
+          axios.get(`${API_BASE}/subjects`, { headers }),
+        ]);
+
+        setStats({
+          totalStudents: studentsRes.data.data?.length || 0,
+          totalLecturers: lecturersRes.data.data?.length || 0,
+          totalCourses: subjectsRes.data.count || 0,
+          totalEmails: emailsRes.data.data?.length || 0,
+          totalComplaints: complaintsRes.data.count || 0
+        });
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
   
   return (
     <div className="admin-page">
@@ -77,7 +123,7 @@ function AdminHome() {
                   <h3>Total Students</h3>
                   <span className="stat-icon"></span>
                 </div>
-                <p>4,200</p>
+                <p>{loading ? "..." : stats.totalStudents}</p>
               </div>
 
               <div className="stat-card">
@@ -85,7 +131,7 @@ function AdminHome() {
                   <h3>Total Lecturers</h3>
                   <span className="stat-icon"></span>
                 </div>
-                <p>67</p>
+                <p>{loading ? "..." : stats.totalLecturers}</p>
               </div>
 
               <div className="stat-card">
@@ -93,7 +139,7 @@ function AdminHome() {
                   <h3>Total Courses</h3>
                   <span className="stat-icon"></span>
                 </div>
-                <p>220</p>
+                <p>{loading ? "..." : stats.totalCourses}</p>
               </div>
 
               <div className="stat-card">
@@ -101,7 +147,7 @@ function AdminHome() {
                   <h3>Total Emails</h3>
                   <span className="stat-icon"></span>
                 </div>
-                <p>23</p>
+                <p>{loading ? "..." : stats.totalEmails}</p>
               </div>
 
               <div className="stat-card">
@@ -109,7 +155,7 @@ function AdminHome() {
                   <h3>Total Complaints</h3>
                   <span className="stat-icon"></span>
                 </div>
-                <p>06</p>
+                <p>{loading ? "..." : stats.totalComplaints}</p>
               </div>
 
               <div className="stat-card notice-card">
