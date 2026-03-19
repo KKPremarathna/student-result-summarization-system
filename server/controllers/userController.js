@@ -38,7 +38,9 @@ exports.updateProfile = async (req, res) => {
         faculty, 
         university, 
         department,
-        lecturerId
+        lecturerId,
+        phone,
+        dob
     } = req.body;
 
     try {
@@ -59,6 +61,8 @@ exports.updateProfile = async (req, res) => {
         if (university !== undefined) updatedFields.university = university;
         if (department !== undefined) updatedFields.department = department;
         if (lecturerId !== undefined) updatedFields.lecturerId = lecturerId;
+        if (phone !== undefined) updatedFields.phone = phone;
+        if (dob !== undefined) updatedFields.dob = dob;
 
         // 2. Update Password if both old & new are provided
         if (oldPassword && newPassword) {

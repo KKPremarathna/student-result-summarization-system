@@ -29,6 +29,14 @@ function StudentProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState({ ...userData });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Password Update State
+  const [passwordData, setPasswordData] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: ""
+  });
+  const [passwordStatus, setPasswordStatus] = useState({ loading: false, success: "", error: "" });
 
   const handleEditToggle = () => {
     if (isEditing) {
@@ -42,6 +50,42 @@ function StudentProfile() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEditedData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePasswordUpdate = async (e) => {
+    e.preventDefault();
+    setPasswordStatus({ loading: true, success: "", error: "" });
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordStatus({ loading: false, success: "", error: "New passwords do not match." });
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch("http://localhost:5000/api/user/update-profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          oldPassword: passwordData.oldPassword,
+          newPassword: passwordData.newPassword
+        })
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setPasswordStatus({ loading: false, success: "Password updated successfully!", error: "" });
+        setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "" });
+        setTimeout(() => setIsModalOpen(false), 2000);
+      } else {
+        setPasswordStatus({ loading: false, success: "", error: data.message || "Failed to update password." });
+      }
+    } catch (err) {
+      setPasswordStatus({ loading: false, success: "", error: "Connection error. Please try again." });
+    }
   };
 
   return (
@@ -276,37 +320,49 @@ function StudentProfile() {
                 <p className="st-modal__subtitle">Ensure your account is protected with a strong password</p>
               </div>
 
-              <form onSubmit={(e) => { e.preventDefault(); setIsModalOpen(false); }} className="st-modal__form">
+              <form onSubmit={handlePasswordUpdate} className="st-modal__form">
+                {passwordStatus.error && <p className="st-error-msg">{passwordStatus.error}</p>}
+                {passwordStatus.success && <p className="st-success-msg">{passwordStatus.success}</p>}
+                
                 <div className="st-modal__field">
                   <label className="st-modal__label">Current Password</label>
                   <input
+                    required
                     type="password"
                     className="st-modal__input"
                     placeholder="••••••••"
+                    value={passwordData.oldPassword}
+                    onChange={(e) => setPasswordData({...passwordData, oldPassword: e.target.value})}
                   />
                 </div>
 
                 <div className="st-modal__field">
                   <label className="st-modal__label">New Password</label>
                   <input
+                    required
                     type="password"
                     className="st-modal__input"
                     placeholder="••••••••"
+                    value={passwordData.newPassword}
+                    onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
                   />
                 </div>
 
                 <div className="st-modal__field">
                   <label className="st-modal__label">Confirm New Password</label>
                   <input
+                    required
                     type="password"
                     className="st-modal__input"
                     placeholder="••••••••"
+                    value={passwordData.confirmPassword}
+                    onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
                   />
                 </div>
 
                 <div className="st-modal__submit-wrap">
-                  <button className="st-modal__submit-btn">
-                    Update Security
+                  <button type="submit" className="st-modal__submit-btn" disabled={passwordStatus.loading}>
+                    {passwordStatus.loading ? "Updating..." : "Update Security"}
                   </button>
                 </div>
               </form>

@@ -527,3 +527,24 @@
   background: #1a454c;
   transform: translateY(-2px);
 }
+.st-error-msg {
+  color: #D62828;
+  background: rgba(214, 40, 40, 0.1);
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
+}
+
+.st-success-msg {
+  color: #2D6A4F;
+  background: rgba(45, 106, 79, 0.1);
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
+}

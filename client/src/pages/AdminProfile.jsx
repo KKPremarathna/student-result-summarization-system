@@ -20,8 +20,10 @@ function AdminProfile() {
 
   // Password Modal Fields
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -111,9 +113,10 @@ function AdminProfile() {
     setLoading(true);
     setPasswordMessage({ type: "", text: "" });
     try {
-      const payload = { newPassword };
+      const payload = { oldPassword, newPassword };
       await axios.put("http://localhost:5000/api/user/update-profile", payload, { headers });
       setPasswordMessage({ type: "success", text: "Password successfully updated!" });
+      setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
       setTimeout(() => {
@@ -293,6 +296,21 @@ function AdminProfile() {
             )}
 
             <form onSubmit={handleChangePassword} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <label style={{ fontWeight: 'bold', fontSize: '12px', color: '#588b83', letterSpacing: '1px' }}>CURRENT PASSWORD</label>
+                <div className="password-input-wrapper">
+                  <input
+                    type={showOldPassword ? "text" : "password"}
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    required
+                  />
+                  <div className="eye-icon" onClick={() => setShowOldPassword(!showOldPassword)}>
+                    {showOldPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </div>
+                </div>
+              </div>
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                 <label style={{ fontWeight: 'bold', fontSize: '12px', color: '#588b83', letterSpacing: '1px' }}>NEW PASSWORD</label>
                 <div className="password-input-wrapper">
