@@ -177,7 +177,9 @@ exports.forgotPassword = async(req, res) => {
         const otpIndex = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digit OTP
 
         // 3. Save OTP to DB
-        await OTP.findOneAndUpdate({ email }, { otp: otpIndex, isVerified: false }, // Reset isVerified on new request
+        await OTP.findOneAndUpdate(
+            { email }, 
+            { otp: otpIndex, isVerified: false, createdAt: new Date() }, // Explicitly reset createdAt
             { upsert: true, new: true, setDefaultsOnInsert: true }
         );
 

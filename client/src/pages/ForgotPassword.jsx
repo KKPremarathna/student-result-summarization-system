@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import { sendResetOtp, verifyResetOtp, resetPassword as resetPasswordApi } from "../services/authaService";
 import InnerNavbar from "../components/InnerNavbar";
 import { Mail, ShieldCheck, Lock, ChevronRight, ArrowLeft, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import "../styles/ForgotPassword.css";
@@ -9,13 +9,11 @@ const ForgotPassword = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: New Password
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({ type: null, message: "" });
-
-  const API_BASE_URL = "http://localhost:5000/api/auth";
 
   useEffect(() => {
     if (status.message) {
@@ -26,12 +24,43 @@ const ForgotPassword = () => {
     }
   }, [status.message]);
 
+  const handleOtpChange = (index, value) => {
+    if (value.length > 1) {
+      const pastedData = value.split("").slice(0, 6);
+      const updatedOtp = [...otp];
+      pastedData.forEach((char, i) => {
+        if (index + i < 6) updatedOtp[index + i] = char;
+      });
+      setOtp(updatedOtp);
+      const nextIndex = Math.min(index + pastedData.length, 5);
+      const nextInput = document.getElementById(`otp-${nextIndex}`);
+      if (nextInput) nextInput.focus();
+      return;
+    }
+
+    const updatedOtp = [...otp];
+    updatedOtp[index] = value;
+    setOtp(updatedOtp);
+
+    if (value && index < 5) {
+      const nextInput = document.getElementById(`otp-${index + 1}`);
+      if (nextInput) nextInput.focus();
+    }
+  };
+
+  const handleKeyDown = (index, e) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      const prevInput = document.getElementById(`otp-${index - 1}`);
+      if (prevInput) prevInput.focus();
+    }
+  };
+
   const handleRequestOTP = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(`${API_BASE_URL}/forgot-password`, { email });
-      setStatus({ type: "success", message: "OTP sent to your email!" });
+      await sendResetOtp(email);
+      setStatus({ type: "success", message: "Verification OTP sent to your email!" });
       setStep(2);
     } catch (err) {
       setStatus({ type: "error", message: err.response?.data?.message || "Failed to send OTP." });
@@ -42,13 +71,19 @@ const ForgotPassword = () => {
 
   const handleVerifyOTP = async (e) => {
     e.preventDefault();
+    const otpString = otp.join("");
+    if (otpString.length !== 6) {
+      setStatus({ type: "error", message: "Please enter the 6-digit code." });
+      return;
+    }
+
     setLoading(true);
     try {
-      await axios.post(`${API_BASE_URL}/verify-reset-otp`, { email, otp });
-      setStatus({ type: "success", message: "OTP verified! Set your new password." });
+      await verifyResetOtp(email, otpString);
+      setStatus({ type: "success", message: "Email verified! You can now reset your password." });
       setStep(3);
     } catch (err) {
-      setStatus({ type: "error", message: err.response?.data?.message || "Invalid OTP." });
+      setStatus({ type: "error", message: err.response?.data?.message || "Invalid or expired OTP." });
     } finally {
       setLoading(false);
     }
@@ -60,13 +95,18 @@ const ForgotPassword = () => {
       setStatus({ type: "error", message: "Passwords do not match." });
       return;
     }
+    if (newPassword.length < 6) {
+      setStatus({ type: "error", message: "Password must be at least 6 characters." });
+      return;
+    }
+
     setLoading(true);
     try {
-      await axios.post(`${API_BASE_URL}/reset-password`, { email, newPassword });
-      setStatus({ type: "success", message: "Password reset successful! Redirecting to login..." });
+      await resetPasswordApi(email, newPassword);
+      setStatus({ type: "success", message: "Password reset successful! Redirecting to sign in..." });
       setTimeout(() => navigate("/signin"), 2000);
     } catch (err) {
-      setStatus({ type: "error", message: err.response?.data?.message || "Reset failed." });
+      setStatus({ type: "error", message: err.response?.data?.message || "Reset failed. Please try again." });
     } finally {
       setLoading(false);
     }
@@ -142,16 +182,20 @@ const ForgotPassword = () => {
             <form onSubmit={handleVerifyOTP} className="fp-form">
               <div className="fp-input-group">
                 <label>6-Digit Code</label>
-                <div className="fp-input-wrapper">
-                  <ShieldCheck className="fp-input-icon" size={18} />
-                  <input 
-                    type="text" 
-                    placeholder="Enter OTP"
-                    maxLength={6}
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    required
-                  />
+                <div className="fp-otp-boxes">
+                  {otp.map((digit, index) => (
+                    <input
+                      key={index}
+                      id={`otp-${index}`}
+                      type="text"
+                      maxLength="1"
+                      value={digit}
+                      autoComplete="off"
+                      onChange={(e) => handleOtpChange(index, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(index, e)}
+                      className="fp-otp-input"
+                    />
+                  ))}
                 </div>
               </div>
               <button type="submit" className="fp-btn" disabled={loading}>
@@ -159,7 +203,7 @@ const ForgotPassword = () => {
                 {!loading && <ChevronRight size={18} />}
               </button>
               <p className="fp-resend">
-                Didn't receive the code? <button type="button" onClick={handleRequestOTP} disabled={loading}>Resend OTP</button>
+                Didn't receive the code? <button type="button" onClick={() => handleRequestOTP()} disabled={loading}>Resend OTP</button>
               </p>
             </form>
           )}

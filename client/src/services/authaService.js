@@ -12,10 +12,23 @@ const getBaseUrl = () => {
 };
 
 const API_BASE_URL = `${getBaseUrl()}/api/auth`;
+
 export const requestOtp = async (email) => {
   return await axios.post(`${API_BASE_URL}/request-otp`, { email });
 };
 
 export const signupUser = async (userData) => {
   return await axios.post(`${API_BASE_URL}/signup`, userData);
+};
+
+export const sendResetOtp = async (email) => {
+  return await axios.post(`${API_BASE_URL}/forgot-password`, { email });
+};
+
+export const verifyResetOtp = async (email, otp) => {
+  return await axios.post(`${API_BASE_URL}/verify-reset-otp`, { email, otp });
+};
+
+export const resetPassword = async (email, newPassword) => {
+  return await axios.post(`${API_BASE_URL}/reset-password`, { email, newPassword });
 };
