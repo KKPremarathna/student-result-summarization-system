@@ -1,90 +1,113 @@
 import React, { useState } from "react";
+import AdminLayout from "../components/AdminLayout";
 import "../styles/AdminResetPassword.css";
-import Navbar from "../components/InnerNavbar";
+import { 
+  Key, 
+  ChevronRight, 
+  ShieldCheck, 
+  Eye, 
+  EyeOff, 
+  Lock,
+  AlertCircle,
+  CheckCircle2,
+  ArrowRight
+} from "lucide-react";
 import { Link } from "react-router-dom";
-import bgImage from "../assets/images/admin.jpg";
 
 function ResetPassword() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPass, setShowPass] = useState(false);
+  const [status, setStatus] = useState({ type: "", text: "" });
 
-  // temporary frontend-only admin data
   const adminName = "Mrs K.B Ranathunga";
 
   const handleUpdate = (e) => {
     e.preventDefault();
-
     if (newPassword !== confirmPassword) {
-      alert("Passwords do not match");
+      setStatus({ type: "error", text: "New passwords do not match" });
       return;
     }
-
-    alert("Password updated successfully");
+    setStatus({ type: "success", text: "Password security updated successfully" });
   };
 
   return (
-    <div className="reset-page">
-      <Navbar />
+    <AdminLayout>
+      <div className="arp-page">
+        <header className="arp-header">
+           <div className="arp-breadcrumb">
+              <Key size={14} />
+              <span>Security</span>
+              <ChevronRight size={14} />
+              <span className="arp-breadcrumb-current">Key Reset</span>
+           </div>
+           <h1 className="arp-title">Credential Management</h1>
+        </header>
 
-      <div className="reset-content">
-        <aside className="sidebar">
-          <div className="sidebar-title">Management</div>
-          <ul className="sidebar-menu">
-            <li><Link to="/adminhome"><span className="sidebar-icon"></span>Admin Home</Link></li>
-            <li><Link to="/adduser"><span className="sidebar-icon"></span>Add User</Link></li>
-            <li><Link to="/admincomplaint"><span className="sidebar-icon"></span>Complaint</Link></li>
-            <li><Link to="/adminresults"><span className="sidebar-icon"></span>Results</Link></li>
-            <li><Link to="/adminprofile"><span className="sidebar-icon"></span>Profile</Link></li>
-          </ul>
-        </aside>
-
-        <main
-          className="reset-main"
-          style={{ backgroundImage: `url(${bgImage})` }}
-        >
-          <div className="reset-overlay"></div>
-
-          <div className="reset-main-content">
-            <div className="profile-section">
-              <div className="profile-icon">👤</div>
-              <span className="edit-text">Edit</span>
-            </div>
-
-            <div className="admin-info">
-              <p>
-                <span>Name :</span> {adminName}
-              </p>
-            </div>
-
-            <form className="reset-form" onSubmit={handleUpdate}>
-              <div className="form-row">
-                <label>New Password :</label>
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                />
+        <div className="arp-container">
+           <div className="arp-card">
+              <div className="arp-card-left">
+                 <div className="arp-icon-wrap">
+                    <ShieldCheck size={48} />
+                 </div>
+                 <h2>Identity Security</h2>
+                 <p>Managing credentials for: <br/><strong>{adminName}</strong></p>
+                 <div className="arp-info-note">
+                    <Lock size={16} />
+                    <span>Passwords must be at least 8 characters with a mix of letters and numbers.</span>
+                 </div>
+                 <Link to="/adminprofile" className="arp-back-link">
+                    Return to Profile <ArrowRight size={16} />
+                 </Link>
               </div>
 
-              <div className="form-row">
-                <label>Confirm Password :</label>
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                />
-              </div>
+              <div className="arp-card-right">
+                 <form className="arp-form" onSubmit={handleUpdate}>
+                    <h3>Authentication Key Update</h3>
+                    
+                    {status.text && (
+                      <div className={`arp-status ${status.type}`}>
+                         {status.type === "success" ? <CheckCircle2 size={18}/> : <AlertCircle size={18}/>}
+                         <span>{status.text}</span>
+                      </div>
+                    )}
 
-              <div className="btn-row">
-                <button type="submit" className="update-btn">
-                  Update
-                </button>
+                    <div className="arp-input-group">
+                       <label>New Administrative Key</label>
+                       <div className="arp-pass-box">
+                          <input 
+                            type={showPass ? "text" : "password"} 
+                            placeholder="••••••••"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                          />
+                          <button type="button" onClick={() => setShowPass(!showPass)}>
+                             {showPass ? <EyeOff size={18}/> : <Eye size={18}/>}
+                          </button>
+                       </div>
+                    </div>
+
+                    <div className="arp-input-group">
+                       <label>Re-verify Administrative Key</label>
+                       <div className="arp-pass-box">
+                          <input 
+                            type={showPass ? "text" : "password"} 
+                            placeholder="••••••••"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                          />
+                       </div>
+                    </div>
+
+                    <button type="submit" className="arp-submit-btn">
+                       Update Secret Key
+                    </button>
+                 </form>
               </div>
-            </form>
-          </div>
-        </main>
+           </div>
+        </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }
 

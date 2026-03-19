@@ -17,22 +17,15 @@ function LecturerLayout({ children }) {
   };
 
   return (
-    <div className="lecturer-layout">
-
-      {/* Top Navbar with solid background */}
+    <div className="student-layout"> {/* Unified layout container */}
       <Navbar />
-
-      <div className="lecturer-layout__body">
-
-        {/* Sidebar with solid background */}
+      <div className="student-layout__body">
         <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-
-        {/* Page Content area */}
-        <div className="lecturer-layout__content">
-          <div className="lecturer-layout__inner">
+        <main className="student-layout__content">
+          <div className="student-layout__inner">
             {children}
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );

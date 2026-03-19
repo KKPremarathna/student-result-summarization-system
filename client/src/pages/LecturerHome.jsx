@@ -60,9 +60,6 @@ function LecturerHome() {
   return (
     <LecturerLayout>
       <div className="lh-page">
-
-
-        {/* Dashboard Content Grid */}
         <div className="lh-grid">
 
           {/* Left Column: Profile Card */}

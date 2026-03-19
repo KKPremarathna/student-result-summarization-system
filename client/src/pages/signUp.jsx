@@ -214,12 +214,12 @@ function Signup() {
                 <label>Date of Birth</label>
                 <div className="signup-input-wrapper">
                   <Calendar className="signup-input-icon" size={18} />
-                  <input 
-                    name="dob" 
-                    type="date" 
-                    required 
+                  <input
+                    name="dob"
+                    type="date"
+                    required
                     value={formData.dob}
-                    onChange={handleChange} 
+                    onChange={handleChange}
                   />
                 </div>
               </div>
@@ -274,7 +274,7 @@ function Signup() {
                 <h3>Verification Code</h3>
                 <p>{otpSent ? `Code sent to ${formData.email}` : "We'll send a 6-digit code to your email"}</p>
               </div>
-              
+
               <div className="otp-container">
                 {otpSent && (
                   <div className="otp-boxes">

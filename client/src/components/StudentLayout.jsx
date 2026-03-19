@@ -1,13 +1,7 @@
 import { useState } from "react";
 import Navbar from "./InnerNavbar.jsx";
 import Sidebar from "./StudentSidebar.jsx";
-import "../styles/LecturerLayout.css";
-
-/*
-Student Layout
-Standardized container for all student portal pages.
-Ensures a consistent, distraction-free "Winter Chill" professional environment.
-*/
+import "../styles/StudentLayout.css";
 
 function StudentLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -17,20 +11,20 @@ function StudentLayout({ children }) {
   };
 
   return (
-    <div className="lecturer-layout student-layout">
+    <div className="student-layout">
       {/* Top Navbar */}
       <Navbar toggleSidebar={toggleSidebar} />
 
-      <div className="lecturer-layout__body">
+      <div className="student-layout__body">
         {/* Sidebar */}
         <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
         {/* Page Content area */}
-        <div className="lecturer-layout__content">
-          <div className="lecturer-layout__inner">
+        <main className="student-layout__content">
+          <div className="student-layout__inner">
             {children}
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );
