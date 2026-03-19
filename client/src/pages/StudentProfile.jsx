@@ -2,10 +2,6 @@ import React, { useState, useEffect } from "react";
 import StudentLayout from "../components/StudentLayout.jsx";
 import "../styles/StudentProfile.css";
 import {
-  getStudentDetails,
-  updateStudentProfile
-} from "../services/studentApi";
-import {
   Settings,
   User,
   Mail,
@@ -25,7 +21,6 @@ import {
   Eye,
   EyeOff
 } from "lucide-react";
-import { extractRegNoFromEmail, formatRegNo } from "../utils/regUtils";
 
 function StudentProfile() {
   const [userData, setUserData] = useState({
@@ -41,7 +36,7 @@ function StudentProfile() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({ type: null, message: "" });
-  
+
   const [editForm, setEditForm] = useState({
     firstName: "",
     lastName: "",
@@ -74,12 +69,42 @@ function StudentProfile() {
     }
   }, [status.message]);
 
+  const extractRegNoFromEmail = (email) => {
+    if (!email) return "";
+    const match = email.match(/^(\d{4}e\d{3})@/i);
+    return match ? match[1] : "";
+  };
+
+  const formatRegNo = (value) => {
+    if (!value) return "";
+    const cleaned = value.replace(/[^0-9eE]/g, "").toUpperCase();
+    const match = cleaned.match(/^(\d{4})E(\d{3})$/);
+    if (!match) return value;
+    return `${match[1]}/E/${match[2]}`;
+  };
+
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      const res = await getStudentDetails();
-      const data = res.data.data;
+      const token = localStorage.getItem("token");
+
+      const response = await fetch("http://localhost:5000/api/user/profile", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const res = await response.json();
+
+      if (!response.ok) {
+        throw new Error(res.message || "Failed to load profile details.");
+      }
+
+      const data = res.data;
       const rawENo = data.studentENo || extractRegNoFromEmail(data.email);
+
       const profile = {
         firstName: data.firstName || "",
         lastName: data.lastName || "",
@@ -88,11 +113,12 @@ function StudentProfile() {
         studentENo: formatRegNo(rawENo) || "N/A",
         degree: data.degree || "B.Sc. (Hons) in Engineering"
       };
+
       setUserData(profile);
       setEditForm(profile);
     } catch (err) {
       console.error("Failed to fetch profile", err);
-      setStatus({ type: "error", message: "Failed to load profile details." });
+      setStatus({ type: "error", message: err.message || "Failed to load profile details." });
     } finally {
       setLoading(false);
     }
@@ -101,14 +127,31 @@ function StudentProfile() {
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
-      await updateStudentProfile(editForm);
+      const token = localStorage.getItem("token");
+
+      const response = await fetch("http://localhost:5000/api/user/update-profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(editForm)
+      });
+
+      const res = await response.json();
+
+      if (!response.ok) {
+        throw new Error(res.message || "Failed to update profile.");
+      }
+
       setUserData(editForm);
       setStatus({ type: "success", message: "Profile updated successfully!" });
       setIsEditModalOpen(false);
     } catch (err) {
       console.error("Update failed", err);
-      setStatus({ type: "error", message: err.response?.data?.message || "Failed to update profile." });
+      setStatus({ type: "error", message: err.message || "Failed to update profile." });
     } finally {
       setLoading(false);
     }
@@ -116,6 +159,7 @@ function StudentProfile() {
 
   const handlePasswordUpdate = async (e) => {
     e.preventDefault();
+
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       setStatus({ type: "error", message: "Passwords do not match." });
       return;
@@ -123,16 +167,36 @@ function StudentProfile() {
 
     setLoading(true);
     try {
-      await updateStudentProfile({
-        oldPassword: passwordForm.oldPassword,
-        newPassword: passwordForm.newPassword
+      const token = localStorage.getItem("token");
+
+      const response = await fetch("http://localhost:5000/api/user/update-profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          oldPassword: passwordForm.oldPassword,
+          newPassword: passwordForm.newPassword
+        })
       });
+
+      const res = await response.json();
+
+      if (!response.ok) {
+        throw new Error(res.message || "Failed to update password.");
+      }
+
       setStatus({ type: "success", message: "Password updated successfully!" });
       setIsModalOpen(false);
-      setPasswordForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
+      setPasswordForm({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: ""
+      });
     } catch (err) {
       console.error("Password update failed", err);
-      setStatus({ type: "error", message: err.response?.data?.message || "Failed to update password." });
+      setStatus({ type: "error", message: err.message || "Failed to update password." });
     } finally {
       setLoading(false);
     }
@@ -146,8 +210,6 @@ function StudentProfile() {
   return (
     <StudentLayout>
       <div className="st-page">
-
-        {/* Page Header */}
         <div className="st-header">
           <div className="st-breadcrumb">
             <LayoutDashboard size={14} />
@@ -162,8 +224,6 @@ function StudentProfile() {
         </div>
 
         <div className="st-layout">
-
-          {/* Sidebar - Profile Card */}
           <div className="st-sidebar">
             <div className="st-profile-card">
               <div className="st-avatar-wrap">
@@ -174,7 +234,7 @@ function StudentProfile() {
                     </div>
                   ) : (
                     <img
-                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.firstName || 'Student'}`}
+                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.firstName || "Student"}`}
                       alt="Profile"
                       className="st-avatar__img"
                     />
@@ -190,7 +250,7 @@ function StudentProfile() {
 
               <div className="st-divider" />
 
-              <button 
+              <button
                 onClick={openEditModal}
                 className="st-profile-btn st-profile-btn--primary"
                 disabled={loading}
@@ -198,7 +258,7 @@ function StudentProfile() {
                 <User size={18} />
                 Edit Profile
               </button>
-              
+
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="st-profile-btn st-profile-btn--outline"
@@ -217,7 +277,6 @@ function StudentProfile() {
               </div>
             )}
 
-            {/* Unified Information Card */}
             <div className="st-card">
               <div className="st-card__header">
                 <div className="st-card__icon-wrap">
@@ -227,7 +286,6 @@ function StudentProfile() {
               </div>
 
               <div className="st-info-list">
-                {/* Personal Section */}
                 <div className="st-info-row" onClick={openEditModal}>
                   <div>
                     <p className="st-info-row__label">
@@ -249,12 +307,10 @@ function StudentProfile() {
                     </p>
                     <p className="st-info-row__value">{userData.email}</p>
                   </div>
-                  <ChevronRight size={20} className="st-info-row__arrow" />
                 </div>
 
                 <div className="st-thin-divider" />
 
-                {/* Academic Section */}
                 <div className="st-info-row" onClick={openEditModal}>
                   <div>
                     <p className="st-info-row__label">
@@ -274,13 +330,11 @@ function StudentProfile() {
                       <Award size={12} />
                       Index Number
                     </p>
-                    <code className="st-info-row__code">
-                      {userData.studentENo}
-                    </code>
+                    <code className="st-info-row__code">{userData.studentENo}</code>
                   </div>
                   <ChevronRight size={20} className="st-info-row__arrow" />
                 </div>
-                
+
                 <div className="st-thin-divider" />
 
                 <div className="st-info-row" onClick={openEditModal}>
@@ -295,10 +349,26 @@ function StudentProfile() {
                 </div>
               </div>
             </div>
+
+            <div className="st-privacy-card">
+              <div className="st-privacy-card__blob" />
+              <div className="st-privacy-card__body">
+                <div className="st-privacy-card__heading">
+                  <Shield size={28} />
+                  <h4 className="st-privacy-card__title">Privacy & Security</h4>
+                </div>
+                <p className="st-privacy-card__text">
+                  Customize your credential protection and secondary verification methods.
+                  Keep your academic records secure.
+                </p>
+                <button onClick={() => setIsModalOpen(true)} className="st-privacy-btn">
+                  Manage Security
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Edit Profile Modal */}
         {isEditModalOpen && (
           <div className="st-modal-overlay">
             <div className="st-modal-backdrop" onClick={() => !loading && setIsEditModalOpen(false)} />
@@ -318,19 +388,19 @@ function StudentProfile() {
                 <div className="st-modal-grid">
                   <div className="st-modal__field">
                     <label className="st-modal__label">First Name</label>
-                    <input 
+                    <input
                       className="st-modal__input"
                       value={editForm.firstName}
-                      onChange={(e) => setEditForm({...editForm, firstName: e.target.value})}
+                      onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })}
                       required
                     />
                   </div>
                   <div className="st-modal__field">
                     <label className="st-modal__label">Last Name</label>
-                    <input 
+                    <input
                       className="st-modal__input"
                       value={editForm.lastName}
-                      onChange={(e) => setEditForm({...editForm, lastName: e.target.value})}
+                      onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })}
                       required
                     />
                   </div>
@@ -338,10 +408,10 @@ function StudentProfile() {
 
                 <div className="st-modal__field">
                   <label className="st-modal__label">University Email</label>
-                  <input 
+                  <input
                     className="st-modal__input"
                     value={editForm.email}
-                    onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                    onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
                     required
                   />
                 </div>
@@ -349,19 +419,19 @@ function StudentProfile() {
                 <div className="st-modal-grid">
                   <div className="st-modal__field">
                     <label className="st-modal__label">Index Number</label>
-                    <input 
+                    <input
                       className="st-modal__input"
                       value={editForm.studentENo}
-                      onChange={(e) => setEditForm({...editForm, studentENo: e.target.value})}
+                      onChange={(e) => setEditForm({ ...editForm, studentENo: e.target.value })}
                       required
                     />
                   </div>
                   <div className="st-modal__field">
                     <label className="st-modal__label">Faculty</label>
-                    <input 
+                    <input
                       className="st-modal__input"
                       value={editForm.faculty}
-                      onChange={(e) => setEditForm({...editForm, faculty: e.target.value})}
+                      onChange={(e) => setEditForm({ ...editForm, faculty: e.target.value })}
                       required
                     />
                   </div>
@@ -369,10 +439,10 @@ function StudentProfile() {
 
                 <div className="st-modal__field">
                   <label className="st-modal__label">Degree Program</label>
-                  <input 
+                  <input
                     className="st-modal__input"
                     value={editForm.degree}
-                    onChange={(e) => setEditForm({...editForm, degree: e.target.value})}
+                    onChange={(e) => setEditForm({ ...editForm, degree: e.target.value })}
                     required
                   />
                 </div>
@@ -387,16 +457,11 @@ function StudentProfile() {
           </div>
         )}
 
-        {/* Password Modal */}
         {isModalOpen && (
           <div className="st-modal-overlay">
             <div className="st-modal-backdrop" onClick={() => !loading && setIsModalOpen(false)} />
-
             <div className="st-modal">
-              <button
-                className="st-modal__close"
-                onClick={() => setIsModalOpen(false)}
-              >
+              <button className="st-modal__close" onClick={() => setIsModalOpen(false)}>
                 <X size={20} />
               </button>
 
@@ -417,14 +482,10 @@ function StudentProfile() {
                       className="st-modal__input"
                       placeholder="••••••••"
                       value={passwordForm.oldPassword}
-                      onChange={(e) => setPasswordForm(prev => ({ ...prev, oldPassword: e.target.value }))}
+                      onChange={(e) => setPasswordForm((prev) => ({ ...prev, oldPassword: e.target.value }))}
                       required
                     />
-                    <button 
-                      type="button" 
-                      className="st-eye-icon"
-                      onClick={() => setShowOldPassword(!showOldPassword)}
-                    >
+                    <button type="button" className="st-eye-icon" onClick={() => setShowOldPassword(!showOldPassword)}>
                       {showOldPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
                   </div>
@@ -438,14 +499,10 @@ function StudentProfile() {
                       className="st-modal__input"
                       placeholder="••••••••"
                       value={passwordForm.newPassword}
-                      onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
+                      onChange={(e) => setPasswordForm((prev) => ({ ...prev, newPassword: e.target.value }))}
                       required
                     />
-                    <button 
-                      type="button" 
-                      className="st-eye-icon"
-                      onClick={() => setShowNewPassword(!showNewPassword)}
-                    >
+                    <button type="button" className="st-eye-icon" onClick={() => setShowNewPassword(!showNewPassword)}>
                       {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
                   </div>
@@ -459,21 +516,17 @@ function StudentProfile() {
                       className="st-modal__input"
                       placeholder="••••••••"
                       value={passwordForm.confirmPassword}
-                      onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      onChange={(e) => setPasswordForm((prev) => ({ ...prev, confirmPassword: e.target.value }))}
                       required
                     />
-                    <button 
-                      type="button" 
-                      className="st-eye-icon"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
+                    <button type="button" className="st-eye-icon" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
                       {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
                   </div>
                 </div>
 
                 <div className="st-modal__submit-wrap">
-                  <button className="st-modal__submit-btn" disabled={loading}>
+                  <button type="submit" className="st-modal__submit-btn" disabled={loading}>
                     {loading ? <Loader2 className="animate-spin" size={24} /> : "Update Security"}
                   </button>
                 </div>
