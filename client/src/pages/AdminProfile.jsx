@@ -1,168 +1,172 @@
 import React, { useState, useEffect, useRef } from "react";
-import "../styles/AdminResetPassword.css";
+import "../styles/AdminProfile.css";
 import Navbar from "../components/InnerNavbar";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { Shield, Eye, EyeOff, Camera, User, Fingerprint } from "lucide-react";
+import { 
+  Shield, 
+  Eye, 
+  EyeOff, 
+  Camera, 
+  User, 
+  Fingerprint, 
+  Mail, 
+  Phone, 
+  Calendar, 
+  Key, 
+  X, 
+  ChevronRight, 
+  Loader2, 
+  CheckCircle2, 
+  AlertCircle 
+} from "lucide-react";
 
 function AdminProfile() {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [statusMsg, setStatusMsg] = useState({ type: "", text: "" });
 
-  // View/Edit State
-  const [isEditing, setIsEditing] = useState(false);
+  // Modal visibility
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showSecurityModal, setShowSecurityModal] = useState(false);
 
-  // Profile Editable Fields
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [dob, setDob] = useState("");
-  const [profilePicture, setProfilePicture] = useState("");
+  // Profile Form State
+  const [editForm, setEditForm] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    dob: "",
+    profilePicture: ""
+  });
 
-  // Password Modal Fields
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showOldPassword, setShowOldPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  // Password Form State
+  const [passwordForm, setPasswordForm] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: ""
+  });
 
-  const [message, setMessage] = useState({ type: "", text: "" });
-  const [passwordMessage, setPasswordMessage] = useState({ type: "", text: "" });
-  const [loading, setLoading] = useState(false);
+  const [showOldPass, setShowOldPass] = useState(false);
+  const [showNewPass, setShowNewPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
+
   const fileInputRef = useRef(null);
 
   useEffect(() => {
     fetchProfile();
   }, []);
 
-  const getAuthHeader = () => {
+  const getHeaders = () => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      setMessage({ type: "error", text: "Session expired. Please login again." });
-      return null;
-    }
-    return { Authorization: `Bearer ${token}` };
+    return { headers: { Authorization: `Bearer ${token}` } };
   };
 
   const fetchProfile = async () => {
-    const headers = getAuthHeader();
-    if (!headers) return;
     try {
-      const response = await axios.get("http://localhost:5000/api/user/details", { headers });
+      setLoading(true);
+      const response = await axios.get("http://localhost:5000/api/user/details", getHeaders());
       const userData = response.data.data;
       setUser(userData);
-      setFirstName(userData.firstName || "");
-      setLastName(userData.lastName || "");
-      setPhone(userData.phone || "");
-      if (userData.dob) {
-        setDob(new Date(userData.dob).toISOString().split('T')[0]);
-      }
-      setProfilePicture(userData.profilePicture || "");
+      setEditForm({
+        firstName: userData.firstName || "",
+        lastName: userData.lastName || "",
+        phone: userData.phone || "",
+        dob: userData.dob ? new Date(userData.dob).toISOString().split('T')[0] : "",
+        profilePicture: userData.profilePicture || ""
+      });
     } catch (error) {
-      console.error(error);
-      setMessage({ type: "error", text: "Failed to load profile details" });
-    }
-  };
-
-  const handleUpdateProfile = async (e) => {
-    e.preventDefault();
-    const headers = getAuthHeader();
-    if (!headers) return;
-
-    setLoading(true);
-    setMessage({ type: "", text: "" });
-    try {
-      const payload = {
-        firstName,
-        lastName,
-        phone,
-        dob,
-        profilePicture
-      };
-
-      await axios.put("http://localhost:5000/api/user/update-profile", payload, { headers });
-
-      // Update local storage user if name changed
-      const localUser = JSON.parse(localStorage.getItem("user") || "{}");
-      localUser.firstName = firstName;
-      localUser.lastName = lastName;
-      localStorage.setItem("user", JSON.stringify(localUser));
-
-      fetchProfile();
-      setIsEditing(false); // Switch back to view mode on success
-    } catch (error) {
-      let errorMsg = error.response?.data?.message || "Failed to update profile.";
-      if (typeof errorMsg === 'object') errorMsg = JSON.stringify(errorMsg);
-      setMessage({ type: "error", text: errorMsg });
+      console.error("Failed to load profile:", error);
+      setStatusMsg({ type: "error", text: "Failed to load profile details" });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChangePassword = async (e) => {
+  const handleProfileUpdate = async (e) => {
     e.preventDefault();
-    const headers = getAuthHeader();
-    if (!headers) return;
+    setUpdateLoading(true);
+    setStatusMsg({ type: "", text: "" });
 
-    if (newPassword !== confirmPassword) {
-      setPasswordMessage({ type: "error", text: "New passwords do not match." });
+    try {
+      await axios.put("http://localhost:5000/api/user/update-profile", editForm, getHeaders());
+      
+      // Update local storage user
+      const localUser = JSON.parse(localStorage.getItem("user") || "{}");
+      localUser.firstName = editForm.firstName;
+      localUser.lastName = editForm.lastName;
+      localStorage.setItem("user", JSON.stringify(localUser));
+
+      await fetchProfile();
+      setStatusMsg({ type: "success", text: "Profile updated successfully!" });
+      setTimeout(() => {
+        setShowEditModal(false);
+        setStatusMsg({ type: "", text: "" });
+      }, 1500);
+    } catch (error) {
+      setStatusMsg({ type: "error", text: error.response?.data?.message || "Failed to update profile" });
+    } finally {
+      setUpdateLoading(false);
+    }
+  };
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setStatusMsg({ type: "error", text: "Passwords do not match!" });
       return;
     }
 
-    setLoading(true);
-    setPasswordMessage({ type: "", text: "" });
+    setUpdateLoading(true);
+    setStatusMsg({ type: "", text: "" });
+
     try {
-      const payload = { oldPassword, newPassword };
-      await axios.put("http://localhost:5000/api/user/update-profile", payload, { headers });
-      setPasswordMessage({ type: "success", text: "Password successfully updated!" });
-      setOldPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      await axios.put("http://localhost:5000/api/user/update-profile", {
+        oldPassword: passwordForm.oldPassword,
+        newPassword: passwordForm.newPassword
+      }, getHeaders());
+
+      setStatusMsg({ type: "success", text: "Password changed successfully!" });
+      setPasswordForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
       setTimeout(() => {
-        setShowPasswordModal(false);
-        setPasswordMessage({ type: "", text: "" });
+        setShowSecurityModal(false);
+        setStatusMsg({ type: "", text: "" });
       }, 1500);
     } catch (error) {
-      let errorMsg = error.response?.data?.message || "Failed to update password.";
-      if (typeof errorMsg === 'object') errorMsg = JSON.stringify(errorMsg);
-      setPasswordMessage({ type: "error", text: errorMsg });
+      setStatusMsg({ type: "error", text: error.response?.data?.message || "Failed to change password" });
     } finally {
-      setLoading(false);
+      setUpdateLoading(false);
     }
   };
 
-  const handlePhotoChange = (e) => {
+  const handlePhotoUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfilePicture(reader.result);
+        setEditForm({ ...editForm, profilePicture: reader.result });
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const renderAvatar = () => {
-    if (profilePicture && profilePicture !== "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png") {
-      return <img src={profilePicture} alt="Profile Avatar" className="avatar-image" />;
-    }
-
-    const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : "";
-    const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : "";
-
-    if (!firstInitial && !lastInitial) {
-      return <div className="avatar-image" style={{ backgroundColor: '#008080' }}>A</div>;
-    }
-
-    return <div className="avatar-image">{firstInitial}{lastInitial}</div>;
-  };
+  if (loading) {
+    return (
+      <div className="ad-page">
+        <Navbar />
+        <div className="st-loading">
+          <Loader2 className="st-loader-icon" size={48} />
+          <p>Loading Administrator Profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="reset-page">
+    <div className="ad-page">
       <Navbar />
 
-      <div className="reset-content">
+      <div className="ad-content">
         <aside className="sidebar">
           <div className="sidebar-title">Management</div>
           <ul className="sidebar-menu">
@@ -174,178 +178,232 @@ function AdminProfile() {
           </ul>
         </aside>
 
-        <main className="reset-main">
+        <main className="ad-main">
           <div className="profile-container">
-
-            {/* LEFT COLUMN: AVATAR & QUICK ACTIONS */}
-            <div className="profile-left-column">
-              <div className="avatar-wrapper">
-                {renderAvatar()}
-                <button className="avatar-edit-btn" onClick={() => fileInputRef.current.click()} title="Change Photo">
-                  <Camera size={16} />
+            {/* Sidebar Profile Card */}
+            <div className="ad-profile-card">
+              <div className="ad-avatar-wrap">
+                <div className="ad-avatar">
+                  {editForm.profilePicture ? (
+                    <img src={editForm.profilePicture} alt="Profile" className="ad-avatar__img" />
+                  ) : (
+                    user ? `${user.firstName?.charAt(0)}${user.lastName?.charAt(0)}` : "A"
+                  )}
+                </div>
+                <button className="ad-avatar__edit-btn" onClick={() => fileInputRef.current.click()} title="Change Photo">
+                  <Camera size={18} />
                 </button>
-                <input type="file" accept="image/*" ref={fileInputRef} style={{ display: 'none' }} onChange={handlePhotoChange} />
+                <input type="file" accept="image/*" ref={fileInputRef} style={{ display: 'none' }} onChange={handlePhotoUpload} />
               </div>
 
-              <div className="profile-name">
-                {firstName || lastName ? `${firstName} ${lastName}` : "Admin User"}
-              </div>
-              <div className="profile-role">Systems Administrator</div>
+              <h2 className="ad-profile__name">{user?.firstName} {user?.lastName}</h2>
+              <p className="ad-profile__role">Systems Administrator</p>
+              
+              <div className="ad-divider"></div>
 
-              <button
-                className="edit-profile-btn"
-                onClick={() => setIsEditing(!isEditing)}
-              >
-                <User size={18} />
-                {isEditing ? "Cancel Edit" : "Edit Profile"}
+              <button className="ad-profile-btn ad-profile-btn--primary" onClick={() => setShowEditModal(true)}>
+                <User size={20} />
+                Update Profile
+              </button>
+              <button className="ad-profile-btn ad-profile-btn--primary" onClick={() => setShowSecurityModal(true)}>
+                <Shield size={20} />
+                Security Access
               </button>
             </div>
 
-            {/* RIGHT COLUMN: INFORMATION & SECURITY */}
-            <div className="profile-right-column">
-
-              {message.text && (
-                <div style={{ padding: '12px', borderRadius: '10px', backgroundColor: message.type === 'error' ? '#f8d7da' : '#d4edda', color: message.type === 'error' ? '#721c24' : '#155724', fontWeight: 'bold' }}>
-                  {message.text}
-                </div>
-              )}
-
-              {/* INFO CARD */}
-              <div className="info-card">
-                <div className="info-card-header">
-                  <Fingerprint size={24} color="#0f2c29" />
-                  Personal Information
-                </div>
-
-                {isEditing ? (
-                  <form onSubmit={handleUpdateProfile}>
-                    <div className="info-row">
-                      <label className="info-label">FIRST NAME</label>
-                      <input type="text" className="info-input" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
-                    </div>
-                    <div className="info-row">
-                      <label className="info-label">LAST NAME</label>
-                      <input type="text" className="info-input" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
-                    </div>
-                    <div className="info-row">
-                      <label className="info-label">EMAIL ADDRESS</label>
-                      <input type="email" className="info-input" value={user?.email || ""} readOnly style={{ backgroundColor: '#f0f0f0', cursor: 'not-allowed' }} />
-                    </div>
-                    <div className="info-row">
-                      <label className="info-label">PHONE NUMBER</label>
-                      <input type="text" className="info-input" value={phone} onChange={(e) => setPhone(e.target.value)} required />
-                    </div>
-                    <div className="info-row">
-                      <label className="info-label">DATE OF BIRTH</label>
-                      <input type="date" className="info-input" value={dob} onChange={(e) => setDob(e.target.value)} required />
-                    </div>
-                    <button type="submit" className="save-profile-btn" disabled={loading}>
-                      {loading ? "Saving..." : "Save Changes"}
-                    </button>
-                  </form>
-                ) : (
-                  <div>
-                    <div className="info-row">
-                      <div className="info-label">DISPLAY NAME</div>
-                      <div className="info-value">{firstName || lastName ? `${firstName} ${lastName}` : "Not Set"}</div>
-                    </div>
-                    <div className="info-row">
-                      <div className="info-label">EMAIL ADDRESS</div>
-                      <div className="info-value">{user?.email || "Loading..."}</div>
-                    </div>
-                    <div className="info-row">
-                      <div className="info-label">PHONE NUMBER</div>
-                      <div className="info-value">{phone || "Not Set"}</div>
-                    </div>
-                    <div className="info-row">
-                      <div className="info-label">DATE OF BIRTH</div>
-                      <div className="info-value">{dob || "Not Set"}</div>
-                    </div>
+            {/* Main Content Details */}
+            <div className="ad-details">
+              <div className="ad-card">
+                <div className="ad-card__header">
+                  <div className="ad-card__icon-wrap">
+                    <Fingerprint size={24} />
                   </div>
-                )}
-              </div>
-
-              {/* SECURITY CARD */}
-              <div className="security-card">
-                <div className="security-icon">
-                  <Shield size={32} />
+                  <h3 className="ad-card__title">Personal Information</h3>
                 </div>
-                <div className="security-text">
-                  Protect your academic account using encrypted authentication methods and two-factor verification.
-                </div>
-                <button className="manage-password-btn" onClick={() => setShowPasswordModal(true)}>
-                  Manage Passwords
-                </button>
-              </div>
 
+                <div className="ad-info-list">
+                  <div className="ad-info-row">
+                    <span className="ad-info-row__label"><User size={14} /> Full Name</span>
+                    <span className="ad-info-row__value">{user?.firstName} {user?.lastName}</span>
+                    <ChevronRight className="ad-info-row__arrow" size={18} />
+                  </div>
+                  <div className="ad-info-row">
+                    <span className="ad-info-row__label"><Mail size={14} /> Email Address</span>
+                    <span className="ad-info-row__value">{user?.email}</span>
+                    <ChevronRight className="ad-info-row__arrow" size={18} />
+                  </div>
+                  <div className="ad-info-row">
+                    <span className="ad-info-row__label"><Phone size={14} /> Contact Number</span>
+                    <span className="ad-info-row__value">{user?.phone || "Not Set"}</span>
+                    <ChevronRight className="ad-info-row__arrow" size={18} />
+                  </div>
+                  <div className="ad-info-row">
+                    <span className="ad-info-row__label"><Calendar size={14} /> Date of Birth</span>
+                    <span className="ad-info-row__value">{editForm.dob || "Not Set"}</span>
+                    <ChevronRight className="ad-info-row__arrow" size={18} />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </main>
       </div>
 
-      {/* Password Reset Modal Overlay */}
-      {showPasswordModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>Change Password</h2>
+      {/* Edit Profile Modal */}
+      {showEditModal && (
+        <div className="st-modal-overlay">
+          <div className="st-modal">
+            <button className="st-modal__close" onClick={() => setShowEditModal(false)}>
+              <X size={20} />
+            </button>
+            <div className="st-modal__header">
+              <div className="st-modal__icon-wrap">
+                <User size={32} />
+              </div>
+              <h2 className="st-modal__title">Update Profile</h2>
+              <p className="st-modal__subtitle">Update your personal information</p>
+            </div>
 
-            {passwordMessage.text && (
-              <div style={{ padding: '10px', marginBottom: '15px', borderRadius: '5px', backgroundColor: passwordMessage.type === 'error' ? '#f8d7da' : '#d4edda', color: passwordMessage.type === 'error' ? '#721c24' : '#155724', fontSize: '14px', fontWeight: 'bold' }}>
-                {passwordMessage.text}
+            {statusMsg.text && (
+              <div className={`st-status-msg st-status-msg--${statusMsg.type}`}>
+                {statusMsg.type === "success" ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+                {statusMsg.text}
               </div>
             )}
 
-            <form onSubmit={handleChangePassword} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                <label style={{ fontWeight: 'bold', fontSize: '12px', color: '#588b83', letterSpacing: '1px' }}>CURRENT PASSWORD</label>
-                <div className="password-input-wrapper">
-                  <input
-                    type={showOldPassword ? "text" : "password"}
-                    value={oldPassword}
-                    onChange={(e) => setOldPassword(e.target.value)}
+            <form className="st-modal__form" onSubmit={handleProfileUpdate}>
+              <div className="st-modal-grid">
+                <div className="st-modal__field">
+                  <label className="st-modal__label">First Name</label>
+                  <input 
+                    type="text" 
+                    className="st-modal__input" 
+                    value={editForm.firstName}
+                    onChange={(e) => setEditForm({...editForm, firstName: e.target.value})}
                     required
                   />
-                  <div className="eye-icon" onClick={() => setShowOldPassword(!showOldPassword)}>
-                    {showOldPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </div>
+                </div>
+                <div className="st-modal__field">
+                  <label className="st-modal__label">Last Name</label>
+                  <input 
+                    type="text" 
+                    className="st-modal__input" 
+                    value={editForm.lastName}
+                    onChange={(e) => setEditForm({...editForm, lastName: e.target.value})}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="st-modal-grid">
+                <div className="st-modal__field">
+                  <label className="st-modal__label">Phone Number</label>
+                  <input 
+                    type="text" 
+                    className="st-modal__input" 
+                    value={editForm.phone}
+                    onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                  />
+                </div>
+                <div className="st-modal__field">
+                  <label className="st-modal__label">Date of Birth</label>
+                  <input 
+                    type="date" 
+                    className="st-modal__input" 
+                    value={editForm.dob}
+                    onChange={(e) => setEditForm({...editForm, dob: e.target.value})}
+                  />
+                </div>
+              </div>
+              <div className="st-modal__field">
+                <label className="st-modal__label">Profile Picture URL</label>
+                <input 
+                  type="text" 
+                  className="st-modal__input" 
+                  value={editForm.profilePicture}
+                  onChange={(e) => setEditForm({...editForm, profilePicture: e.target.value})}
+                />
+              </div>
+
+              <button className="st-modal-submit-btn" type="submit" disabled={updateLoading}>
+                {updateLoading ? <Loader2 className="st-loader-icon" size={20} /> : "Save Changes"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Security Modal */}
+      {showSecurityModal && (
+        <div className="st-modal-overlay">
+          <div className="st-modal">
+            <button className="st-modal__close" onClick={() => setShowSecurityModal(false)}>
+              <X size={20} />
+            </button>
+            <div className="st-modal__header">
+              <div className="st-modal__icon-wrap">
+                <Key size={32} />
+              </div>
+              <h2 className="st-modal__title">Security Update</h2>
+              <p className="st-modal__subtitle">Secure your administrator account</p>
+            </div>
+
+            {statusMsg.text && (
+              <div className={`st-status-msg st-status-msg--${statusMsg.type}`}>
+                {statusMsg.type === "success" ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+                {statusMsg.text}
+              </div>
+            )}
+
+            <form className="st-modal__form" onSubmit={handlePasswordChange}>
+              <div className="st-modal__field">
+                <label className="st-modal__label">Current Password</label>
+                <div className="st-password-wrapper">
+                  <input 
+                    type={showOldPass ? "text" : "password"} 
+                    className="st-modal__input" 
+                    value={passwordForm.oldPassword}
+                    onChange={(e) => setPasswordForm({...passwordForm, oldPassword: e.target.value})}
+                    required
+                  />
+                  <button type="button" className="st-eye-icon" onClick={() => setShowOldPass(!showOldPass)}>
+                    {showOldPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+              <div className="st-modal__field">
+                <label className="st-modal__label">New Password</label>
+                <div className="st-password-wrapper">
+                  <input 
+                    type={showNewPass ? "text" : "password"} 
+                    className="st-modal__input" 
+                    value={passwordForm.newPassword}
+                    onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
+                    required
+                  />
+                  <button type="button" className="st-eye-icon" onClick={() => setShowNewPass(!showNewPass)}>
+                    {showNewPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+              <div className="st-modal__field">
+                <label className="st-modal__label">Confirm New Password</label>
+                <div className="st-password-wrapper">
+                  <input 
+                    type={showConfirmPass ? "text" : "password"} 
+                    className="st-modal__input" 
+                    value={passwordForm.confirmPassword}
+                    onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
+                    required
+                  />
+                  <button type="button" className="st-eye-icon" onClick={() => setShowConfirmPass(!showConfirmPass)}>
+                    {showConfirmPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                <label style={{ fontWeight: 'bold', fontSize: '12px', color: '#588b83', letterSpacing: '1px' }}>NEW PASSWORD</label>
-                <div className="password-input-wrapper">
-                  <input
-                    type={showNewPassword ? "text" : "password"}
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    required
-                  />
-                  <div className="eye-icon" onClick={() => setShowNewPassword(!showNewPassword)}>
-                    {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </div>
-                </div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                <label style={{ fontWeight: 'bold', fontSize: '12px', color: '#588b83', letterSpacing: '1px' }}>CONFIRM NEW PASSWORD</label>
-                <div className="password-input-wrapper">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                  />
-                  <div className="eye-icon" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                    {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </div>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '15px' }}>
-                <button type="button" onClick={() => setShowPasswordModal(false)} style={{ padding: '10px 20px', backgroundColor: '#89a8a1', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>Cancel</button>
-                <button type="submit" disabled={loading} style={{ padding: '10px 20px', backgroundColor: '#0f2c29', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-                  {loading ? "Saving..." : "Save Password"}
-                </button>
-              </div>
+              <button className="st-modal-submit-btn" type="submit" disabled={updateLoading}>
+                {updateLoading ? <Loader2 className="st-loader-icon" size={20} /> : "Update Security"}
+              </button>
             </form>
           </div>
         </div>
