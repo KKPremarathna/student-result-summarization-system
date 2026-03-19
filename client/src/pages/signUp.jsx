@@ -4,7 +4,7 @@ import "../styles/signup.css";
 import "../styles/Toast.css";
 import InnerNavbar from "../components/InnerNavbar";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { requestOtp, signupUser } from "../services/authaService";
 
 function Signup() {
   const navigate = useNavigate();
@@ -35,7 +35,19 @@ function Signup() {
   };
 
   const handleOtpChange = (index, value) => {
-    if (value.length > 1) return;
+    if (value.length > 1) {
+      // Handle paste
+      const pastedData = value.split("").slice(0, 6);
+      const updatedOtp = [...otp];
+      pastedData.forEach((char, i) => {
+        if (index + i < 6) updatedOtp[index + i] = char;
+      });
+      setOtp(updatedOtp);
+      const nextIndex = Math.min(index + pastedData.length, 5);
+      document.getElementById(`otp-${nextIndex}`).focus();
+      return;
+    }
+
     const updatedOtp = [...otp];
     updatedOtp[index] = value;
     setOtp(updatedOtp);
@@ -46,16 +58,26 @@ function Signup() {
     }
   };
 
+  const handleKeyDown = (index, e) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      document.getElementById(`otp-${index - 1}`).focus();
+    }
+  };
+
   const handleSendOtp = async () => {
     if (!formData.email) {
       setMessage({ type: "error", text: "Please enter your email first." });
       return;
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setMessage({ type: "error", text: "Please enter a valid academic email." });
+      return;
+    }
+
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/request-otp", {
-        email: formData.email,
-      });
+      const response = await requestOtp(formData.email);
       setMessage({ type: "success", text: response.data.message });
     } catch (error) {
       setMessage({
@@ -82,7 +104,7 @@ function Signup() {
 
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/signup", {
+      const response = await signupUser({
         ...formData,
         otp: otpString,
       });
@@ -212,6 +234,7 @@ function Signup() {
                       maxLength="1"
                       value={digit}
                       onChange={(e) => handleOtpChange(index, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(index, e)}
                       className="otp-input"
                     />
                   ))}
