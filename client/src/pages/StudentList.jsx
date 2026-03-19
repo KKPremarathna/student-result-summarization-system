@@ -19,6 +19,7 @@ function StudentList() {
 
   // Toast
   const [toast, setToast] = useState({ visible: false, message: "", type: "success" });
+  const [confirmModal, setConfirmModal] = useState({ visible: false, id: null, email: "" });
 
   const token = localStorage.getItem("token");
 
@@ -83,16 +84,26 @@ function StudentList() {
 
   // Helper to extract regNum from email (e.g., 2021e140@eng.jfn.ac.lk -> 2021/E/140)
   const extractRegNumFromEmail = (email) => {
-    if (!email) return "";
-    const prefix = email.split("@")[0];
-    const year = prefix.substring(0, 4);
-    const num = prefix.substring(5); // skips the 'e'
-    return `${year}/E/${num}`;
+    if (!email || !email.includes("@")) return "";
+    const prefix = email.split("@")[0].toLowerCase();
+    
+    // Check if prefix matches 20xxExxx
+    const match = prefix.match(/^(\d{4})([a-z])(\d{3,})$/);
+    if (match) {
+      const [, year, char, num] = match;
+      return `${year}/${char.toUpperCase()}/${num}`;
+    }
+    return "";
   };
 
-  // Delete allowed email
-  const handleDeleteAllowed = async (id, email) => {
-    if (!window.confirm(`Remove "${email}" from allowed list?`)) return;
+  // Open modal instead of confirm
+  const handleDeleteAllowed = (id, email) => {
+    setConfirmModal({ visible: true, id, email });
+  };
+
+  const confirmDelete = async () => {
+    const { id, email } = confirmModal;
+    setConfirmModal({ visible: false, id: null, email: "" });
     
     const regNum = extractRegNumFromEmail(email);
     if (!regNum) {
@@ -309,6 +320,29 @@ function StudentList() {
           </div>
         </main>
       </div>
+      {/* Confirmation Modal */}
+      {confirmModal.visible && (
+        <div className="sl-modal-overlay">
+          <div className="sl-modal">
+            <h3 className="sl-modal-title">Confirm Removal</h3>
+            <p className="sl-modal-text">
+              Are you sure you want to remove <strong>{confirmModal.email}</strong> from the allowed list?
+            </p>
+            <div className="sl-modal-actions">
+              <button 
+                className="sl-modal-cancel" 
+                onClick={() => setConfirmModal({ visible: false, id: null, email: "" })}
+              >
+                Cancel
+              </button>
+              <button className="sl-modal-confirm" onClick={confirmDelete}>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

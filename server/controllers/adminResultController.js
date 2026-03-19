@@ -5,19 +5,19 @@ const { isValidRegNum } = require('../utils/regUtils');
  * Add final results in batch
  * req.body = { courseCode, semester, batch, lectureId, results: [{ regNum, grade }, ...] }
  */
-exports.addBatchResults = async(req, res) => {
+exports.addBatchResults = async (req, res) => {
     try {
-        let { courseCode, semester, batch, lectureId, results } = req.body;
+        const { courseCode, semester, batch, lecturerEmail, lectureId, results } = req.body;
+        const finalLecturer = lecturerEmail || lectureId;
 
-        if (!courseCode || !semester || !batch || !lectureId || !results || !Array.isArray(results)) {
+        if (!courseCode || !semester || !batch || !finalLecturer || !results || !Array.isArray(results)) {
             return res.status(400).json({ message: 'Missing required fields or results array' });
         }
 
         // Validate all registration numbers first
-        for (let i=0; i < results.length; i++) {
-            results[i].regNum = normalizeRegNo(results[i].regNum);
-            if (!isValidRegNum(results[i].regNum)) {
-                return res.status(400).json({ message: `Invalid registration number format: ${results[i].regNum}. Expected 20XX/E/xxx` });
+        for (const item of results) {
+            if (!isValidRegNum(item.regNum)) {
+                return res.status(400).json({ message: `Invalid registration number format: ${item.regNum}. Expected 20XX/E/xxx` });
             }
         }
 
@@ -25,7 +25,7 @@ exports.addBatchResults = async(req, res) => {
             courseCode: courseCode.toUpperCase(),
             semester,
             batch,
-            lectureId,
+            lectureId: finalLecturer,
             studentRegNum: item.regNum.toUpperCase(),
             grade: item.grade.toUpperCase(),
         }));
@@ -123,6 +123,27 @@ exports.deleteSubjectResults = async(req, res) => {
         res.status(200).json({
             message: `${result.deletedCount} results deleted successfully`
         });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Get results for a specific subject/batch/semester
+exports.getResults = async (req, res) => {
+    try {
+        const { courseCode, batch, semester } = req.query;
+
+        if (!courseCode || !batch || !semester) {
+            return res.status(400).json({ message: 'Missing query parameters' });
+        }
+
+        const results = await AdminResult.find({
+            courseCode: courseCode.toUpperCase(),
+            batch,
+            semester
+        }).sort({ studentRegNum: 1 });
+
+        res.status(200).json({ success: true, data: results });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

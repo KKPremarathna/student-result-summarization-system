@@ -585,66 +585,24 @@
   background: #1a454c;
   transform: translateY(-2px);
 }
-
-/* ── Content Main (for status bar) ────────────── */
-.st-content-main {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-/* ── Status Bar ───────────────────────────────── */
-.st-status-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1.25rem;
+.st-error-msg {
+  color: #D62828;
+  background: rgba(214, 40, 40, 0.1);
+  padding: 0.75rem 1rem;
   border-radius: 0.75rem;
-  font-weight: 600;
-  animation: slideInDown 0.3s ease;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
 }
 
-.st-status-bar.success {
-  background: #d1fae5;
-  color: #065f46;
-  border: 1px solid #a7f3d0;
-}
-
-.st-status-bar.error {
-  background: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #fecaca;
-}
-
-/* ── Loader ───────────────────────────────────── */
-.st-loader-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: #4F7C82;
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes zoomIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes slideInDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+.st-success-msg {
+  color: #2D6A4F;
+  background: rgba(45, 106, 79, 0.1);
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
 }

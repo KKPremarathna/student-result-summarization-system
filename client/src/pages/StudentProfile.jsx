@@ -34,8 +34,14 @@ function StudentProfile() {
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState({ type: null, message: "" });
+  
+  // Password Update State
+  const [passwordData, setPasswordData] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: ""
+  });
+  const [passwordStatus, setPasswordStatus] = useState({ loading: false, success: "", error: "" });
 
   const [editForm, setEditForm] = useState({
     firstName: "",
@@ -205,6 +211,42 @@ function StudentProfile() {
   const openEditModal = () => {
     setEditForm({ ...userData });
     setIsEditModalOpen(true);
+  };
+
+  const handlePasswordUpdate = async (e) => {
+    e.preventDefault();
+    setPasswordStatus({ loading: true, success: "", error: "" });
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordStatus({ loading: false, success: "", error: "New passwords do not match." });
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch("http://localhost:5000/api/user/update-profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          oldPassword: passwordData.oldPassword,
+          newPassword: passwordData.newPassword
+        })
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setPasswordStatus({ loading: false, success: "Password updated successfully!", error: "" });
+        setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "" });
+        setTimeout(() => setIsModalOpen(false), 2000);
+      } else {
+        setPasswordStatus({ loading: false, success: "", error: data.message || "Failed to update password." });
+      }
+    } catch (err) {
+      setPasswordStatus({ loading: false, success: "", error: "Connection error. Please try again." });
+    }
   };
 
   return (
@@ -474,60 +516,48 @@ function StudentProfile() {
               </div>
 
               <form onSubmit={handlePasswordUpdate} className="st-modal__form">
+                {passwordStatus.error && <p className="st-error-msg">{passwordStatus.error}</p>}
+                {passwordStatus.success && <p className="st-success-msg">{passwordStatus.success}</p>}
+                
                 <div className="st-modal__field">
                   <label className="st-modal__label">Current Password</label>
-                  <div className="st-password-wrapper">
-                    <input
-                      type={showOldPassword ? "text" : "password"}
-                      className="st-modal__input"
-                      placeholder="••••••••"
-                      value={passwordForm.oldPassword}
-                      onChange={(e) => setPasswordForm((prev) => ({ ...prev, oldPassword: e.target.value }))}
-                      required
-                    />
-                    <button type="button" className="st-eye-icon" onClick={() => setShowOldPassword(!showOldPassword)}>
-                      {showOldPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </button>
-                  </div>
+                  <input
+                    required
+                    type="password"
+                    className="st-modal__input"
+                    placeholder="••••••••"
+                    value={passwordData.oldPassword}
+                    onChange={(e) => setPasswordData({...passwordData, oldPassword: e.target.value})}
+                  />
                 </div>
 
                 <div className="st-modal__field">
                   <label className="st-modal__label">New Password</label>
-                  <div className="st-password-wrapper">
-                    <input
-                      type={showNewPassword ? "text" : "password"}
-                      className="st-modal__input"
-                      placeholder="••••••••"
-                      value={passwordForm.newPassword}
-                      onChange={(e) => setPasswordForm((prev) => ({ ...prev, newPassword: e.target.value }))}
-                      required
-                    />
-                    <button type="button" className="st-eye-icon" onClick={() => setShowNewPassword(!showNewPassword)}>
-                      {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </button>
-                  </div>
+                  <input
+                    required
+                    type="password"
+                    className="st-modal__input"
+                    placeholder="••••••••"
+                    value={passwordData.newPassword}
+                    onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                  />
                 </div>
 
                 <div className="st-modal__field">
                   <label className="st-modal__label">Confirm New Password</label>
-                  <div className="st-password-wrapper">
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      className="st-modal__input"
-                      placeholder="••••••••"
-                      value={passwordForm.confirmPassword}
-                      onChange={(e) => setPasswordForm((prev) => ({ ...prev, confirmPassword: e.target.value }))}
-                      required
-                    />
-                    <button type="button" className="st-eye-icon" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                      {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </button>
-                  </div>
+                  <input
+                    required
+                    type="password"
+                    className="st-modal__input"
+                    placeholder="••••••••"
+                    value={passwordData.confirmPassword}
+                    onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                  />
                 </div>
 
                 <div className="st-modal__submit-wrap">
-                  <button type="submit" className="st-modal__submit-btn" disabled={loading}>
-                    {loading ? <Loader2 className="animate-spin" size={24} /> : "Update Security"}
+                  <button type="submit" className="st-modal__submit-btn" disabled={passwordStatus.loading}>
+                    {passwordStatus.loading ? "Updating..." : "Update Security"}
                   </button>
                 </div>
               </form>
