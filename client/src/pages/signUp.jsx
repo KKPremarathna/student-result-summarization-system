@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import InnerNavbar from "../components/InnerNavbar";
 import { requestOtp, signupUser } from "../services/authaService";
 import { User, Mail, Phone, Calendar, Lock, Eye, EyeOff, UserPlus, ChevronRight, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
-import "../styles/signUp.css";
+import "../styles/signup.css";
 
 function Signup() {
   const navigate = useNavigate();
