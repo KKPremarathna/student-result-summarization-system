@@ -100,36 +100,46 @@ function Complaint() {
                 <div className="loading-spinner">Loading complaints...</div>
               ) : error ? (
                 <div className="error-message">{error}</div>
-              ) : complaints.length === 0 ? (
-                <div className="no-complaints">No complaints found.</div>
+              ) : complaints.filter(comp => comp.isAdminRecipient).length === 0 ? (
+                <div className="no-complaints">No lecturer reports found.</div>
               ) : (
-                complaints.map((item) => (
-                  <div
-                    className={`complaint-card ${item.status === "Resolved" ? "read" : ""}`}
-                    key={item._id}
-                  >
-                    <div className="complaint-text">
-                      <p>
-                        <strong>+ {item.title} :</strong>
-                      </p>
-                      <p>{item.description}</p>
-                      <p className="complaint-meta">
-                        From: {item.studentId?.firstName} {item.studentId?.lastName} ({item.studentId?.studentENo}) <br />
-                        To: {item.lecturerId?.firstName} {item.lecturerId?.lastName} <br />
-                        Subject: {item.subjectId?.courseCode} - {item.subjectId?.courseName}
-                      </p>
-                    </div>
+                complaints
+                  .filter(comp => comp.isAdminRecipient)
+                  .map((item) => (
+                    <div
+                      className={`complaint-card ${item.status === "Resolved" ? "read" : ""}`}
+                      key={item._id}
+                    >
+                      <div className="complaint-text">
+                        <p>
+                          <strong>+ {item.title} :</strong>
+                        </p>
+                        <p>{item.description}</p>
+                        <div className="complaint-meta">
+                          <p>
+                            <strong>From:</strong> {item.lecturerId?.firstName} {item.lecturerId?.lastName} (Lecturer)
+                          </p>
+                          {item.subjectId && (
+                            <p>
+                              <strong>Subject:</strong> {item.subjectId.courseCode} - {item.subjectId.courseName}
+                            </p>
+                          )}
+                          <p className="complaint-date">
+                            <strong>Date:</strong> {new Date(item.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
 
-                    <div className="complaint-read">
-                      <label>Mark As Resolved</label>
-                      <input
-                        type="checkbox"
-                        checked={item.status === "Resolved"}
-                        onChange={() => handleReadToggle(item._id, item.status)}
-                      />
+                      <div className="complaint-read">
+                        <label>Mark As Resolved</label>
+                        <input
+                          type="checkbox"
+                          checked={item.status === "Resolved"}
+                          onChange={() => handleReadToggle(item._id, item.status)}
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))
+                  ))
               )}
             </div>
           </div>

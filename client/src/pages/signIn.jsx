@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import InnerNavbar from "../components/InnerNavbar";
 import axios from "axios";
+import InnerNavbar from "../components/InnerNavbar";
+import { Mail, Lock, Eye, EyeOff, LogIn, ChevronRight, AlertCircle, CheckCircle2 } from "lucide-react";
 import "../styles/signIn.css";
-import "../styles/Toast.css";
 
 function Signin() {
   const navigate = useNavigate();
@@ -35,24 +35,16 @@ function Signin() {
 
       if (response.data.success) {
         const { token, user } = response.data;
-
-        // Store session info
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
 
         setMessage({ type: "success", text: "Login successful! Redirecting..." });
 
-        // Role-based redirection
         setTimeout(() => {
-          if (user.role === "admin") {
-            navigate("/adminhome");
-          } else if (user.role === "lecturer") {
-            navigate("/lecturer/home");
-          } else if (user.role === "student") {
-            navigate("/student/home");
-          } else {
-            navigate("/"); // Default fallback
-          }
+          if (user.role === "admin") navigate("/adminhome");
+          else if (user.role === "lecturer") navigate("/lecturer/home");
+          else if (user.role === "student") navigate("/student/home");
+          else navigate("/");
         }, 1500);
       }
     } catch (error) {
@@ -66,71 +58,75 @@ function Signin() {
   };
 
   return (
-    <div className="signin-page">
+    <div className="signin-page winter-theme">
       <InnerNavbar />
-
-      {message.text && (
-        <div className="toast-container">
-          <div className={`toast ${message.type}`}>
-            <div className="toast-content">
-              <span className="toast-icon">
-                {message.type === "success" ? "✅" : "❌"}
-              </span>
-              <span className="toast-message">{message.text}</span>
-            </div>
-            <button className="toast-close" onClick={() => setMessage({ type: "", text: "" })}>✕</button>
-          </div>
-        </div>
-      )}
 
       <main className="signin-container">
         <div className="signin-card">
-          <div className="signin-header">
+          <header className="signin-header">
+            <div className="signin-icon-container">
+              <LogIn size={32} />
+            </div>
             <h1 className="signin-title">Sign In</h1>
             <p className="signin-subtitle">Enter your credentials to continue</p>
-          </div>
+          </header>
+
+          {message.text && (
+            <div className={`signin-status-message ${message.type}`}>
+              {message.type === "success" ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+              <span>{message.text}</span>
+            </div>
+          )}
 
           <form className="signin-form" onSubmit={handleSubmit}>
-            <div className="form-group">
-              <input
-                type="email"
-                placeholder="Email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+            <div className="signin-input-group">
+              <label>Email Address</label>
+              <div className="signin-input-wrapper">
+                <Mail className="signin-input-icon" size={18} />
+                <input
+                  type="email"
+                  placeholder="name@university.ac.lk"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
             </div>
 
-            <div className="form-group">
-              <div className="password-wrapper">
+            <div className="signin-input-group">
+              <label>Password</label>
+              <div className="signin-input-wrapper">
+                <Lock className="signin-input-icon" size={18} />
                 <input
                   type={showPassword ? "text" : "password"}
-                  placeholder="Password"
+                  placeholder="••••••••"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <span
-                  className="eye-icon"
+                <button
+                  type="button"
+                  className="signin-eye-btn"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? "👁" : "👁"}
-                </span>
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
             </div>
 
-            <div className="form-footer">
-              <Link to="/forgot-password">
-                <span className="forgot-password">Forgot Password ?</span>
+            <div className="signin-footer">
+              <Link to="/forgot-password" title="Reset your password">
+                <span className="signin-forgot-link">Forgot Password?</span>
               </Link>
             </div>
 
             <button type="submit" className="signin-btn" disabled={loading}>
               {loading ? "Signing In..." : "Sign In"}
+              {!loading && <ChevronRight size={18} />}
             </button>
 
-            <p className="signup-text">
-              Don't have an Account ?{" "}
+            <p className="signup-prompt">
+              Don't have an Account?{" "}
               <Link to="/signup" className="signup-link">
                 Create One
               </Link>

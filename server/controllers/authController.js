@@ -29,7 +29,12 @@ exports.requestOTP = async(req, res) => {
         const otpIndex = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digit OTP
 
         // 4. Save OTP to DB (upsert to replace existing OTP for same email)
-        await OTP.findOneAndUpdate({ email }, { otp: otpIndex }, { upsert: true, new: true, setDefaultsOnInsert: true });
+        // Reset createdAt to ensure the 5-minute TTL starts fresh
+        await OTP.findOneAndUpdate(
+            { email }, 
+            { otp: otpIndex, createdAt: new Date() }, 
+            { upsert: true, new: true, setDefaultsOnInsert: true }
+        );
 
         // 5. Send OTP via Email
         const message = `Your OTP for registration is: ${otpIndex}. It expires in 5 minutes.`;
@@ -172,7 +177,9 @@ exports.forgotPassword = async(req, res) => {
         const otpIndex = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digit OTP
 
         // 3. Save OTP to DB
-        await OTP.findOneAndUpdate({ email }, { otp: otpIndex, isVerified: false }, // Reset isVerified on new request
+        await OTP.findOneAndUpdate(
+            { email }, 
+            { otp: otpIndex, isVerified: false, createdAt: new Date() }, // Explicitly reset createdAt
             { upsert: true, new: true, setDefaultsOnInsert: true }
         );
 

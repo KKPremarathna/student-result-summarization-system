@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import signupImage from "../assets/images/signup-image.png";
-import "../styles/signup.css";
-import "../styles/Toast.css";
-import InnerNavbar from "../components/InnerNavbar";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import InnerNavbar from "../components/InnerNavbar";
+import { requestOtp, signupUser } from "../services/authaService";
+import { User, Mail, Phone, Calendar, Lock, Eye, EyeOff, UserPlus, ChevronRight, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import "../styles/signup.css";
 
 function Signup() {
   const navigate = useNavigate();
@@ -18,31 +17,54 @@ function Signup() {
     confirmPassword: "",
   });
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     if (message.text) {
       const timer = setTimeout(() => {
         setMessage({ type: "", text: "" });
-      }, 4000);
+      }, 5000);
       return () => clearTimeout(timer);
     }
-  }, [message]);
+  }, [message.text]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleOtpChange = (index, value) => {
-    if (value.length > 1) return;
+    if (value.length > 1) {
+      const pastedData = value.split("").slice(0, 6);
+      const updatedOtp = [...otp];
+      pastedData.forEach((char, i) => {
+        if (index + i < 6) updatedOtp[index + i] = char;
+      });
+      setOtp(updatedOtp);
+      const nextIndex = Math.min(index + pastedData.length, 5);
+      const nextInput = document.getElementById(`otp-${nextIndex}`);
+      if (nextInput) nextInput.focus();
+      return;
+    }
+
     const updatedOtp = [...otp];
     updatedOtp[index] = value;
     setOtp(updatedOtp);
 
-    // Auto focus next input
     if (value && index < 5) {
-      document.getElementById(`otp-${index + 1}`).focus();
+      const nextInput = document.getElementById(`otp-${index + 1}`);
+      if (nextInput) nextInput.focus();
+    }
+  };
+
+  const handleKeyDown = (index, e) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      const prevInput = document.getElementById(`otp-${index - 1}`);
+      if (prevInput) prevInput.focus();
     }
   };
 
@@ -51,19 +73,24 @@ function Signup() {
       setMessage({ type: "error", text: "Please enter your email first." });
       return;
     }
-    setLoading(true);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setMessage({ type: "error", text: "Please enter a valid academic email." });
+      return;
+    }
+
+    setOtpLoading(true);
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/request-otp", {
-        email: formData.email,
-      });
-      setMessage({ type: "success", text: response.data.message });
+      const response = await requestOtp(formData.email);
+      setMessage({ type: "success", text: "Verification code sent to your email!" });
+      setOtpSent(true);
     } catch (error) {
       setMessage({
         type: "error",
         text: error.response?.data?.message || "Error sending OTP.",
       });
     } finally {
-      setLoading(false);
+      setOtpLoading(false);
     }
   };
 
@@ -76,13 +103,13 @@ function Signup() {
 
     const otpString = otp.join("");
     if (otpString.length !== 6) {
-      setMessage({ type: "error", text: "Please enter the 6-digit OTP." });
+      setMessage({ type: "error", text: "Please enter the 6-digit verification code." });
       return;
     }
 
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/signup", {
+      const response = await signupUser({
         ...formData,
         otp: otpString,
       });
@@ -101,138 +128,189 @@ function Signup() {
   };
 
   return (
-    <div className="signup-page">
+    <div className="signup-page winter-theme">
       <InnerNavbar />
-
-      {message.text && (
-        <div className="toast-container">
-          <div className={`toast ${message.type}`}>
-            <div className="toast-content">
-              <span className="toast-icon">
-                {message.type === "success" ? "✅" : "❌"}
-              </span>
-              <span className="toast-message">{message.text}</span>
-            </div>
-            <button className="toast-close" onClick={() => setMessage({ type: "", text: "" })}>✕</button>
-          </div>
-        </div>
-      )}
 
       <main className="signup-container">
         <div className="signup-card">
-          <div className="signup-header">
+          <header className="signup-header">
+            <div className="signup-icon-container">
+              <UserPlus size={32} />
+            </div>
             <h1 className="signup-title">Create Account</h1>
-            <p className="signup-subtitle">Join Academet for secure result analysis</p>
-          </div>
+            <p className="signup-subtitle">Join our academic community today</p>
+          </header>
+
+          {message.text && (
+            <div className={`signup-status-message ${message.type}`}>
+              {message.type === "success" ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+              <span>{message.text}</span>
+            </div>
+          )}
 
           <form className="signup-form" onSubmit={handleSubmit}>
-            <div className="form-grid">
-              <input
-                type="text"
-                name="firstName"
-                placeholder="First Name"
-                required
-                value={formData.firstName}
-                onChange={handleChange}
-              />
-              <input
-                type="text"
-                name="lastName"
-                placeholder="Last Name"
-                required
-                value={formData.lastName}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-group">
-              <input
-                type="email"
-                name="email"
-                placeholder="Academic Email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-grid">
-              <div className="form-group-date">
-                <label className="date-label">Birth Date</label>
-                <input
-                  type="date"
-                  name="dob"
-                  required
-                  value={formData.dob}
-                  onChange={handleChange}
-                />
-              </div>
-              <input
-                type="text"
-                name="phone"
-                placeholder="Phone Number"
-                required
-                value={formData.phone}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="form-grid">
-              <div className="password-wrapper">
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Password"
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="password-wrapper">
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  placeholder="Confirm Password"
-                  required
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-
-            <div className="otp-section">
-              <p className="otp-label">Identity Verification</p>
-              <div className="otp-row">
-                <div className="otp-boxes">
-                  {otp.map((digit, index) => (
-                    <input
-                      key={index}
-                      id={`otp-${index}`}
-                      type="text"
-                      maxLength="1"
-                      value={digit}
-                      onChange={(e) => handleOtpChange(index, e.target.value)}
-                      className="otp-input"
-                    />
-                  ))}
+            <div className="signup-form-grid">
+              <div className="signup-input-group">
+                <label>First Name</label>
+                <div className="signup-input-wrapper">
+                  <User className="signup-input-icon" size={18} />
+                  <input
+                    name="firstName"
+                    type="text"
+                    placeholder="John"
+                    required
+                    value={formData.firstName}
+                    onChange={handleChange}
+                  />
                 </div>
+              </div>
+
+              <div className="signup-input-group">
+                <label>Last Name</label>
+                <div className="signup-input-wrapper">
+                  <User className="signup-input-icon" size={18} />
+                  <input
+                    name="lastName"
+                    type="text"
+                    placeholder="Doe"
+                    required
+                    value={formData.lastName}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <div className="signup-input-group">
+                <label>Email Address</label>
+                <div className="signup-input-wrapper">
+                  <Mail className="signup-input-icon" size={18} />
+                  <input
+                    name="email"
+                    type="email"
+                    placeholder="john@university.ac.lk"
+                    required
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <div className="signup-input-group">
+                <label>Phone Number</label>
+                <div className="signup-input-wrapper">
+                  <Phone className="signup-input-icon" size={18} />
+                  <input
+                    name="phone"
+                    type="tel"
+                    placeholder="+94 7X XXX XXXX"
+                    required
+                    value={formData.phone}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <div className="signup-input-group full-width">
+                <label>Date of Birth</label>
+                <div className="signup-input-wrapper">
+                  <Calendar className="signup-input-icon" size={18} />
+                  <input 
+                    name="dob" 
+                    type="date" 
+                    required 
+                    value={formData.dob}
+                    onChange={handleChange} 
+                  />
+                </div>
+              </div>
+
+              <div className="signup-input-group">
+                <label>Password</label>
+                <div className="signup-input-wrapper">
+                  <Lock className="signup-input-icon" size={18} />
+                  <input
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    required
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+                  <button
+                    type="button"
+                    className="signup-eye-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="signup-input-group">
+                <label>Confirm Password</label>
+                <div className="signup-input-wrapper">
+                  <Lock className="signup-input-icon" size={18} />
+                  <input
+                    name="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    required
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                  />
+                  <button
+                    type="button"
+                    className="signup-eye-btn"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="signup-otp-section">
+              <div className="otp-header">
+                <h3>Verification Code</h3>
+                <p>{otpSent ? `Code sent to ${formData.email}` : "We'll send a 6-digit code to your email"}</p>
+              </div>
+              
+              <div className="otp-container">
+                {otpSent && (
+                  <div className="otp-boxes">
+                    {otp.map((digit, index) => (
+                      <input
+                        key={index}
+                        id={`otp-${index}`}
+                        type="text"
+                        maxLength="1"
+                        value={digit}
+                        className="otp-box"
+                        autoComplete="off"
+                        onChange={(e) => handleOtpChange(index, e.target.value)}
+                        onKeyDown={(e) => handleKeyDown(index, e)}
+                      />
+                    ))}
+                  </div>
+                )}
                 <button
                   type="button"
                   className="send-otp-btn"
                   onClick={handleSendOtp}
-                  disabled={loading}
+                  disabled={otpLoading}
                 >
-                  {loading ? "Sending..." : "Send OTP"}
+                  {otpLoading ? <Loader2 className="animate-spin" size={18} /> : (otpSent ? "Resend Code" : "Send Code")}
                 </button>
               </div>
             </div>
 
-            <button type="submit" className="signup-btn" disabled={loading}>
-              {loading ? "Processing..." : "Create Account"}
+            <button type="submit" className="signup-submit-btn" disabled={loading}>
+              {loading ? <Loader2 className="animate-spin" size={20} /> : "Create Account"}
+              {!loading && <ChevronRight size={18} />}
             </button>
 
-            <p className="signin-text">
-              Already have an Account ?{" "}
+            <p className="signin-prompt">
+              Already have an Account?{" "}
               <Link to="/signin" className="signin-link">
                 Sign In
               </Link>
