@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import StudentLayout from "../components/StudentLayout.jsx";
+import { getStudentDetails, updateStudentProfile } from "../services/studentApi.js";
 import "../styles/StudentProfile.css";
 import {
   Settings,
@@ -7,148 +8,198 @@ import {
   Mail,
   Shield,
   Camera,
+  Eye,
+  EyeOff,
   Key,
   X,
   ChevronRight,
   LayoutDashboard,
   GraduationCap,
   Fingerprint,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
   Award,
-  BookOpen
+  Phone,
+  Calendar
 } from "lucide-react";
 
 function StudentProfile() {
-  const [userData, setUserData] = useState({
-    name: "Karunarathna K.P.S",
-    email: "kps.karunarathna@std.uok.lk",
-    faculty: "Faculty of Engineering",
-    indexNumber: "2021/E/162",
-    degree: "B.Sc. (Hons) in Engineering"
-  });
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedData, setEditedData] = useState({ ...userData });
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // Password Update State
-  const [passwordData, setPasswordData] = useState({
-    oldPassword: "",
-    newPassword: "",
-    confirmPassword: ""
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({ oldPassword: "", newPassword: "" });
+  const [editForm, setEditForm] = useState({
+    firstName: "",
+    lastName: "",
+    faculty: "",
+    studentENo: "",
+    department: "",
+    phone: "",
+    dob: "",
+    profilePicture: ""
   });
-  const [passwordStatus, setPasswordStatus] = useState({ loading: false, success: "", error: "" });
+  const [status, setStatus] = useState({ loading: false, success: "", error: "" });
+  const [imageLoadError, setImageLoadError] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
-  const handleEditToggle = () => {
-    if (isEditing) {
-      setUserData(editedData);
-    } else {
-      setEditedData({ ...userData });
-    }
-    setIsEditing(!isEditing);
-  };
+  useEffect(() => {
+    fetchUserData();
+  }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setEditedData(prev => ({ ...prev, [name]: value }));
-  };
+  const DEFAULT_AVATAR = "https://api.dicebear.com/7.x/avataaars/svg?seed=Karun";
 
-  const handlePasswordUpdate = async (e) => {
-    e.preventDefault();
-    setPasswordStatus({ loading: true, success: "", error: "" });
-
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setPasswordStatus({ loading: false, success: "", error: "New passwords do not match." });
-      return;
-    }
-
-    const token = localStorage.getItem("token");
+  const fetchUserData = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/user/update-profile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          oldPassword: passwordData.oldPassword,
-          newPassword: passwordData.newPassword
-        })
+      const res = await getStudentDetails();
+      const data = res.data.data;
+      setUserData(data);
+      setEditForm({
+        firstName: data.firstName || "",
+        lastName: data.lastName || "",
+        faculty: data.faculty || "",
+        studentENo: data.studentENo || "",
+        department: data.department || "",
+        phone: data.phone || "",
+        dob: data.dob ? new Date(data.dob).toISOString().split('T')[0] : "",
+        profilePicture: data.profilePicture || ""
       });
-
-      const data = await response.json();
-      if (response.ok) {
-        setPasswordStatus({ loading: false, success: "Password updated successfully!", error: "" });
-        setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "" });
-        setTimeout(() => setIsModalOpen(false), 2000);
-      } else {
-        setPasswordStatus({ loading: false, success: "", error: data.message || "Failed to update password." });
-      }
     } catch (err) {
-      setPasswordStatus({ loading: false, success: "", error: "Connection error. Please try again." });
+      console.error("Error fetching user data:", err);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    setStatus({ loading: true, success: "", error: "" });
+    try {
+      await updateStudentProfile(passwordForm);
+      setStatus({ loading: false, success: "Password changed successfully!", error: "" });
+      setPasswordForm({ oldPassword: "", newPassword: "" });
+      setTimeout(() => setIsModalOpen(false), 2000);
+    } catch (err) {
+      const msg = err.response?.data?.message || "Failed to change password.";
+      setStatus({ loading: false, success: "", error: msg });
+    }
+  };
+
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    setStatus({ loading: true, success: "", error: "" });
+    try {
+      const res = await updateStudentProfile(editForm);
+      const updatedUser = res.data.data;
+      setUserData(updatedUser);
+      setEditForm({
+        firstName: updatedUser.firstName || "",
+        lastName: updatedUser.lastName || "",
+        faculty: updatedUser.faculty || "",
+        studentENo: updatedUser.studentENo || "",
+        department: updatedUser.department || "",
+        phone: updatedUser.phone || "",
+        dob: updatedUser.dob ? new Date(updatedUser.dob).toISOString().split('T')[0] : "",
+        profilePicture: updatedUser.profilePicture || ""
+      });
+      setStatus({ loading: false, success: "Profile updated successfully!", error: "" });
+      setTimeout(() => setIsEditModalOpen(false), 2000);
+    } catch (err) {
+      const msg = err.response?.data?.message || "Failed to update profile.";
+      setStatus({ loading: false, success: "", error: msg });
+    }
+  };
+
+  const handleImageError = (e) => {
+    if (e.target.src !== DEFAULT_AVATAR) {
+      setImageLoadError(true);
+      e.target.src = DEFAULT_AVATAR;
+    }
+  };
+
+  if (loading) {
+    return (
+      <StudentLayout>
+        <div className="st-loading">
+          <Loader2 className="st-loader-icon" />
+          <p>Loading profile details...</p>
+        </div>
+      </StudentLayout>
+    );
+  }
+
+  const openEditModal = () => {
+    setEditForm({
+      firstName: userData?.firstName || "",
+      lastName: userData?.lastName || "",
+      faculty: userData?.faculty || "",
+      studentENo: userData?.studentENo || "",
+      department: userData?.department || "",
+      phone: userData?.phone || "",
+      dob: userData?.dob ? new Date(userData.dob).toISOString().split('T')[0] : "",
+      profilePicture: userData?.profilePicture || ""
+    });
+    setStatus({ loading: false, success: "", error: "" });
+    setImageLoadError(false);
+    setIsEditModalOpen(true);
   };
 
   return (
     <StudentLayout>
       <div className="st-page">
-
         {/* Page Header */}
         <div className="st-header">
           <div className="st-breadcrumb">
             <LayoutDashboard size={14} />
             <span>Student Portal</span>
             <ChevronRight size={14} />
-            <span className="st-breadcrumb__current">Profile Settings</span>
+            <span className="st-breadcrumb__current">Account Settings</span>
           </div>
           <h2 className="st-title">
             <Settings size={32} className="st-title__icon" />
-            Account & Profile
+            Profile & Security
           </h2>
         </div>
 
         <div className="st-layout">
-
           {/* Profile Card */}
           <div className="st-sidebar">
             <div className="st-profile-card">
               <div className="st-avatar-wrap">
                 <div className="st-avatar">
                   <img
-                    src="https://api.dicebear.com/7.x/avataaars/svg?seed=Karun"
+                    src={userData?.profilePicture || DEFAULT_AVATAR}
                     alt="Profile"
                     className="st-avatar__img"
+                    onError={handleImageError}
                   />
                 </div>
-                <button className="st-avatar__edit-btn">
+                <button className="st-avatar__edit-btn" onClick={openEditModal}>
                   <Camera size={20} />
                 </button>
               </div>
 
-              <h3 className="st-profile__name">{userData.name}</h3>
+              <h3 className="st-profile__name">
+                {userData?.firstName} {userData?.lastName}
+              </h3>
               <p className="st-profile__role">Engineering Student</p>
 
               <div className="st-divider" />
 
-              <button
-                onClick={handleEditToggle}
-                className={`st-profile-btn ${isEditing ? 'st-profile-btn--success' : 'st-profile-btn--primary'}`}
+              <button 
+                onClick={openEditModal}
+                className="st-profile-btn st-profile-btn--primary"
               >
-                {isEditing ? <Fingerprint size={18} /> : <User size={18} />}
-                {isEditing ? 'Save Changes' : 'Edit Profile'}
+                <User size={18} />
+                Edit Profile
               </button>
-
-              {isEditing && (
-                <button
-                  onClick={() => setIsEditing(false)}
-                  className="st-profile-btn st-profile-btn--cancel"
-                >
-                  <X size={18} />
-                  Cancel
-                </button>
-              )}
-
               <button
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => {
+                  setStatus({ loading: false, success: "", error: "" });
+                  setIsModalOpen(true);
+                }}
                 className="st-profile-btn st-profile-btn--outline"
               >
                 <Key size={18} />
@@ -159,7 +210,6 @@ function StudentProfile() {
 
           {/* Details Section */}
           <div className="st-details">
-
             {/* Personal Information Card */}
             <div className="st-card">
               <div className="st-card__header">
@@ -176,17 +226,14 @@ function StudentProfile() {
                       <User size={12} />
                       Full Name
                     </p>
-                    {isEditing ? (
-                      <input
-                        name="name"
-                        value={editedData.name}
-                        onChange={handleChange}
-                        className="st-info-input"
-                      />
-                    ) : (
-                      <p className="st-info-row__value">{userData.name}</p>
-                    )}
+                    <p className="st-info-row__value">{userData?.firstName} {userData?.lastName}</p>
                   </div>
+                  <ChevronRight 
+                    size={20} 
+                    className="st-info-row__arrow" 
+                    onClick={openEditModal}
+                    style={{ cursor: "pointer" }}
+                  />
                 </div>
 
                 <div className="st-thin-divider" />
@@ -197,38 +244,9 @@ function StudentProfile() {
                       <Mail size={12} />
                       University Email
                     </p>
-                    {isEditing ? (
-                      <input
-                        name="email"
-                        value={editedData.email}
-                        onChange={handleChange}
-                        className="st-info-input"
-                      />
-                    ) : (
-                      <p className="st-info-row__value">{userData.email}</p>
-                    )}
+                    <p className="st-info-row__value">{userData?.email}</p>
                   </div>
-                </div>
-
-                <div className="st-thin-divider" />
-
-                <div className="st-info-row">
-                  <div>
-                    <p className="st-info-row__label">
-                      <GraduationCap size={12} />
-                      Faculty
-                    </p>
-                    {isEditing ? (
-                      <input
-                        name="faculty"
-                        value={editedData.faculty}
-                        onChange={handleChange}
-                        className="st-info-input"
-                      />
-                    ) : (
-                      <p className="st-info-row__value">{userData.faculty}</p>
-                    )}
-                  </div>
+                  <ChevronRight size={20} className="st-info-row__arrow" />
                 </div>
 
                 <div className="st-thin-divider" />
@@ -239,19 +257,13 @@ function StudentProfile() {
                       <Award size={12} />
                       Index Number
                     </p>
-                    {isEditing ? (
-                      <input
-                        name="indexNumber"
-                        value={editedData.indexNumber}
-                        onChange={handleChange}
-                        className="st-info-input st-info-input--mono"
-                      />
-                    ) : (
-                      <code className="st-info-row__code">
-                        {userData.indexNumber}
-                      </code>
-                    )}
+                    <code className="st-info-row__code">{userData?.studentENo || "Not Set"}</code>
                   </div>
+                  <ChevronRight 
+                    size={20} 
+                    className="st-info-row__arrow" 
+                    onClick={openEditModal}
+                  />
                 </div>
 
                 <div className="st-thin-divider" />
@@ -259,55 +271,172 @@ function StudentProfile() {
                 <div className="st-info-row">
                   <div>
                     <p className="st-info-row__label">
-                      <BookOpen size={12} />
-                      Degree Program
+                      <GraduationCap size={12} />
+                      Faculty & Department
                     </p>
-                    {isEditing ? (
-                      <input
-                        name="degree"
-                        value={editedData.degree}
-                        onChange={handleChange}
-                        className="st-info-input"
-                      />
-                    ) : (
-                      <p className="st-info-row__value">{userData.degree}</p>
-                    )}
+                    <p className="st-info-row__value">
+                      {userData?.faculty || "Not Set"} - {userData?.department || "No Dept"}
+                    </p>
                   </div>
+                  <ChevronRight 
+                    size={20} 
+                    className="st-info-row__arrow" 
+                    onClick={openEditModal}
+                  />
                 </div>
-              </div>
-            </div>
 
-            {/* Privacy Section */}
-            <div className="st-privacy-card">
-              <div className="st-privacy-card__blob" />
-              <div className="st-privacy-card__body">
-                <div className="st-privacy-card__heading">
-                  <Shield size={28} />
-                  <h4 className="st-privacy-card__title">Privacy & Security</h4>
+                <div className="st-thin-divider" />
+
+                <div className="st-info-row">
+                  <div>
+                    <p className="st-info-row__label">
+                      <Phone size={12} />
+                      Contact Number
+                    </p>
+                    <p className="st-info-row__value">{userData?.phone || "Not Set"}</p>
+                  </div>
+                  <ChevronRight size={20} className="st-info-row__arrow" onClick={openEditModal} />
                 </div>
-                <p className="st-privacy-card__text">
-                  Customize your credential protection and secondary verification methods. Keep your academic records secure.
-                </p>
-                <button
-                  onClick={() => setIsModalOpen(true)}
-                  className="st-privacy-btn"
-                >
-                  Manage Security
-                </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Modal Overlay */}
+        {/* Edit Profile Modal */}
+        {isEditModalOpen && (
+          <div className="st-modal-overlay">
+            <div className="st-modal-backdrop" onClick={() => !status.loading && setIsEditModalOpen(false)} />
+            <div className="st-modal">
+              <button className="st-modal__close" onClick={() => setIsEditModalOpen(false)}>
+                <X size={20} />
+              </button>
+              <div className="st-modal__header">
+                <div className="st-modal__icon-wrap">
+                  <User size={32} />
+                </div>
+                <h3 className="st-modal__title">Update Profile</h3>
+                <p className="st-modal__subtitle">Update your personal information</p>
+              </div>
+
+              {status.success ? (
+                <div className="st-status-msg st-status-msg--success">
+                  <CheckCircle2 size={48} />
+                  <p>{status.success}</p>
+                </div>
+              ) : (
+                <form onSubmit={handleProfileUpdate} className="st-modal__form">
+                  {status.error && (
+                    <div className="st-status-msg st-status-msg--error">
+                      <AlertCircle size={20} />
+                      <p>{status.error}</p>
+                    </div>
+                  )}
+                  <div className="st-modal-grid">
+                    <div className="st-modal__field">
+                      <label className="st-modal__label">First Name</label>
+                      <input 
+                        className="st-modal__input"
+                        value={editForm.firstName}
+                        onChange={(e) => setEditForm({...editForm, firstName: e.target.value})}
+                      />
+                    </div>
+                    <div className="st-modal__field">
+                      <label className="st-modal__label">Last Name</label>
+                      <input 
+                        className="st-modal__input"
+                        value={editForm.lastName}
+                        onChange={(e) => setEditForm({...editForm, lastName: e.target.value})}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="st-modal-grid">
+                    <div className="st-modal__field">
+                      <label className="st-modal__label">Index No</label>
+                      <input 
+                        className="st-modal__input"
+                        value={editForm.studentENo}
+                        onChange={(e) => setEditForm({...editForm, studentENo: e.target.value})}
+                        placeholder="e.g. 2021/E/162"
+                      />
+                    </div>
+                    <div className="st-modal__field">
+                      <label className="st-modal__label">Phone</label>
+                      <input 
+                        className="st-modal__input"
+                        value={editForm.phone}
+                        onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="st-modal-grid">
+                    <div className="st-modal__field">
+                      <label className="st-modal__label">Faculty</label>
+                      <input 
+                        className="st-modal__input"
+                        value={editForm.faculty}
+                        onChange={(e) => setEditForm({...editForm, faculty: e.target.value})}
+                      />
+                    </div>
+                    <div className="st-modal__field">
+                      <label className="st-modal__label">Department</label>
+                      <input 
+                        className="st-modal__input"
+                        value={editForm.department}
+                        onChange={(e) => setEditForm({...editForm, department: e.target.value})}
+                        placeholder="e.g. Computing"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="st-modal__field">
+                    <label className="st-modal__label">Profile Picture URL</label>
+                    <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+                      <input 
+                        placeholder="https://example.com/image.png"
+                        className="st-modal__input"
+                        value={editForm.profilePicture}
+                        onChange={(e) => {
+                          setEditForm({...editForm, profilePicture: e.target.value});
+                          setImageLoadError(false);
+                        }}
+                        style={{ flex: 1 }}
+                      />
+                      {editForm.profilePicture && (
+                        <div className="st-avatar" style={{ width: "40px", height: "40px", flexShrink: 0 }}>
+                          <img 
+                            src={editForm.profilePicture} 
+                            alt="Preview" 
+                            className="st-avatar__img"
+                            onError={handleImageError}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="st-modal__submit-wrap">
+                    <button type="submit" className="st-modal__submit-btn" disabled={status.loading}>
+                      {status.loading ? "Saving..." : "Save Changes"}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Modal Overlay for Password */}
         {isModalOpen && (
           <div className="st-modal-overlay">
-            <div className="st-modal-backdrop" onClick={() => setIsModalOpen(false)} />
+            <div className="st-modal-backdrop" onClick={() => !status.loading && setIsModalOpen(false)} />
 
             <div className="st-modal">
               <button
                 className="st-modal__close"
                 onClick={() => setIsModalOpen(false)}
+                disabled={status.loading}
               >
                 <X size={20} />
               </button>
@@ -316,56 +445,76 @@ function StudentProfile() {
                 <div className="st-modal__icon-wrap">
                   <Key size={32} />
                 </div>
-                <h3 className="st-modal__title">Update Password</h3>
-                <p className="st-modal__subtitle">Ensure your account is protected with a strong password</p>
+                <h3 className="st-modal__title">Security Update</h3>
+                <p className="st-modal__subtitle">Create a strong password to protect results</p>
               </div>
 
-              <form onSubmit={handlePasswordUpdate} className="st-modal__form">
-                {passwordStatus.error && <p className="st-error-msg">{passwordStatus.error}</p>}
-                {passwordStatus.success && <p className="st-success-msg">{passwordStatus.success}</p>}
-
-                <div className="st-modal__field">
-                  <label className="st-modal__label">Current Password</label>
-                  <input
-                    required
-                    type="password"
-                    className="st-modal__input"
-                    placeholder="••••••••"
-                    value={passwordData.oldPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
-                  />
+              {status.success ? (
+                <div className="st-status-msg st-status-msg--success">
+                  <CheckCircle2 size={48} />
+                  <p>{status.success}</p>
                 </div>
+              ) : (
+                <form onSubmit={handlePasswordChange} className="st-modal__form">
+                  {status.error && (
+                    <div className="st-status-msg st-status-msg--error">
+                      <AlertCircle size={20} />
+                      <p>{status.error}</p>
+                    </div>
+                  )}
+                  <div className="st-modal__field">
+                    <label className="st-modal__label">Current Password</label>
+                    <div className="st-password-wrapper">
+                      <input
+                        required
+                        type={showOldPassword ? "text" : "password"}
+                        className="st-modal__input"
+                        placeholder="••••••••"
+                        value={passwordForm.oldPassword}
+                        onChange={(e) => setPasswordForm({ ...passwordForm, oldPassword: e.target.value })}
+                      />
+                      <button 
+                        type="button"
+                        className="st-eye-icon"
+                        onClick={() => setShowOldPassword(!showOldPassword)}
+                      >
+                        {showOldPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
+                  </div>
 
-                <div className="st-modal__field">
-                  <label className="st-modal__label">New Password</label>
-                  <input
-                    required
-                    type="password"
-                    className="st-modal__input"
-                    placeholder="••••••••"
-                    value={passwordData.newPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                  />
-                </div>
+                  <div className="st-modal__field">
+                    <label className="st-modal__label">New Secure Password</label>
+                    <div className="st-password-wrapper">
+                      <input
+                        required
+                        type={showNewPassword ? "text" : "password"}
+                        className="st-modal__input"
+                        placeholder="••••••••"
+                        value={passwordForm.newPassword}
+                        onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                      />
+                      <button 
+                        type="button"
+                        className="st-eye-icon"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                      >
+                        {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
+                  </div>
 
-                <div className="st-modal__field">
-                  <label className="st-modal__label">Confirm New Password</label>
-                  <input
-                    required
-                    type="password"
-                    className="st-modal__input"
-                    placeholder="••••••••"
-                    value={passwordData.confirmPassword}
-                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                  />
-                </div>
-
-                <div className="st-modal__submit-wrap">
-                  <button type="submit" className="st-modal__submit-btn" disabled={passwordStatus.loading}>
-                    {passwordStatus.loading ? "Updating..." : "Update Security"}
-                  </button>
-                </div>
-              </form>
+                  <div className="st-modal__submit-wrap">
+                    <button 
+                      type="submit" 
+                      className="st-modal__submit-btn"
+                      disabled={status.loading}
+                    >
+                      {status.loading ? "Updating..." : "Update Security"}
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           </div>
         )}
@@ -374,4 +523,4 @@ function StudentProfile() {
   );
 }
 
-export default StudentProfile;
+export default StudentProfile;
