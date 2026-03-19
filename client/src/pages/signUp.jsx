@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import InnerNavbar from "../components/InnerNavbar";
 import { requestOtp, signupUser } from "../services/authaService";
 import { User, Mail, Phone, Calendar, Lock, Eye, EyeOff, UserPlus, ChevronRight, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
-import "../styles/signUp.css";
+import "../styles/signup.css";
 
 function Signup() {
   const navigate = useNavigate();
@@ -214,12 +214,12 @@ function Signup() {
                 <label>Date of Birth</label>
                 <div className="signup-input-wrapper">
                   <Calendar className="signup-input-icon" size={18} />
-                  <input 
-                    name="dob" 
-                    type="date" 
-                    required 
+                  <input
+                    name="dob"
+                    type="date"
+                    required
                     value={formData.dob}
-                    onChange={handleChange} 
+                    onChange={handleChange}
                   />
                 </div>
               </div>
@@ -274,7 +274,7 @@ function Signup() {
                 <h3>Verification Code</h3>
                 <p>{otpSent ? `Code sent to ${formData.email}` : "We'll send a 6-digit code to your email"}</p>
               </div>
-              
+
               <div className="otp-container">
                 {otpSent && (
                   <div className="otp-boxes">
