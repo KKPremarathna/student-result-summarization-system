@@ -1,0 +1,361 @@
+/* StudentComplaints.css - Winter Chill Theme */
+
+.sc-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding-bottom: 4rem;
+}
+
+/* ── Header ────────────────────────────────── */
+.sc-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sc-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #4F7C82;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.sc-breadcrumb__current {
+  color: #0B2E33;
+}
+
+.sc-header__main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.sc-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 2.25rem;
+  font-weight: 900;
+  color: #0B2E33;
+  letter-spacing: -0.02em;
+}
+
+.sc-title__icon {
+  color: #219EBC;
+}
+
+.sc-subtitle {
+  color: #4F7C82;
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
+.sc-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.5rem;
+  background: #0B2E33;
+  color: white;
+  border: none;
+  border-radius: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 20px rgba(11, 46, 51, 0.2);
+}
+
+.sc-add-btn:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.2);
+}
+
+.sc-add-btn.active {
+  background: #D62828;
+}
+
+/* ── Banner ────────────────────────────────── */
+.sc-banner {
+  background: linear-gradient(135deg, #0B2E33 0%, #4F7C82 100%);
+  border-radius: 1.5rem;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  box-shadow: 0 20px 40px rgba(11, 46, 51, 0.15);
+}
+
+.sc-banner__item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sc-banner__icon {
+  color: #B8E3E9;
+  opacity: 0.8;
+}
+
+.sc-banner__label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #B8E3E9;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.sc-banner__value {
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.sc-banner__divider {
+  width: 1px;
+  height: 2.5rem;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Content ────────────────────────────────── */
+.sc-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* ── Form Card ───────────────────────────────── */
+.sc-form-card {
+  background: white;
+  border-radius: 2rem;
+  padding: 2.5rem;
+  box-shadow: 0 15px 45px rgba(0,0,0,0.05);
+  border: 1px solid rgba(184, 227, 233, 0.3);
+}
+
+.sc-card-header {
+  margin-bottom: 2rem;
+}
+
+.sc-card-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0B2E33;
+}
+
+.sc-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.sc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.sc-field:nth-child(3) {
+  grid-column: span 2;
+}
+
+.sc-label {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #4F7C82;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sc-select, .sc-input, .sc-textarea {
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  border: 2px solid rgba(184, 227, 233, 0.3);
+  background: #F8FAFC;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0B2E33;
+  transition: all 0.3s ease;
+}
+
+.sc-select:focus, .sc-input:focus, .sc-textarea:focus {
+  outline: none;
+  border-color: #219EBC;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(33, 158, 188, 0.1);
+}
+
+.sc-submit-btn {
+  grid-column: span 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #219EBC;
+  color: white;
+  border: none;
+  border-radius: 1rem;
+  font-weight: 800;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.sc-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(33, 158, 188, 0.2);
+}
+
+/* ── History ─────────────────────────────────── */
+.sc-history {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sc-section-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0B2E33;
+  margin-bottom: 0.5rem;
+}
+
+.sc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.sc-complaint-card {
+  background: white;
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid rgba(184, 227, 233, 0.3);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.sc-complaint-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+  border-color: #219EBC;
+}
+
+.sc-complaint-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sc-status-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.sc-status--pending { background: rgba(251, 133, 0, 0.1); color: #FB8500; }
+.sc-status--inprogress { background: rgba(33, 158, 188, 0.1); color: #219EBC; }
+.sc-status--resolved { background: rgba(45, 106, 79, 0.1); color: #2D6A4F; }
+
+.sc-date {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #4F7C82;
+}
+
+.sc-subject-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  background: #F1F5F9;
+  border-radius: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #4F7C82;
+  margin-bottom: 0.5rem;
+}
+
+.sc-complaint-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0B2E33;
+  margin-bottom: 0.5rem;
+}
+
+.sc-complaint-desc {
+  font-size: 0.95rem;
+  color: #4F7C82;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sc-complaint-card__footer {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid #F1F5F9;
+}
+
+.sc-recipient {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #4F7C82;
+}
+
+/* ── Empty State ─────────────────────────────── */
+.sc-empty {
+  background: white;
+  border-radius: 1.5rem;
+  padding: 4rem;
+  text-align: center;
+  color: #4F7C82;
+  border: 2px dashed rgba(184, 227, 233, 0.5);
+}
+
+.sc-empty-icon {
+  opacity: 0.2;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Status Bar ─────────────────────────────── */
+.sc-status-bar {
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-weight: 700;
+}
+
+.sc-status-bar.success { background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
+.sc-status-bar.error { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+
+/* ── Animations ─────────────────────────────── */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-down {
+  animation: slideDown 0.4s ease forwards;
+}

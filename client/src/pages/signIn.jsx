@@ -120,7 +120,7 @@ function Signin() {
             </div>
 
             <div className="form-footer">
-              <Link to="#">
+              <Link to="/forgot-password">
                 <span className="forgot-password">Forgot Password ?</span>
               </Link>
             </div>
