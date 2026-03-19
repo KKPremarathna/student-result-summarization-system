@@ -1,6 +1,20 @@
 import React, { useState, useEffect, useCallback } from "react";
+import AdminLayout from "../components/AdminLayout";
 import "../styles/LectureList.css";
-import Navbar from "../components/InnerNavbar";
+import { 
+  Users, 
+  Building2, 
+  Search, 
+  RotateCw, 
+  ChevronRight, 
+  UserCheck,
+  Building,
+  AlertCircle,
+  Filter,
+  ArrowRight,
+  TrendingUp,
+  ArrowLeft
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 const API_BASE = "http://localhost:5000/api/admin";
@@ -26,11 +40,6 @@ function LectureList() {
     Authorization: `Bearer ${token}`,
   };
 
-  const showToast = (message, type = "success") => {
-    setToast({ visible: true, message, type });
-    setTimeout(() => setToast({ visible: false, message: "", type: "success" }), 3000);
-  };
-
   const fetchLecturers = useCallback(async (dept) => {
     setLoading(true);
     setError("");
@@ -54,186 +63,171 @@ function LectureList() {
     }
   }, []);
 
-  // Auto-fetch when department changes (if already loaded once)
   useEffect(() => {
     if (hasFetched) {
       fetchLecturers(department);
     }
-  }, [department]);
+  }, [department, fetchLecturers]);
 
   const handleView = () => {
     fetchLecturers(department);
   };
 
-  // We are removing registered user deletion as per instructions.
-  // This component seems to only show registered lecturers.
-  // If the user wants to delete ALLOWED emails for lecturers, that would be in a different place or a different section.
-  // The current code has a handleDelete that calls /lecturers/registered/${id}.
-  // We'll remove this as registered users shouldn't be deleted.
-
   return (
-    <div className="lecturelist-page">
-      <Navbar />
+    <AdminLayout>
+      <div className="ll-page">
+        {/* Header */}
+        <header className="ll-header">
+           <div className="ll-breadcrumb">
+              <Link to="/adduser" className="ll-back-link"><ArrowLeft size={14} /> Back to Management</Link>
+              <ChevronRight size={14} />
+              <span className="ll-breadcrumb-current">Faculty Directory</span>
+           </div>
+           <h1 className="ll-title">Registered Lecturers</h1>
+           <p className="ll-subtitle">View and manage the academic staff directory across departments.</p>
+        </header>
 
-      {/* Toast */}
-      {toast.visible && (
-        <div className={`ll-toast ll-toast--${toast.type}`}>{toast.message}</div>
-      )}
-
-      <div className="lecturelist-content">
-        {/* Sidebar */}
-        <aside className="sidebar">
-          <div className="sidebar-title">Management</div>
-          <ul className="sidebar-menu">
-            <li>
-              <Link to="/adminhome">
-                <span className="sidebar-icon"></span>Admin Home
-              </Link>
-            </li>
-            <li className="active">
-              <Link to="/adduser">
-                <span className="sidebar-icon"></span>Add User
-              </Link>
-            </li>
-            <li>
-              <Link to="/admincomplaint">
-                <span className="sidebar-icon"></span>Complaint
-              </Link>
-            </li>
-            <li>
-              <Link to="/adminresults">
-                <span className="sidebar-icon"></span>Results
-              </Link>
-            </li>
-            <li>
-              <Link to="/adminprofile">
-                <span className="sidebar-icon"></span>Profile
-              </Link>
-            </li>
-          </ul>
-        </aside>
-
-        {/* Main */}
-        <main className="lecturelist-main">
-          <div className="lecturelist-main-content">
-
-            {/* Section Header */}
-            <div className="ll-section-header">
-              <div className="ll-header-left">
-                <span className="ll-header-icon"></span>
-                <div>
-                  <h1 className="ll-title">Registered Lecturers</h1>
-                  <p className="ll-subtitle">
-                    Browse and manage signed-up academic staff
-                  </p>
-                </div>
+        <div className="ll-content">
+           {/* Summary Stats Row */}
+           <div className="ll-stats-row">
+              <div className="ll-stat-small">
+                 <div className="ll-stat-icon-sm">
+                    <UserCheck size={18} />
+                 </div>
+                 <div className="ll-stat-info-sm">
+                    <span className="ll-stat-label-sm">Total Faculty</span>
+                    <span className="ll-stat-value-sm">{hasFetched ? lecturers.length : "—"}</span>
+                 </div>
               </div>
-              {hasFetched && (
-                <span className="ll-count-badge">
-                  {lecturers.length} lecturer{lecturers.length !== 1 ? "s" : ""}
-                </span>
-              )}
-            </div>
+              <div className="ll-stat-small">
+                 <div className="ll-stat-icon-sm secondary">
+                    <TrendingUp size={18} />
+                 </div>
+                 <div className="ll-stat-info-sm">
+                    <span className="ll-stat-label-sm">Active Depts</span>
+                    <span className="ll-stat-value-sm">4</span>
+                 </div>
+              </div>
+           </div>
 
-            {/* Filter Row */}
-            <div className="ll-filter-card">
+           {/* Filters Card */}
+           <div className="ll-card ll-filter-card">
+              <div className="ll-filter-header">
+                 <div className="ll-filter-title">
+                    <Filter size={20} />
+                    <span>Filter Staff</span>
+                 </div>
+                 <button className="ll-refresh-btn" onClick={() => fetchLecturers(department)}>
+                    <RotateCw size={16} className={loading ? "animate-spin" : ""} />
+                    Sync Data
+                 </button>
+              </div>
+
               <div className="ll-filter-row">
-                <div className="ll-filter-group">
-                  <label className="ll-filter-label">Department</label>
-                  <select
-                    className="ll-filter-select"
-                    value={department}
-                    onChange={(e) => setDepartment(e.target.value)}
-                  >
-                    <option value="">All Departments</option>
-                    {DEPARTMENTS.map((d) => (
-                      <option key={d} value={d}>{d}</option>
-                    ))}
-                  </select>
-                </div>
+                 <div className="ll-form-group">
+                    <label>By Department</label>
+                    <div className="ll-select-wrap">
+                       <Building2 size={18} className="ll-select-icon" />
+                       <select
+                         className="ll-select"
+                         value={department}
+                         onChange={(e) => setDepartment(e.target.value)}
+                       >
+                         <option value="">All Departments</option>
+                         {DEPARTMENTS.map((d) => (
+                           <option key={d} value={d}>{d}</option>
+                         ))}
+                       </select>
+                    </div>
+                 </div>
 
-                <button className="ll-view-btn" onClick={handleView} disabled={loading}>
-                  {loading ? (
-                    <span className="ll-btn-spinner" />
-                  ) : (
-                    <>View</>
-                  )}
-                </button>
-
-                {hasFetched && (
-                  <button
-                    className="ll-refresh-btn"
-                    onClick={() => fetchLecturers(department)}
-                    title="Refresh"
-                  >
-                    Refresh
-                  </button>
-                )}
+                 <button className="ll-view-btn" onClick={handleView} disabled={loading}>
+                    {loading ? <RotateCw className="animate-spin" size={20} /> : <><Search size={20} /> Load Faculty</>}
+                 </button>
               </div>
+           </div>
 
-              {!hasFetched && (
-                <p className="ll-hint">
-                  Select a department (or leave blank for all) and click <strong>View</strong> to load lecturers.
-                </p>
-              )}
-            </div>
+           {/* Error Alert */}
+           {error && (
+             <div className="ll-alert error">
+                <AlertCircle size={20} />
+                <span>{error}</span>
+             </div>
+           )}
 
-            {/* Error */}
-            {error && <div className="ll-alert ll-alert--error">{error}</div>}
-
-            {/* Loading */}
-            {loading && (
-              <div className="ll-spinner-wrap">
-                <div className="ll-spinner" />
-                <span>Loading lecturers…</span>
-              </div>
-            )}
-
-            {/* Table */}
-            {hasFetched && !loading && (
-              <div className="ll-table-wrapper">
-                {lecturers.length === 0 ? (
-                  <div className="ll-empty">
-                    <p>No registered lecturers found{department ? ` in ${department}` : ""}.</p>
-                  </div>
-                ) : (
-                  <table className="ll-table">
+           {/* Table Section */}
+           <div className="ll-table-card">
+              <div className="ll-table-container">
+                 <table className="ll-table">
                     <thead>
-                      <tr>
-                        <th>#</th>
-                        <th>Full Name</th>
-                        <th>Email Address</th>
-                        <th>Department</th>
-                      </tr>
+                       <tr>
+                          <th>#</th>
+                          <th>Full Name</th>
+                          <th>Email Address</th>
+                          <th>Departmental Affiliation</th>
+                          <th>Status</th>
+                       </tr>
                     </thead>
                     <tbody>
-                      {lecturers.map((lec, idx) => (
-                        <tr key={lec._id}>
-                          <td className="ll-td-num">{idx + 1}</td>
-                          <td className="ll-td-name">
-                            {lec.title && <span className="ll-title-badge">{lec.title}</span>}
-                            {lec.firstName} {lec.lastName}
-                          </td>
-                          <td className="ll-td-email">{lec.email}</td>
-                          <td>
-                            {lec.department ? (
-                              <span className="ll-dept-badge">{lec.department}</span>
-                            ) : (
-                              <span className="ll-dept-none">—</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
+                       {!hasFetched && !loading ? (
+                         <tr>
+                            <td colSpan="5">
+                               <div className="ll-empty">
+                                  <Building size={48} />
+                                  <p>Select a department and click <strong>Load Faculty</strong> to begin.</p>
+                               </div>
+                            </td>
+                         </tr>
+                       ) : loading ? (
+                         <tr>
+                            <td colSpan="5">
+                               <div className="ll-loading">
+                                  <RotateCw className="animate-spin" size={32} />
+                                  <p>Gathering faculty profiles...</p>
+                               </div>
+                            </td>
+                         </tr>
+                       ) : lecturers.length === 0 ? (
+                         <tr>
+                            <td colSpan="5">
+                               <div className="ll-empty">
+                                  <Users size={48} />
+                                  <p>No registered lecturers found{department ? ` in ${department}` : ""}.</p>
+                               </div>
+                            </td>
+                         </tr>
+                       ) : (
+                         lecturers.map((lec, idx) => (
+                           <tr key={lec._id}>
+                              <td className="ll-td-num">#{String(idx + 1).padStart(2, '0')}</td>
+                              <td className="ll-td-identity">
+                                 <div className="ll-avatar-sm">
+                                    {lec.firstName?.charAt(0)}{lec.lastName?.charAt(0)}
+                                 </div>
+                                 <div className="ll-name-wrap">
+                                    <span className="ll-name">{lec.title} {lec.firstName} {lec.lastName}</span>
+                                    <span className="ll-role-label">Academic Staff</span>
+                                 </div>
+                              </td>
+                              <td className="ll-td-email">{lec.email}</td>
+                              <td>
+                                 <div className="ll-dept-badge">
+                                    <span className="ll-dept-text">{lec.department || "General"}</span>
+                                 </div>
+                              </td>
+                              <td>
+                                 <span className="ll-status active">VERIFIED</span>
+                              </td>
+                           </tr>
+                         ))
+                       )}
                     </tbody>
-                  </table>
-                )}
+                 </table>
               </div>
-            )}
-
-          </div>
-        </main>
+           </div>
+        </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }
 

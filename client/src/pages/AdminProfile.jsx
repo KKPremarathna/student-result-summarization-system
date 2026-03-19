@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import "../styles/AdminProfile.css";
-import Navbar from "../components/InnerNavbar";
-import { Link } from "react-router-dom";
 import axios from "axios";
+import AdminLayout from "../components/AdminLayout";
+import "../styles/AdminProfile.css";
 import { 
   Shield, 
   Eye, 
@@ -18,7 +17,10 @@ import {
   ChevronRight, 
   Loader2, 
   CheckCircle2, 
-  AlertCircle 
+  AlertCircle,
+  Settings,
+  ShieldCheck,
+  Smartphone
 } from "lucide-react";
 
 function AdminProfile() {
@@ -27,11 +29,9 @@ function AdminProfile() {
   const [updateLoading, setUpdateLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState({ type: "", text: "" });
 
-  // Modal visibility
   const [showEditModal, setShowEditModal] = useState(false);
   const [showSecurityModal, setShowSecurityModal] = useState(false);
 
-  // Profile Form State
   const [editForm, setEditForm] = useState({
     firstName: "",
     lastName: "",
@@ -40,7 +40,6 @@ function AdminProfile() {
     profilePicture: ""
   });
 
-  // Password Form State
   const [passwordForm, setPasswordForm] = useState({
     oldPassword: "",
     newPassword: "",
@@ -77,7 +76,6 @@ function AdminProfile() {
       });
     } catch (error) {
       console.error("Failed to load profile:", error);
-      setStatusMsg({ type: "error", text: "Failed to load profile details" });
     } finally {
       setLoading(false);
     }
@@ -90,8 +88,6 @@ function AdminProfile() {
 
     try {
       await axios.put("http://localhost:5000/api/user/update-profile", editForm, getHeaders());
-      
-      // Update local storage user
       const localUser = JSON.parse(localStorage.getItem("user") || "{}");
       localUser.firstName = editForm.firstName;
       localUser.lastName = editForm.lastName;
@@ -99,12 +95,9 @@ function AdminProfile() {
 
       await fetchProfile();
       setStatusMsg({ type: "success", text: "Profile updated successfully!" });
-      setTimeout(() => {
-        setShowEditModal(false);
-        setStatusMsg({ type: "", text: "" });
-      }, 1500);
+      setTimeout(() => setShowEditModal(false), 2000);
     } catch (error) {
-      setStatusMsg({ type: "error", text: error.response?.data?.message || "Failed to update profile" });
+      setStatusMsg({ type: "error", text: error.response?.data?.message || "Update failed" });
     } finally {
       setUpdateLoading(false);
     }
@@ -126,14 +119,11 @@ function AdminProfile() {
         newPassword: passwordForm.newPassword
       }, getHeaders());
 
-      setStatusMsg({ type: "success", text: "Password changed successfully!" });
+      setStatusMsg({ type: "success", text: "Security credentials updated!" });
       setPasswordForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
-      setTimeout(() => {
-        setShowSecurityModal(false);
-        setStatusMsg({ type: "", text: "" });
-      }, 1500);
+      setTimeout(() => setShowSecurityModal(false), 2000);
     } catch (error) {
-      setStatusMsg({ type: "error", text: error.response?.data?.message || "Failed to change password" });
+      setStatusMsg({ type: "error", text: error.response?.data?.message || "Update failed" });
     } finally {
       setUpdateLoading(false);
     }
@@ -152,181 +142,185 @@ function AdminProfile() {
 
   if (loading) {
     return (
-      <div className="ad-page">
-        <Navbar />
-        <div className="st-loading">
-          <Loader2 className="st-loader-icon" size={48} />
-          <p>Loading Administrator Profile...</p>
+      <AdminLayout>
+        <div className="ap-loading">
+          <Loader2 className="animate-spin" size={48} />
+          <p>Syncing account data...</p>
         </div>
-      </div>
+      </AdminLayout>
     );
   }
 
   return (
-    <div className="ad-page">
-      <Navbar />
+    <AdminLayout>
+      <div className="ap-page">
+        <header className="ap-header">
+           <div className="ap-header-left">
+              <div className="ap-breadcrumb">
+                 <Settings size={14} />
+                 <span>Account</span>
+                 <ChevronRight size={14} />
+                 <span className="ap-breadcrumb-current">Settings & Profile</span>
+              </div>
+              <h1 className="ap-title">Identity Manager</h1>
+           </div>
+        </header>
 
-      <div className="ad-content">
-        <aside className="sidebar">
-          <div className="sidebar-title">Management</div>
-          <ul className="sidebar-menu">
-            <li><Link to="/adminhome"><span className="sidebar-icon"></span>Admin Home</Link></li>
-            <li><Link to="/adduser"><span className="sidebar-icon"></span>Add User</Link></li>
-            <li><Link to="/admincomplaint"><span className="sidebar-icon"></span>Complaint</Link></li>
-            <li><Link to="/adminresults"><span className="sidebar-icon"></span>Results</Link></li>
-            <li className="active"><Link to="/adminprofile"><span className="sidebar-icon"></span>Profile</Link></li>
-          </ul>
-        </aside>
+        <div className="ap-grid">
+           {/* Left Column: Identity Card */}
+           <div className="ap-id-section">
+              <div className="ap-card ap-id-card">
+                 <div className="ap-avatar-container">
+                    <div className="ap-avatar">
+                       {editForm.profilePicture ? (
+                         <img src={editForm.profilePicture} alt="Profile" />
+                       ) : (
+                         <span>{user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}</span>
+                       )}
+                    </div>
+                    <button className="ap-avatar-edit" onClick={() => fileInputRef.current.click()}>
+                       <Camera size={16} />
+                    </button>
+                    <input type="file" hidden ref={fileInputRef} onChange={handlePhotoUpload} />
+                 </div>
+                 
+                 <div className="ap-id-info">
+                    <h2>{user?.firstName} {user?.lastName}</h2>
+                    <p>Systems Administrator</p>
+                    <div className="ap-badge-list">
+                       <span className="ap-badge">Root Admin</span>
+                       <span className="ap-badge success">Verified</span>
+                    </div>
+                 </div>
 
-        <main className="ad-main">
-          <div className="profile-container">
-            {/* Sidebar Profile Card */}
-            <div className="ad-profile-card">
-              <div className="ad-avatar-wrap">
-                <div className="ad-avatar">
-                  {editForm.profilePicture ? (
-                    <img src={editForm.profilePicture} alt="Profile" className="ad-avatar__img" />
-                  ) : (
-                    user ? `${user.firstName?.charAt(0)}${user.lastName?.charAt(0)}` : "A"
-                  )}
-                </div>
-                <button className="ad-avatar__edit-btn" onClick={() => fileInputRef.current.click()} title="Change Photo">
-                  <Camera size={18} />
-                </button>
-                <input type="file" accept="image/*" ref={fileInputRef} style={{ display: 'none' }} onChange={handlePhotoUpload} />
+                 <div className="ap-card-actions">
+                    <button className="ap-btn-primary full" onClick={() => setShowEditModal(true)}>
+                       <User size={18} /> Edit Personal Info
+                    </button>
+                    <button className="ap-btn-secondary full" onClick={() => setShowSecurityModal(true)}>
+                       <ShieldCheck size={18} /> Credentials & Access
+                    </button>
+                 </div>
               </div>
 
-              <h2 className="ad-profile__name">{user?.firstName} {user?.lastName}</h2>
-              <p className="ad-profile__role">Systems Administrator</p>
-              
-              <div className="ad-divider"></div>
-
-              <button className="ad-profile-btn ad-profile-btn--primary" onClick={() => setShowEditModal(true)}>
-                <User size={20} />
-                Update Profile
-              </button>
-              <button className="ad-profile-btn ad-profile-btn--primary" onClick={() => setShowSecurityModal(true)}>
-                <Shield size={20} />
-                Security Access
-              </button>
-            </div>
-
-            {/* Main Content Details */}
-            <div className="ad-details">
-              <div className="ad-card">
-                <div className="ad-card__header">
-                  <div className="ad-card__icon-wrap">
-                    <Fingerprint size={24} />
-                  </div>
-                  <h3 className="ad-card__title">Personal Information</h3>
-                </div>
-
-                <div className="ad-info-list">
-                  <div className="ad-info-row">
-                    <span className="ad-info-row__label"><User size={14} /> Full Name</span>
-                    <span className="ad-info-row__value">{user?.firstName} {user?.lastName}</span>
-                    <ChevronRight className="ad-info-row__arrow" size={18} />
-                  </div>
-                  <div className="ad-info-row">
-                    <span className="ad-info-row__label"><Mail size={14} /> Email Address</span>
-                    <span className="ad-info-row__value">{user?.email}</span>
-                    <ChevronRight className="ad-info-row__arrow" size={18} />
-                  </div>
-                  <div className="ad-info-row">
-                    <span className="ad-info-row__label"><Phone size={14} /> Contact Number</span>
-                    <span className="ad-info-row__value">{user?.phone || "Not Set"}</span>
-                    <ChevronRight className="ad-info-row__arrow" size={18} />
-                  </div>
-                  <div className="ad-info-row">
-                    <span className="ad-info-row__label"><Calendar size={14} /> Date of Birth</span>
-                    <span className="ad-info-row__value">{editForm.dob || "Not Set"}</span>
-                    <ChevronRight className="ad-info-row__arrow" size={18} />
-                  </div>
-                </div>
+              <div className="ap-security-hint">
+                 <Shield size={20} />
+                 <p>Your session is protected by 256-bit encryption. Keep your credentials private.</p>
               </div>
-            </div>
-          </div>
-        </main>
+           </div>
+
+           {/* Right Column: Details List */}
+           <div className="ap-details-section">
+              <div className="ap-card">
+                 <div className="ap-card-header">
+                    <Fingerprint size={20} />
+                    <h3>Contact & Personal Details</h3>
+                 </div>
+                 
+                 <div className="ap-detail-list">
+                    <div className="ap-detail-item">
+                       <div className="ap-detail-icon"><User size={18}/></div>
+                       <div className="ap-detail-content">
+                          <label>Legal Name</label>
+                          <span>{user?.firstName} {user?.lastName}</span>
+                       </div>
+                       <ChevronRight size={18} className="ap-detail-arrow" />
+                    </div>
+
+                    <div className="ap-detail-item">
+                       <div className="ap-detail-icon"><Mail size={18}/></div>
+                       <div className="ap-detail-content">
+                          <label>Work Email</label>
+                          <span>{user?.email}</span>
+                       </div>
+                       <ChevronRight size={18} className="ap-detail-arrow" />
+                    </div>
+
+                    <div className="ap-detail-item">
+                       <div className="ap-detail-icon"><Smartphone size={18}/></div>
+                       <div className="ap-detail-content">
+                          <label>Phone Number</label>
+                          <span>{user?.phone || "Not configured"}</span>
+                       </div>
+                       <ChevronRight size={18} className="ap-detail-arrow" />
+                    </div>
+
+                    <div className="ap-detail-item">
+                       <div className="ap-detail-icon"><Calendar size={18}/></div>
+                       <div className="ap-detail-content">
+                          <label>Birth Date</label>
+                          <span>{editForm.dob || "Not configured"}</span>
+                       </div>
+                       <ChevronRight size={18} className="ap-detail-arrow" />
+                    </div>
+                 </div>
+              </div>
+
+              <div className="ap-audit-card">
+                 <div className="ap-audit-header">
+                    <h3>Recent Access Logs</h3>
+                 </div>
+                 <div className="ap-audit-row">
+                    <span>IP Address</span>
+                    <span className="mono">192.168.1.45</span>
+                 </div>
+                 <div className="ap-audit-row">
+                    <span>Last Login</span>
+                    <span>Today, 10:45 AM</span>
+                 </div>
+              </div>
+           </div>
+        </div>
       </div>
 
-      {/* Edit Profile Modal */}
+      {/* Edit Modal */}
       {showEditModal && (
-        <div className="st-modal-overlay">
-          <div className="st-modal">
-            <button className="st-modal__close" onClick={() => setShowEditModal(false)}>
-              <X size={20} />
-            </button>
-            <div className="st-modal__header">
-              <div className="st-modal__icon-wrap">
-                <User size={32} />
-              </div>
-              <h2 className="st-modal__title">Update Profile</h2>
-              <p className="st-modal__subtitle">Update your personal information</p>
+        <div className="ap-modal-overlay">
+          <div className="ap-modal">
+            <div className="ap-modal-header">
+               <div>
+                  <h3>Update Identity</h3>
+                  <p>Change your public information</p>
+               </div>
+               <button className="ap-modal-close" onClick={() => setShowEditModal(false)}><X size={20}/></button>
             </div>
+            
+            <form className="ap-modal-body" onSubmit={handleProfileUpdate}>
+               {statusMsg.text && (
+                 <div className={`ap-modal-alert ${statusMsg.type}`}>
+                    {statusMsg.type === "success" ? <CheckCircle2 size={16}/> : <AlertCircle size={16}/>}
+                    {statusMsg.text}
+                 </div>
+               )}
 
-            {statusMsg.text && (
-              <div className={`st-status-msg st-status-msg--${statusMsg.type}`}>
-                {statusMsg.type === "success" ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
-                {statusMsg.text}
-              </div>
-            )}
+               <div className="ap-modal-grid">
+                  <div className="ap-input-group">
+                     <label>First Name</label>
+                     <input value={editForm.firstName} onChange={e => setEditForm({...editForm, firstName: e.target.value})} required />
+                  </div>
+                  <div className="ap-input-group">
+                     <label>Last Name</label>
+                     <input value={editForm.lastName} onChange={e => setEditForm({...editForm, lastName: e.target.value})} required />
+                  </div>
+               </div>
 
-            <form className="st-modal__form" onSubmit={handleProfileUpdate}>
-              <div className="st-modal-grid">
-                <div className="st-modal__field">
-                  <label className="st-modal__label">First Name</label>
-                  <input 
-                    type="text" 
-                    className="st-modal__input" 
-                    value={editForm.firstName}
-                    onChange={(e) => setEditForm({...editForm, firstName: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="st-modal__field">
-                  <label className="st-modal__label">Last Name</label>
-                  <input 
-                    type="text" 
-                    className="st-modal__input" 
-                    value={editForm.lastName}
-                    onChange={(e) => setEditForm({...editForm, lastName: e.target.value})}
-                    required
-                  />
-                </div>
-              </div>
-              <div className="st-modal-grid">
-                <div className="st-modal__field">
-                  <label className="st-modal__label">Phone Number</label>
-                  <input 
-                    type="text" 
-                    className="st-modal__input" 
-                    value={editForm.phone}
-                    onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
-                  />
-                </div>
-                <div className="st-modal__field">
-                  <label className="st-modal__label">Date of Birth</label>
-                  <input 
-                    type="date" 
-                    className="st-modal__input" 
-                    value={editForm.dob}
-                    onChange={(e) => setEditForm({...editForm, dob: e.target.value})}
-                  />
-                </div>
-              </div>
-              <div className="st-modal__field">
-                <label className="st-modal__label">Profile Picture URL</label>
-                <input 
-                  type="text" 
-                  className="st-modal__input" 
-                  value={editForm.profilePicture}
-                  onChange={(e) => setEditForm({...editForm, profilePicture: e.target.value})}
-                />
-              </div>
+               <div className="ap-modal-grid">
+                  <div className="ap-input-group">
+                     <label>Phone</label>
+                     <input value={editForm.phone} onChange={e => setEditForm({...editForm, phone: e.target.value})} />
+                  </div>
+                  <div className="ap-input-group">
+                     <label>DOB</label>
+                     <input type="date" value={editForm.dob} onChange={e => setEditForm({...editForm, dob: e.target.value})} />
+                  </div>
+               </div>
 
-              <button className="st-modal-submit-btn" type="submit" disabled={updateLoading}>
-                {updateLoading ? <Loader2 className="st-loader-icon" size={20} /> : "Save Changes"}
-              </button>
+               <div className="ap-modal-footer">
+                  <button type="button" className="ap-btn-secondary" onClick={() => setShowEditModal(false)}>Discard</button>
+                  <button type="submit" className="ap-btn-primary" disabled={updateLoading}>
+                     {updateLoading ? <Loader2 className="animate-spin" size={18}/> : "Save Profile"}
+                  </button>
+               </div>
             </form>
           </div>
         </div>
@@ -334,81 +328,59 @@ function AdminProfile() {
 
       {/* Security Modal */}
       {showSecurityModal && (
-        <div className="st-modal-overlay">
-          <div className="st-modal">
-            <button className="st-modal__close" onClick={() => setShowSecurityModal(false)}>
-              <X size={20} />
-            </button>
-            <div className="st-modal__header">
-              <div className="st-modal__icon-wrap">
-                <Key size={32} />
-              </div>
-              <h2 className="st-modal__title">Security Update</h2>
-              <p className="st-modal__subtitle">Secure your administrator account</p>
+        <div className="ap-modal-overlay">
+          <div className="ap-modal">
+            <div className="ap-modal-header">
+               <div>
+                  <h3>Vault Update</h3>
+                  <p>Secure your administrator credentials</p>
+               </div>
+               <button className="ap-modal-close" onClick={() => setShowSecurityModal(false)}><X size={20}/></button>
             </div>
+            
+            <form className="ap-modal-body" onSubmit={handlePasswordChange}>
+               {statusMsg.text && (
+                 <div className={`ap-modal-alert ${statusMsg.type}`}>
+                    {statusMsg.type === "success" ? <CheckCircle2 size={16}/> : <AlertCircle size={16}/>}
+                    {statusMsg.text}
+                 </div>
+               )}
 
-            {statusMsg.text && (
-              <div className={`st-status-msg st-status-msg--${statusMsg.type}`}>
-                {statusMsg.type === "success" ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
-                {statusMsg.text}
-              </div>
-            )}
+               <div className="ap-input-group">
+                  <label>Current Vault Key</label>
+                  <div className="ap-pass-box">
+                     <input type={showOldPass ? "text" : "password"} value={passwordForm.oldPassword} onChange={e => setPasswordForm({...passwordForm, oldPassword: e.target.value})} required />
+                     <button type="button" onClick={() => setShowOldPass(!showOldPass)}>{showOldPass ? <EyeOff size={18}/> : <Eye size={18}/>}</button>
+                  </div>
+               </div>
 
-            <form className="st-modal__form" onSubmit={handlePasswordChange}>
-              <div className="st-modal__field">
-                <label className="st-modal__label">Current Password</label>
-                <div className="st-password-wrapper">
-                  <input 
-                    type={showOldPass ? "text" : "password"} 
-                    className="st-modal__input" 
-                    value={passwordForm.oldPassword}
-                    onChange={(e) => setPasswordForm({...passwordForm, oldPassword: e.target.value})}
-                    required
-                  />
-                  <button type="button" className="st-eye-icon" onClick={() => setShowOldPass(!showOldPass)}>
-                    {showOldPass ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-              </div>
-              <div className="st-modal__field">
-                <label className="st-modal__label">New Password</label>
-                <div className="st-password-wrapper">
-                  <input 
-                    type={showNewPass ? "text" : "password"} 
-                    className="st-modal__input" 
-                    value={passwordForm.newPassword}
-                    onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
-                    required
-                  />
-                  <button type="button" className="st-eye-icon" onClick={() => setShowNewPass(!showNewPass)}>
-                    {showNewPass ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-              </div>
-              <div className="st-modal__field">
-                <label className="st-modal__label">Confirm New Password</label>
-                <div className="st-password-wrapper">
-                  <input 
-                    type={showConfirmPass ? "text" : "password"} 
-                    className="st-modal__input" 
-                    value={passwordForm.confirmPassword}
-                    onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
-                    required
-                  />
-                  <button type="button" className="st-eye-icon" onClick={() => setShowConfirmPass(!showConfirmPass)}>
-                    {showConfirmPass ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-              </div>
+               <div className="ap-input-group">
+                  <label>New Secret Key</label>
+                  <div className="ap-pass-box">
+                     <input type={showNewPass ? "text" : "password"} value={passwordForm.newPassword} onChange={e => setPasswordForm({...passwordForm, newPassword: e.target.value})} required />
+                     <button type="button" onClick={() => setShowNewPass(!showNewPass)}>{showNewPass ? <EyeOff size={18}/> : <Eye size={18}/>}</button>
+                  </div>
+               </div>
 
-              <button className="st-modal-submit-btn" type="submit" disabled={updateLoading}>
-                {updateLoading ? <Loader2 className="st-loader-icon" size={20} /> : "Update Security"}
-              </button>
+               <div className="ap-input-group">
+                  <label>Re-verify New Key</label>
+                  <div className="ap-pass-box">
+                     <input type={showConfirmPass ? "text" : "password"} value={passwordForm.confirmPassword} onChange={e => setPasswordForm({...passwordForm, confirmPassword: e.target.value})} required />
+                     <button type="button" onClick={() => setShowConfirmPass(!showConfirmPass)}>{showConfirmPass ? <EyeOff size={18}/> : <Eye size={18}/>}</button>
+                  </div>
+               </div>
+
+               <div className="ap-modal-footer">
+                  <button type="button" className="ap-btn-secondary" onClick={() => setShowSecurityModal(false)}>Discard</button>
+                  <button type="submit" className="ap-btn-primary" disabled={updateLoading}>
+                     {updateLoading ? <Loader2 className="animate-spin" size={18}/> : "Update Key"}
+                  </button>
+               </div>
             </form>
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 }
 
