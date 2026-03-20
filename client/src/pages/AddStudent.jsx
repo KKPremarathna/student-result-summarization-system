@@ -1,9 +1,20 @@
 import React, { useState } from "react";
-import "../styles/AddStudent.css";
-import Navbar from "../components/InnerNavbar";
-import bgImage from "../assets/images/admin.jpg";
-import { Link } from "react-router-dom";
 import axios from "axios";
+import AdminLayout from "../components/AdminLayout";
+import "../styles/AddStudent.css";
+import { 
+  UserPlus, 
+  Users, 
+  ChevronRight, 
+  GraduationCap, 
+  PlusCircle, 
+  Trash2, 
+  AlertCircle, 
+  CheckCircle2,
+  Info,
+  ArrowLeft
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
 function AddStudent() {
   const [studentId, setStudentId] = useState("");
@@ -27,7 +38,6 @@ function AddStudent() {
       setMessage({ type: "error", text: "Please enter a Student ID" });
       return;
     }
-
     const headers = getAuthHeader();
     if (!headers) return;
 
@@ -39,10 +49,9 @@ function AddStudent() {
       setMessage({ type: "success", text: response.data.message });
       setStudentId("");
     } catch (error) {
-      console.error("Error adding student:", error);
       setMessage({
         type: "error",
-        text: error.response?.data?.message || error.message || "Error adding student",
+        text: error.response?.data?.message || "Error adding student",
       });
     }
   };
@@ -52,7 +61,6 @@ function AddStudent() {
       setMessage({ type: "error", text: "Please enter both Start and End ID" });
       return;
     }
-
     const headers = getAuthHeader();
     if (!headers) return;
 
@@ -65,10 +73,9 @@ function AddStudent() {
       setStartId("");
       setEndId("");
     } catch (error) {
-      console.error("Error adding bulk students:", error);
       setMessage({
         type: "error",
-        text: error.response?.data?.message || error.message || "Error adding bulk students",
+        text: error.response?.data?.message || "Error adding bulk students",
       });
     }
   };
@@ -78,7 +85,6 @@ function AddStudent() {
       setMessage({ type: "error", text: "Please enter both Start and End ID" });
       return;
     }
-
     const headers = getAuthHeader();
     if (!headers) return;
 
@@ -94,128 +100,132 @@ function AddStudent() {
       setDeleteStartId("");
       setDeleteEndId("");
     } catch (error) {
-      console.error("Error deleting bulk students:", error);
       setMessage({
         type: "error",
-        text: error.response?.data?.message || error.message || "Error deleting bulk students",
+        text: error.response?.data?.message || "Error deleting bulk students",
       });
     }
   };
 
   return (
-    <div className="addstudent-page">
-      <Navbar />
-
-      <div className="addstudent-content">
-        <aside className="sidebar">
-          <div className="sidebar-title">Management</div>
-          <ul className="sidebar-menu">
-            <li>
-              <Link to="/adminhome">
-                <span className="sidebar-icon"></span>
-                Admin Home
-              </Link>
-            </li>
-            <li className="active">
-              <Link to="/adduser">
-                <span className="sidebar-icon"></span>
-                Add User
-              </Link>
-            </li>
-            <li>
-              <Link to="/admincomplaint">
-                <span className="sidebar-icon"></span>
-                Complaint
-              </Link>
-            </li>
-            <li >
-              <Link to="/adminresults">
-                <span className="sidebar-icon"></span>
-                Results
-              </Link>
-            </li>
-            <li>
-              <Link to="/adminprofile">
-                <span className="sidebar-icon"></span>
-                Profile
-              </Link>
-            </li>
-          </ul>
-        </aside>
-
-        <main className="addstudent-main">
-          <div className="addstudent-main-content">
-
-            <h1>Add Student</h1>
-
-            {message.text && (
-              <div className={`status-message ${message.type}`}>
-                {message.text}
-              </div>
-            )}
-
-            <div className="form-group">
-              <label>Add Student :</label>
-              <div className="row">
-                <span>Student Id</span>
-                <input
-                  type="text"
-                  placeholder="20XX/E/XXX (e.g., 2024/E/140)"
-                  value={studentId}
-                  onChange={(e) => setStudentId(e.target.value)}
-                />
-                <button onClick={handleAddSingleStudent}>Add</button>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label>Add Students in Bulk :</label>
-              <div className="row">
-                <span>Start Id :</span>
-                <input
-                  type="text"
-                  placeholder="20XX/E/001"
-                  value={startId}
-                  onChange={(e) => setStartId(e.target.value)}
-                />
-                <span>End Id :</span>
-                <input
-                  type="text"
-                  placeholder="20XX/E/050"
-                  value={endId}
-                  onChange={(e) => setEndId(e.target.value)}
-                />
-                <button onClick={handleAddBulkStudents}>Add</button>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label>Delete Students in Bulk :</label>
-              <div className="row">
-                <span>Start Id :</span>
-                <input
-                  type="text"
-                  placeholder="20XX/E/001"
-                  value={deleteStartId}
-                  onChange={(e) => setDeleteStartId(e.target.value)}
-                />
-                <span>End Id :</span>
-                <input
-                  type="text"
-                  placeholder="20XX/E/050"
-                  value={deleteEndId}
-                  onChange={(e) => setDeleteEndId(e.target.value)}
-                />
-                <button onClick={handleDeleteBulkStudents}>Delete</button>
-              </div>
-            </div>
-            <Link to="/studentlist" className="view-btn-link">
-              <button className="view-btn">View Student List</button>
-            </Link>
+    <AdminLayout>
+      <div className="as-page">
+        {/* Header */}
+        <header className="as-header">
+          <div className="as-breadcrumb">
+             <Link to="/adduser" className="as-back-link"><ArrowLeft size={14} /> Back to Management</Link>
+             <ChevronRight size={14} />
+             <span className="as-breadcrumb-current">Authorize Students</span>
           </div>
-        </main>
+          <h1 className="as-title">Student Access</h1>
+          <p className="as-subtitle">Manage the whitelist of students permitted to register.</p>
+        </header>
+
+        {message.text && (
+          <div className={`as-status-bar ${message.type}`}>
+            {message.type === "success" ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+            <span>{message.text}</span>
+            <button className="as-status-close" onClick={() => setMessage({ type: "", text: "" })}>×</button>
+          </div>
+        )}
+
+        <div className="as-grid">
+           {/* Column 1: Add Operations */}
+           <div className="as-column">
+              <section className="as-card">
+                 <div className="as-card-header">
+                    <PlusCircle size={20} className="as-card-icon" />
+                    <h3 className="as-card-title">Single Authorization</h3>
+                 </div>
+                 <div className="as-form-group">
+                    <label>Registration Number</label>
+                    <div className="as-input-row">
+                       <input 
+                         type="text" 
+                         placeholder="20XX/E/XXX" 
+                         value={studentId}
+                         onChange={(e) => setStudentId(e.target.value)}
+                       />
+                       <button className="as-btn as-btn-primary" onClick={handleAddSingleStudent}>Authorize</button>
+                    </div>
+                 </div>
+              </section>
+
+              <section className="as-card">
+                 <div className="as-card-header">
+                    <Users size={20} className="as-card-icon" />
+                    <h3 className="as-card-title">Bulk Authorization</h3>
+                 </div>
+                 <p className="as-card-desc">Authorize a range of registration numbers in one action.</p>
+                 <div className="as-form-grid">
+                    <div className="as-form-group">
+                       <label>Start ID</label>
+                       <input 
+                         type="text" 
+                         placeholder="20XX/E/001" 
+                         value={startId}
+                         onChange={(e) => setStartId(e.target.value)}
+                       />
+                    </div>
+                    <div className="as-form-group">
+                       <label>End ID</label>
+                       <input 
+                         type="text" 
+                         placeholder="20XX/E/050" 
+                         value={endId}
+                         onChange={(e) => setEndId(e.target.value)}
+                       />
+                    </div>
+                 </div>
+                 <button className="as-btn as-btn-primary as-full-width mt-1" onClick={handleAddBulkStudents}>Authorize Range</button>
+              </section>
+           </div>
+
+           {/* Column 2: Delete & Info */}
+           <div className="as-column">
+              <section className="as-card as-card-danger">
+                 <div className="as-card-header">
+                    <Trash2 size={20} className="as-card-icon" />
+                    <h3 className="as-card-title">Bulk Revocation</h3>
+                 </div>
+                 <p className="as-card-desc">Remove authorization for a range of students.</p>
+                 <div className="as-form-grid">
+                    <div className="as-form-group">
+                       <label>Start ID</label>
+                       <input 
+                         type="text" 
+                         placeholder="20XX/E/001" 
+                         value={deleteStartId}
+                         onChange={(e) => setDeleteStartId(e.target.value)}
+                       />
+                    </div>
+                    <div className="as-form-group">
+                       <label>End ID</label>
+                       <input 
+                         type="text" 
+                         placeholder="20XX/E/050" 
+                         value={deleteEndId}
+                         onChange={(e) => setDeleteEndId(e.target.value)}
+                       />
+                    </div>
+                 </div>
+                 <button className="as-btn as-btn-danger as-full-width mt-1" onClick={handleDeleteBulkStudents}>Revoke Authorization</button>
+              </section>
+
+              <section className="as-card as-card-info">
+                 <div className="as-card-header">
+                    <Info size={20} />
+                    <h3 className="as-card-title">Quick Action</h3>
+                 </div>
+                 <p className="as-card-desc">View and manage the existing whitelist to see authorized students.</p>
+                 <Link to="/studentlist" className="as-btn as-btn-outline as-full-width">
+                    View Student Whitelist
+                 </Link>
+              </section>
+           </div>
+        </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }
 

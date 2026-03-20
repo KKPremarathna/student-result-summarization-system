@@ -1,4 +1,7 @@
 const AllowedEmail = require('../models/AllowedEmail');
+const User = require('../models/User');
+const Complaint = require('../models/Complaint');
+const Subject = require('../models/Subject');
 const { convertRegNumToEmail, generateEmailsFromRange, isValidEmail } = require('../utils/regUtils');
 
 // Add a single allowed email from reg num
@@ -123,3 +126,98 @@ exports.addLecturerEmail = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// Get allowed emails
+exports.getAllowedEmails = async (req, res) => {
+    try {
+        const { role, department } = req.query;
+        const filter = {};
+
+        if (role) {
+            filter.role = role;
+        }
+
+        if (role === 'lecturer' && department) {
+            filter.department = department;
+        }
+
+        const allowedEmails = await AllowedEmail.find(filter).sort({ createdAt: -1 });
+        res.status(200).json({ success: true, data: allowedEmails });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// Get registered users
+exports.getRegisteredUsers = async (req, res) => {
+    try {
+        const { role, department } = req.query;
+        if (!role) {
+            return res.status(400).json({ message: 'Please provide a role (student or lecturer)' });
+        }
+
+        const filter = { role };
+        if (role === 'lecturer' && department) {
+            filter.department = department;
+        }
+
+        const users = await User.find(filter).select('-password').sort({ createdAt: -1 });
+        res.status(200).json({ success: true, data: users });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// Get all complaints for admin
+exports.getAdminComplaints = async (req, res) => {
+    try {
+        const complaints = await Complaint.find()
+            .populate('lecturerId', 'firstName lastName email')
+            .populate('studentId', 'firstName lastName studentENo email')
+            .populate('subjectId', 'courseCode courseName')
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({ success: true, count: complaints.length, data: complaints });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// Update complaint status (Resolved, etc.)
+exports.updateComplaintStatus = async (req, res) => {
+    try {
+        const { status } = req.body;
+        const complaint = await Complaint.findById(req.params.id);
+
+        if (!complaint) {
+            return res.status(404).json({ message: 'Complaint not found' });
+        }
+
+        complaint.status = status || complaint.status;
+        if (status === 'Resolved') {
+            complaint.resolvedAt = Date.now();
+        }
+
+        await complaint.save();
+
+        res.status(200).json({ success: true, data: complaint });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// Get all subjects (courses) for admin
+exports.getAdminSubjects = async (req, res) => {
+    try {
+        const subjects = await Subject.find();
+        res.status(200).json({ success: true, count: subjects.length, data: subjects });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+

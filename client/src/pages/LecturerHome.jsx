@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import LecturerLayout from "../components/LecturerLayout.jsx";
 import { getLecturerDetails } from "../services/lecturerApi.js";
 import profile from '../assets/profile.png';
-import dashboardBg from '../assets/dashboard-bg.png';
 import "../styles/LecturerHome.css";
 import { Link } from "react-router-dom";
 import {
@@ -61,33 +60,6 @@ function LecturerHome() {
   return (
     <LecturerLayout>
       <div className="lh-page">
-
-        {/* Hero Section */}
-        <div className="lh-hero">
-          <img
-            src={dashboardBg}
-            alt="Dashboard Background"
-            className="lh-hero__bg"
-          />
-          <div className="lh-hero__overlay">
-            <div className="lh-hero__meta">
-              <span className="lh-hero__badge">Staff Dashboard</span>
-              <span className="lh-hero__date">
-                <Calendar size={14} />
-                {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-              </span>
-            </div>
-            <h1 className="lh-hero__title">
-              Welcome back, <span>{fullName}</span>..!
-            </h1>
-            <p className="lh-hero__subtitle">
-              Your academic performance and subject management portal is up to date.
-              Check your assigned modules and recent results below.
-            </p>
-          </div>
-        </div>
-
-        {/* Dashboard Content Grid */}
         <div className="lh-grid">
 
           {/* Left Column: Profile Card */}
@@ -198,7 +170,7 @@ function LecturerHome() {
                       </div>
                       <div>
                         <h4 className="lh-subject-item__name">{subject.courseName}</h4>
-                        <p className="lh-subject-item__year">{subject.courseCode} | {subject.batch}</p>
+                        <p className="lh-subject-item__year">{subject.courseCode} | {subject.batch} | {subject.semester}</p>
                       </div>
                     </div>
                   ))

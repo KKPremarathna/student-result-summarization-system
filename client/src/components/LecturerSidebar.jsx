@@ -1,44 +1,67 @@
-import "../styles/Sidebar.css";
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FaBars } from 'react-icons/fa';
-
-/*
-Sidebar Dashboard for Lecturer
-Collapsible toggle logic added
-*/
+import "../styles/Sidebar.css";
+import { 
+  LayoutDashboard, 
+  BarChart3, 
+  PlusCircle, 
+  ClipboardList, 
+  MessageSquare, 
+  CheckSquare, 
+  Settings,
+  Menu,
+  ChevronLeft
+} from 'lucide-react';
 
 function Sidebar({ isOpen, toggleSidebar }) {
   const location = useLocation();
 
   const menuItems = [
-    { name: "Lecturer Home", path: "/lecturer/home" },
-    { name: "View Results", path: "/lecturer/results" },
-    { name: "Manage Subjects", path: "/lecturer/addsubject" },
-    { name: "Incourse Marks", path: "/lecturer/addincourse" },
-    { name: "Pending Review", path: "/lecturer/pending" },
-    { name: "Final Result", path: "/lecturer/final" },
-    { name: "Profile Settings", path: "/lecturer/setting" },
+    { name: "Lecturer Home", path: "/lecturer/home", icon: LayoutDashboard },
+    { name: "View Results", path: "/lecturer/results", icon: BarChart3 },
+    { name: "Manage Subjects", path: "/lecturer/addsubject", icon: PlusCircle },
+    { name: "Incourse Marks", path: "/lecturer/addincourse", icon: ClipboardList },
+    { name: "Complaints", path: "/lecturer/complaints", icon: MessageSquare },
+    { name: "Final Result", path: "/lecturer/final", icon: CheckSquare },
+    { name: "Profile Settings", path: "/lecturer/setting", icon: Settings },
   ];
 
   return (
-    <div className={`sidebar ${isOpen ? "open" : "closed"}`}>
-      <div className="sidebar-toggle-container">
-        <button className="sidebar-toggle" onClick={toggleSidebar}>
-          <FaBars />
+    <aside className={`sidebar-premium ${isOpen ? "open" : "closed"}`}>
+      <div className="sidebar-header">
+        <div className="sidebar-logo">
+          <LayoutDashboard size={24} className="logo-icon" />
+          {isOpen && <span className="logo-text">Lecturer Portal</span>}
+        </div>
+        <button className="sidebar-toggle-btn" onClick={toggleSidebar}>
+          {isOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
         </button>
       </div>
 
-      <div className="sidebar-menu">
-        <div className="sidebar-section">Main Menu</div>
-        <ul>
-          {menuItems.map((item) => (
-            <li key={item.path} className={location.pathname === item.path ? "active" : ""}>
-              <Link to={item.path}>{item.name}</Link>
-            </li>
-          ))}
+      <nav className="sidebar-nav">
+        {isOpen && <div className="nav-label">Main Menu</div>}
+        <ul className="nav-list">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+            return (
+              <li key={item.path} className={isActive ? "active" : ""}>
+                <Link to={item.path} className="nav-link">
+                  <Icon size={20} className="nav-icon" />
+                  {isOpen && <span className="nav-text">{item.name}</span>}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
-      </div>
-    </div>
+      </nav>
+
+      {isOpen && (
+        <div className="sidebar-footer">
+          <p className="footer-version">v2.1.0-winter</p>
+        </div>
+      )}
+    </aside>
   );
 }
 

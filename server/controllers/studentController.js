@@ -87,11 +87,10 @@ exports.submitComplaint = async(req, res) => {
         }
 
         const complaint = await Complaint.create({
-            senderId: req.user.id,
-            senderRole: 'student',
-            receiverId: subject.createdBy, // The lecturer who created the subject
-            receiverRole: 'lecturer',
+            studentId: req.user.id,
+            lecturerId: subject.createdBy, // The lecturer who created the subject
             subjectId: subjectId,
+            isAdminRecipient: false,
             title,
             description,
             status: 'Pending'

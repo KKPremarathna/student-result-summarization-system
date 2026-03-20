@@ -8,6 +8,8 @@ import {
   Mail,
   Shield,
   Camera,
+  Eye,
+  EyeOff,
   Key,
   X,
   ChevronRight,
@@ -36,6 +38,8 @@ function LecturerSetting() {
   });
   const [status, setStatus] = useState({ loading: false, success: "", error: "" });
   const [imageLoadError, setImageLoadError] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
   useEffect(() => {
     fetchUserData();
@@ -222,7 +226,7 @@ function LecturerSetting() {
                       Display Name
                     </p>
                     <p className="st-info-row__value">
-                      {userData?.firstName} {userData?.lastName}
+                      {userData?.title ? userData.title + ' ' : ''}{userData?.firstName} {userData?.lastName}
                     </p>
                   </div>
                   <ChevronRight 
@@ -464,26 +468,44 @@ function LecturerSetting() {
                   )}
                   <div className="st-modal__field">
                     <label className="st-modal__label">Current Password</label>
-                    <input
-                      required
-                      type="password"
-                      className="st-modal__input"
-                      placeholder="••••••••"
-                      value={passwordForm.oldPassword}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, oldPassword: e.target.value })}
-                    />
+                    <div className="st-password-wrapper">
+                      <input
+                        required
+                        type={showOldPassword ? "text" : "password"}
+                        className="st-modal__input"
+                        placeholder="••••••••"
+                        value={passwordForm.oldPassword}
+                        onChange={(e) => setPasswordForm({ ...passwordForm, oldPassword: e.target.value })}
+                      />
+                      <button 
+                        type="button"
+                        className="st-eye-icon"
+                        onClick={() => setShowOldPassword(!showOldPassword)}
+                      >
+                        {showOldPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
                   </div>
 
                   <div className="st-modal__field">
                     <label className="st-modal__label">New Secure Password</label>
-                    <input
-                      required
-                      type="password"
-                      className="st-modal__input"
-                      placeholder="••••••••"
-                      value={passwordForm.newPassword}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                    />
+                    <div className="st-password-wrapper">
+                      <input
+                        required
+                        type={showNewPassword ? "text" : "password"}
+                        className="st-modal__input"
+                        placeholder="••••••••"
+                        value={passwordForm.newPassword}
+                        onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                      />
+                      <button 
+                        type="button"
+                        className="st-eye-icon"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                      >
+                        {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
                   </div>
 
                   <div className="st-modal__submit-wrap">

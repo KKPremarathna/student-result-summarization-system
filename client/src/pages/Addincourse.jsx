@@ -5,7 +5,8 @@ import {
   getBatches, 
   getSubjectByCodeAndBatch,
   getIncourseResultsBySubject,
-  saveIncourseResult
+  saveIncourseResult,
+  deleteIncourseResult
 } from "../services/lecturerApi.js";
 import "../styles/Addincourse.css";
 import {
@@ -21,7 +22,8 @@ import {
   Trash2,
   Users,
   User,
-  X
+  X,
+  Calendar
 } from "lucide-react";
 
 function AddIncourse() {
@@ -51,6 +53,7 @@ function AddIncourse() {
   const [tempList, setTempList] = useState([]);
   const [inputType, setInputType] = useState("bulk"); // "bulk", "individual", or "range"
   const [isEditMode, setIsEditMode] = useState(false);
+  const [deletedIds, setDeletedIds] = useState([]);
 
   // Fetch initial course codes
   useEffect(() => {
@@ -158,6 +161,13 @@ function AddIncourse() {
     
     try {
       let successCount = 0;
+
+      // 1. Process deletions first
+      for (const id of deletedIds) {
+        await deleteIncourseResult(id);
+      }
+
+      // 2. Process saves/updates
       for (const res of results) {
         // If student exists in results but has no marks yet, it's a new entry
         await saveIncourseResult({
@@ -172,6 +182,7 @@ function AddIncourse() {
       }
       setMessage({ type: "success", text: `Successfully saved marks for ${successCount} students.` });
       setIsEditMode(false); // Auto-lock after save
+      setDeletedIds([]); // Clear deleted tracking
       fetchData(); // Refresh to get recalculated totals
     } catch (err) {
       console.error("Save error:", err);
@@ -276,6 +287,10 @@ function AddIncourse() {
   };
 
   const deleteResultRow = (index) => {
+    const rowToDelete = results[index];
+    if (rowToDelete._id) {
+      setDeletedIds(prev => [...prev, rowToDelete._id]);
+    }
     const newResults = results.filter((_, i) => i !== index);
     setResults(newResults);
   };
@@ -318,6 +333,7 @@ function AddIncourse() {
                 if (isEditMode) {
                   // If canceling, re-fetch to discard unsaved local changes
                   fetchData();
+                  setDeletedIds([]); // Also reset deletions
                 }
                 setIsEditMode(!isEditMode);
               }}
@@ -396,6 +412,18 @@ function AddIncourse() {
                 onChange={(e) => setENumberSearch(e.target.value)}
               />
             </div>
+
+            {subjectInfo?.semester && (
+              <div className="aic-field">
+                <label className="aic-label">
+                  <Calendar size={14} />
+                  Semester
+                </label>
+                <div className="aic-read-only-box">
+                  {subjectInfo.semester}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

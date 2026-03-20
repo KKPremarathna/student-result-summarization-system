@@ -290,3 +290,45 @@ exports.getStudentResult = async (req, res) => {
     return res.status(500).json({ message: e.message });
   }
 };
+
+// GET /api/incourse/student/subject-marks?courseCode=CS301
+// Shows all participants' marks for a subject (for students)
+exports.getSubjectIncourseMarks = async (req, res) => {
+  try {
+    const { courseCode } = req.query;
+    let studentENo = normalizeRegNo(req.user.studentENo);
+    if (!studentENo) studentENo = extractRegNoFromEmail(req.user.email);
+
+    if (!courseCode || !studentENo) {
+      return res.status(400).json({ message: "courseCode and identifiable registration number are required" });
+    }
+
+    // 1. Find the subject
+    const subject = await Subject.findOne({ courseCode: courseCode.toUpperCase() });
+    if (!subject) return res.status(404).json({ message: "Subject not found" });
+
+    // 2. Verify the student is enrolled/has a result in this subject
+    const regNoRegex = generateRegNoRegex(studentENo);
+    const myResult = await IncourseResult.findOne({ 
+      subject: subject._id, 
+      studentENo: regNoRegex 
+    });
+    
+    if (!myResult) {
+      return res.status(403).json({ message: "You are not enrolled in this subject or have no marks recorded yet." });
+    }
+
+    // 3. Get all results for this subject
+    const allResults = await IncourseResult.find({ subject: subject._id })
+      .sort({ studentENo: 1 });
+
+    return res.json({
+      subject,
+      myResultId: myResult._id,
+      myENo: studentENo,
+      results: allResults
+    });
+  } catch (e) {
+    return res.status(500).json({ message: e.message });
+  }
+};

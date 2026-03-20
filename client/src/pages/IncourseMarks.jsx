@@ -1,60 +1,115 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import StudentLayout from "../components/StudentLayout.jsx";
 import "../styles/IncourseMarks.css";
+import { getMyIncourseSubjects, getSubjectIncourseMarks, getStudentDetails } from "../services/studentApi";
+import { extractRegNoFromEmail, formatRegNo } from "../utils/regUtils";
 import { 
   BookOpen, 
-  Calendar, 
-  MessageSquare, 
   ChevronLeft,
   Search,
   Award,
   User,
-  Info
+  Info,
+  Loader2,
+  AlertCircle,
+  MessageSquare
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const IncourseMarks = () => {
-  const [selectedCourse, setSelectedCourse] = useState("EC5080");
+  const [courseList, setCourseList] = useState([]);
+  const [selectedCourseCode, setSelectedCourseCode] = useState("");
+  const [resultsData, setResultsData] = useState(null); // { subject, myENo, results }
+  const [studentInfo, setStudentInfo] = useState({ name: "", eNumber: "" });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const studentInfo = {
-    name: "Karunarathna K.P.S",
-    eNumber: "2021/E/162",
-  };
+  useEffect(() => {
+    fetchInitialData();
+  }, []);
 
-  const courseInfo = {
-    code: "EC5080",
-    name: "Software Construction"
-  };
+  const fetchInitialData = async () => {
+    setLoading(true);
+    try {
+      // 1. Fetch student for the banner
+      const userRes = await getStudentDetails();
+      const userData = userRes.data.data;
+      
+      const rawENo = userData.studentENo || extractRegNoFromEmail(userData.email);
+      setStudentInfo({
+        name: `${userData.firstName} ${userData.lastName}`,
+        eNumber: formatRegNo(rawENo) || "N/A"
+      });
 
-  const markData = [
-    {
-      batch: "E 21",
-      assignments: { a01: "15/20", a02: "18/20" },
-      quizzes: { q01: "08/10", q02: "09/10" },
-      labs: { l1: "10/10", l2: "09/10", l3: "10/10", l4: "08/10" },
-      mid: "25/30",
-      incourse: "35/40",
-      results: "B+"
-    },
-    {
-      batch: "E 22",
-      assignments: { a01: "12/20", a02: "14/20" },
-      quizzes: { q01: "06/10", q02: "07/10" },
-      labs: { l1: "08/10", l2: "08/10", l3: "07/10", l4: "09/10" },
-      mid: "20/30",
-      incourse: "28/40",
-      results: "C"
+      // 2. Fetch list of courses with incourse marks
+      const coursesRes = await getMyIncourseSubjects();
+      const results = coursesRes.data || [];
+      
+      const list = results.map(r => ({
+        code: r.subject.courseCode,
+        name: r.subject.courseName,
+        batch: r.subject.batch
+      }));
+
+      setCourseList(list);
+
+      if (list.length > 0) {
+        const first = list[0].code;
+        setSelectedCourseCode(first);
+        fetchSubjectMarks(first);
+      } else {
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error("Failed to load initial data", err);
+      setError("Failed to load your courses. Please try again later.");
+      setLoading(false);
     }
-  ];
+  };
+
+  const fetchSubjectMarks = async (courseCode) => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await getSubjectIncourseMarks(courseCode);
+      setResultsData(res.data);
+    } catch (err) {
+      console.error("Failed to fetch subject marks", err);
+      setError(err.response?.data?.message || "Failed to fetch marks for this course.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCourseChange = (e) => {
+    const code = e.target.value;
+    setSelectedCourseCode(code);
+    fetchSubjectMarks(code);
+  };
+
+  if (loading && !resultsData) {
+    return (
+      <StudentLayout>
+        <div className="sh-loading">
+          <Loader2 className="animate-spin" size={48} />
+          <p>Retrieving subject participation...</p>
+        </div>
+      </StudentLayout>
+    );
+  }
+
+  const assessments = resultsData?.subject?.assessments || {};
+  const allResults = resultsData?.results || [];
+  const myENo = resultsData?.myENo || studentInfo.eNumber;
 
   return (
     <StudentLayout>
       <div className="im-page">
         {/* Back Link */}
         <div className="im-back">
-          <Link to="/student/student-wise" className="im-back-link">
+          <Link to="/student/subject-wise" className="im-back-link">
             <ChevronLeft size={20} />
-            <span>Back to Result Summary</span>
+            <span>Back to Subject Analytics</span>
           </Link>
         </div>
 
@@ -66,7 +121,7 @@ const IncourseMarks = () => {
             </div>
             <div className="im-header__text">
               <h1 className="im-header__title">Incourse Marks Breakdown</h1>
-              <p className="im-header__sub">Detailed continuous assessment performance</p>
+              <p className="im-header__sub">Continuous assessment performance of all participants</p>
             </div>
           </div>
 
@@ -77,18 +132,33 @@ const IncourseMarks = () => {
                 <div className="im-select-wrap">
                   <Search size={18} className="im-select-icon" />
                   <select 
-                    value={selectedCourse} 
-                    onChange={(e) => setSelectedCourse(e.target.value)}
+                    value={selectedCourseCode} 
+                    onChange={handleCourseChange}
                     className="im-select"
+                    disabled={courseList.length === 0}
                   >
-                    <option value="EC5080">EC5080 - Software Construction</option>
-                    <option value="EC9630">EC9630 - Machine Learning</option>
+                    {courseList.length > 0 ? (
+                      courseList.map((c, idx) => (
+                        <option key={idx} value={c.code}>
+                          {c.code} - {c.name} ({c.batch})
+                        </option>
+                      ))
+                    ) : (
+                      <option>No courses found</option>
+                    )}
                   </select>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        {error && (
+          <div className="sh-status-bar error" style={{ marginBottom: '2rem' }}>
+            <AlertCircle size={18} />
+            <span>{error}</span>
+          </div>
+        )}
 
         {/* Student Info Banner */}
         <div className="im-banner">
@@ -111,68 +181,90 @@ const IncourseMarks = () => {
           <div className="im-banner__item">
             <BookOpen size={20} className="im-banner__icon" />
             <div className="im-banner__text">
-              <span className="im-banner__label">Selected Course</span>
-              <span className="im-banner__value">{selectedCourse}</span>
+              <span className="im-banner__label">Batch</span>
+              <span className="im-banner__value">{resultsData?.subject?.batch || "N/A"}</span>
             </div>
           </div>
         </div>
 
-        {/* Marks Table */}
-        <div className="im-card">
-          <div className="im-table-container">
-            <table className="im-table">
-              <thead>
-                <tr className="im-table__main-head">
-                  <th rowSpan="2">Batch</th>
-                  <th colSpan="2" className="im-head-group im-head-group--blue">Assignment</th>
-                  <th colSpan="2" className="im-head-group im-head-group--indigo">Quiz</th>
-                  <th colSpan="4" className="im-head-group im-head-group--teal">Lab</th>
-                  <th rowSpan="2" className="im-head-single">Mid</th>
-                  <th rowSpan="2" className="im-head-single">Incourse</th>
-                </tr>
-                <tr className="im-table__sub-head">
-                  <th>A 01</th>
-                  <th>A 02</th>
-                  <th>Q 01</th>
-                  <th>Q 02</th>
-                  <th>L1</th>
-                  <th>L2</th>
-                  <th>L3</th>
-                  <th>L4</th>
-                </tr>
-              </thead>
-              <tbody>
-                {markData.map((row, idx) => (
-                  <tr key={idx}>
-                    <td className="im-td-batch">{row.batch}</td>
-                    <td>{row.assignments.a01}</td>
-                    <td>{row.assignments.a02}</td>
-                    <td>{row.quizzes.q01}</td>
-                    <td>{row.quizzes.q02}</td>
-                    <td>{row.labs.l1}</td>
-                    <td>{row.labs.l2}</td>
-                    <td>{row.labs.l3}</td>
-                    <td>{row.labs.l4}</td>
-                    <td className="im-td-bold">{row.mid}</td>
-                    <td className="im-td-total">{row.incourse}</td>
+        {resultsData ? (
+          <div className="im-card">
+            <div className="im-table-container">
+              <table className="im-table">
+                <thead>
+                  <tr className="im-table__main-head">
+                    <th rowSpan="2">Student E-No</th>
+                    {assessments.assignmentCount > 0 && (
+                      <th colSpan={assessments.assignmentCount} className="im-head-group im-head-group--blue">Assignments</th>
+                    )}
+                    {assessments.quizCount > 0 && (
+                      <th colSpan={assessments.quizCount} className="im-head-group im-head-group--indigo">Quizzes</th>
+                    )}
+                    {assessments.labCount > 0 && (
+                      <th colSpan={assessments.labCount} className="im-head-group im-head-group--teal">Labs</th>
+                    )}
+                    {(assessments.midWeight > 0) && (
+                      <th rowSpan="2" className="im-head-single">Mid-Term</th>
+                    )}
+                    <th rowSpan="2" className="im-head-single">Total</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                  <tr className="im-table__sub-head">
+                    {/* Sub-headers for Assignments */}
+                    {Array.from({ length: assessments.assignmentCount || 0 }).map((_, i) => (
+                      <th key={`ah-${i}`}>A {String(i + 1).padStart(2, '0')}</th>
+                    ))}
+                    {/* Sub-headers for Quizzes */}
+                    {Array.from({ length: assessments.quizCount || 0 }).map((_, i) => (
+                      <th key={`qh-${i}`}>Q {String(i + 1).padStart(2, '0')}</th>
+                    ))}
+                    {/* Sub-headers for Labs */}
+                    {Array.from({ length: assessments.labCount || 0 }).map((_, i) => (
+                      <th key={`lh-${i}`}>L {i + 1}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {allResults.map((row, idx) => {
+                    const isMe = row.studentENo === myENo;
+                    return (
+                      <tr key={idx} className={isMe ? "im-row-highlight" : ""}>
+                        <td className="im-td-batch">{row.studentENo}</td>
+                        {/* Data for Assignments */}
+                        {Array.from({ length: assessments.assignmentCount || 0 }).map((_, i) => (
+                          <td key={`ad-${i}`}>{row.assignments?.[i] ?? "-"}</td>
+                        ))}
+                        {/* Data for Quizzes */}
+                        {Array.from({ length: assessments.quizCount || 0 }).map((_, i) => (
+                          <td key={`qd-${i}`}>{row.quizzes?.[i] ?? "-"}</td>
+                        ))}
+                        {/* Data for Labs */}
+                        {Array.from({ length: assessments.labCount || 0 }).map((_, i) => (
+                          <td key={`ld-${i}`}>{row.labs?.[i] ?? "-"}</td>
+                        ))}
+                        {/* Mid-term */}
+                        {assessments.midWeight > 0 && (
+                          <td className="im-td-bold">{row.mid ?? "-"}</td>
+                        )}
+                        {/* Total */}
+                        <td className="im-td-total">{row.incourseTotal ?? "0.0"}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        ) : (
+          !loading && courseList.length === 0 && (
+            <div className="sh-empty-state" style={{ textAlign: 'center', padding: '4rem 0' }}>
+               <AlertCircle size={48} style={{ opacity: 0.3, marginBottom: '1rem' }} />
+               <h3>No marks recorded yet</h3>
+               <p>Once results are published, participants' marks will appear here.</p>
+            </div>
+          )
+        )}
 
-        {/* Bottom Actions */}
-        <div className="im-footer">
-          <div className="im-hint">
-            <Info size={16} />
-            <span>If you find any discrepancy in your marks, please submit a complaint.</span>
-          </div>
-          <button className="im-complaint-btn">
-            <MessageSquare size={18} />
-            Submit Complaint
-          </button>
-        </div>
+        {/* No footer here anymore - moved to dedicated page */}
       </div>
     </StudentLayout>
   );

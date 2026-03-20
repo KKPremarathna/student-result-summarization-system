@@ -1,9 +1,19 @@
 import React, { useState } from "react";
-import "../styles/AddLecture.css";
-import Navbar from "../components/InnerNavbar";
-import { Link } from "react-router-dom";
-import bgImage from "../assets/images/admin.jpg";
 import axios from "axios";
+import AdminLayout from "../components/AdminLayout";
+import "../styles/AddLecture.css";
+import { 
+  UserPlus, 
+  Mail, 
+  Building2, 
+  ChevronRight, 
+  ArrowLeft,
+  AlertCircle,
+  CheckCircle2,
+  List,
+  Plus
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
 function AddLecture() {
   const [email, setEmail] = useState("");
@@ -37,15 +47,13 @@ function AddLecture() {
         { email, department },
         { headers }
       );
-
       setMessage({ type: "success", text: response.data.message });
       setEmail("");
       setDepartment("");
     } catch (error) {
-      console.error("Error adding lecturer:", error);
       setMessage({
         type: "error",
-        text: error.response?.data?.message || error.message || "Error adding lecturer email",
+        text: error.response?.data?.message || "Error adding lecturer email",
       });
     } finally {
       setLoading(false);
@@ -53,99 +61,97 @@ function AddLecture() {
   };
 
   return (
-    <div className="addlecture-page">
-      <Navbar />
+    <AdminLayout>
+      <div className="al-page">
+        {/* Header */}
+        <header className="al-header">
+           <div className="al-breadcrumb">
+              <Link to="/adduser" className="al-back-link"><ArrowLeft size={14} /> Back to Management</Link>
+              <ChevronRight size={14} />
+              <span className="al-breadcrumb-current">Authorize Lecturer</span>
+           </div>
+           <h1 className="al-title">Faculty Access</h1>
+           <p className="al-subtitle">Onboard academic staff by whitelisting their institutional emails.</p>
+        </header>
 
-      <div className="addlecture-container">
-        {/* Sidebar */}
-        <aside className="sidebar">
-          <div className="sidebar-title">Management</div>
-          <ul className="sidebar-menu">
-            <li>
-              <Link to="/adminhome">
-                <span className="sidebar-icon"></span>
-                Admin Home
-              </Link>
-            </li>
-            <li className="active">
-              <Link to="/adduser">
-                <span className="sidebar-icon"></span>
-                Add User
-              </Link>
-            </li>
-            <li>
-              <Link to="/admincomplaint">
-                <span className="sidebar-icon"></span>
-                Complaint
-              </Link>
-            </li>
-            <li >
-              <Link to="/adminresults">
-                <span className="sidebar-icon"></span>
-                Results
-              </Link>
-            </li>
-            <li>
-              <Link to="/adminprofile">
-                <span className="sidebar-icon"></span>
-                Profile
-              </Link>
-            </li>
-          </ul>
-        </aside>
-
-        {/* Main Section */}
-        <main className="addlecture-main">
-          <div className="addlecture-main-content">
-            <h2>Add New Lectures</h2>
-
-            {message.text && (
-              <div className={`status-message ${message.type}`}>
-                {message.text}
-              </div>
-            )}
-
-            <div className="form-row">
-              <label>Email :</label>
-              <input
-                type="email"
-                placeholder="lecturer@eng.jfn.ac.lk"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-
-            <div className="form-row">
-              <label>Department :</label>
-              <select
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-              >
-                <option value="">Select Department</option>
-                <option value="Computer Engineering">Computer Engineering</option>
-                <option value="Electrical Engineering">Electrical Engineering</option>
-                <option value="Civil Engineering">Civil Engineering</option>
-                <option value="Mechanical Engineering">Mechanical Engineering</option>
-              </select>
-            </div>
-
-            <div className="button-row">
-              <button
-                className="add-btn"
-                onClick={handleAddLecturer}
-                disabled={loading}
-              >
-                {loading ? "Adding..." : "Add"}
-              </button>
-
-              <Link to="/lecturelist" className="view-btn">
-                View Lecture List
-              </Link>
-            </div>
+        {message.text && (
+          <div className={`al-status-bar ${message.type}`}>
+            {message.type === "success" ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+            <span>{message.text}</span>
+            <button className="al-status-close" onClick={() => setMessage({ type: "", text: "" })}>×</button>
           </div>
-        </main>
+        )}
+
+        <div className="al-grid">
+           {/* Form Card */}
+           <div className="al-card">
+              <div className="al-card-header">
+                 <div className="al-card-icon-wrap">
+                    <UserPlus size={24} />
+                 </div>
+                 <h3 className="al-card-title">New Faculty Authorization</h3>
+              </div>
+
+              <div className="al-form">
+                 <div className="al-form-group">
+                    <label>
+                       <Mail size={14} /> Institutional Email
+                    </label>
+                    <input
+                      type="email"
+                      placeholder="lecturer@eng.jfn.ac.lk"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                 </div>
+
+                 <div className="al-form-group">
+                    <label>
+                       <Building2 size={14} /> Department
+                    </label>
+                    <select
+                      value={department}
+                      onChange={(e) => setDepartment(e.target.value)}
+                    >
+                      <option value="">Select Department</option>
+                      <option value="Computer Engineering">Computer Engineering</option>
+                      <option value="Electrical Engineering">Electrical Engineering</option>
+                      <option value="Civil Engineering">Civil Engineering</option>
+                      <option value="Mechanical Engineering">Mechanical Engineering</option>
+                    </select>
+                 </div>
+
+                 <button
+                   className="al-submit-btn"
+                   onClick={handleAddLecturer}
+                   disabled={loading}
+                 >
+                   {loading ? "Authorizing..." : <><Plus size={20}/> Authorize Lecturer</>}
+                 </button>
+              </div>
+           </div>
+
+           {/* Quick Actions / Link Card */}
+           <div className="al-side-card">
+              <div className="al-info-card">
+                 <div className="al-info-icon">
+                    <List size={24} />
+                 </div>
+                 <h3>Active Directory</h3>
+                 <p>Review the list of lecturers already authorized or signed up in the system.</p>
+                 <Link to="/lecturelist" className="al-btn al-btn-outline">
+                    View Faculty List
+                 </Link>
+              </div>
+              
+              <div className="al-tip-box">
+                 <AlertCircle size={20} />
+                 <p>Emails must be valid university addresses. Verification will be sent upon first sign-up.</p>
+              </div>
+           </div>
+        </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }
 

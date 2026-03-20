@@ -115,7 +115,8 @@ function FinalResult() {
       handleFetchResults(); // Refresh to get grades
     } catch (err) {
       console.error("Save failed", err);
-      setStatus({ type: "error", message: "Some records failed to save." });
+      const errorMsg = err.response?.data?.message || "Some records failed to save.";
+      setStatus({ type: "error", message: errorMsg });
     } finally {
       setLoading(false);
     }

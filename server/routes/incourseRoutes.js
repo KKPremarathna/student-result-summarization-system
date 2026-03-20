@@ -13,7 +13,8 @@ const {
   updateResult,
   deleteResult,
   getStudentCourses,
-  getStudentResult
+  getStudentResult,
+  getSubjectIncourseMarks
 } = require("../controllers/incourseController");
 
 // Must be logged in
@@ -35,5 +36,6 @@ router.delete("/:id", requireRole("lecturer"), deleteResult);
 // Student-specific routes
 router.get("/student/courses", requireRole("student"), getStudentCourses);
 router.get("/student/my-result", requireRole("student"), getStudentResult);
+router.get("/student/subject-marks", requireRole("student"), getSubjectIncourseMarks);
 
 module.exports = router;

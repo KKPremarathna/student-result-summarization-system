@@ -23,7 +23,7 @@ import LecturerHome from "./pages/LecturerHome";
 import ViewResult from "./pages/ViewResult";
 import AddSubject from "./pages/AddSubject";
 import AddIncourse from "./pages/Addincourse";
-import PendingResult from "./pages/PendingResult";
+import LecturerComplaints from "./pages/LecturerComplaints";
 import FinalResult from "./pages/FinalResult";
 import LecturerSetting from "./pages/LecturerSetting";
 
@@ -33,6 +33,8 @@ import SubjectWiseResult from "./pages/SubjectWiseResult";
 import StudentWiseResult from "./pages/StudentWiseResult";
 import IncourseMarks from "./pages/IncourseMarks";
 import StudentProfile from "./pages/StudentProfile";
+import StudentComplaints from "./pages/StudentComplaints";
+import ForgotPassword from "./pages/ForgotPassword";
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const token = localStorage.getItem("token");
@@ -91,7 +93,7 @@ function App() {
         <Route path="/lecturer/results" element={<ProtectedRoute allowedRoles={['lecturer']}><ViewResult /></ProtectedRoute>} />
         <Route path="/lecturer/addsubject" element={<ProtectedRoute allowedRoles={['lecturer']}><AddSubject /></ProtectedRoute>} />
         <Route path="/lecturer/addincourse" element={<ProtectedRoute allowedRoles={['lecturer']}><AddIncourse /></ProtectedRoute>} />
-        <Route path="/lecturer/pending" element={<ProtectedRoute allowedRoles={['lecturer']}><PendingResult /></ProtectedRoute>} />
+        <Route path="/lecturer/complaints" element={<ProtectedRoute allowedRoles={['lecturer']}><LecturerComplaints /></ProtectedRoute>} />
         <Route path="/lecturer/final" element={<ProtectedRoute allowedRoles={['lecturer']}><FinalResult /></ProtectedRoute>} />
         <Route path="/lecturer/setting" element={<ProtectedRoute allowedRoles={['lecturer']}><LecturerSetting /></ProtectedRoute>} />
 
@@ -101,6 +103,8 @@ function App() {
         <Route path="/student/student-wise" element={<ProtectedRoute allowedRoles={['student']}><StudentWiseResult /></ProtectedRoute>} />
         <Route path="/student/incourse-marks" element={<ProtectedRoute allowedRoles={['student']}><IncourseMarks /></ProtectedRoute>} />
         <Route path="/student/profile" element={<ProtectedRoute allowedRoles={['student']}><StudentProfile /></ProtectedRoute>} />
+        <Route path="/student/complaints" element={<ProtectedRoute allowedRoles={['student']}><StudentComplaints /></ProtectedRoute>} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />

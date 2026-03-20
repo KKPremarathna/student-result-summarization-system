@@ -1,12 +1,31 @@
 import React, { useState } from "react";
+import axios from "axios";
+import AdminLayout from "../components/AdminLayout";
 import "../styles/AdminResult.css";
-import Navbar from "../components/InnerNavbar";
+import { 
+  FileText, 
+  ChevronRight, 
+  Plus, 
+  Trash2, 
+  Save, 
+  RotateCw, 
+  AlertCircle, 
+  CheckCircle2,
+  Database,
+  Users,
+  Layers,
+  Search,
+  X,
+  PlusCircle,
+  Hash,
+  Download,
+  Info
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 const API_BASE = "http://localhost:5000/api/admin";
 const GRADES = ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D", "E", "AB"];
 
-// ── Reg-num helper (client-side mirror) ────────────────────────────────────
 const REG_PATTERN = /^20\d{2}\/E\/\d{3}$/i;
 const isValidReg = (r) => REG_PATTERN.test(r.trim());
 
@@ -59,7 +78,7 @@ function AddStudentModal({ courseCode, onCommit, onCancel, existingRegs }) {
 
     const invalid = nums.filter((n) => !isValidReg(n));
     if (invalid.length) {
-      setModalError(`Invalid format: ${invalid.slice(0, 3).join(", ")}${invalid.length > 3 ? "…" : ""}. Use 20XX/E/xxx`);
+      setModalError(`Invalid format: ${invalid.slice(0, 3).join(", ")}${invalid.length > 3 ? "…" : ""}.`);
       return;
     }
 
@@ -75,23 +94,24 @@ function AddStudentModal({ courseCode, onCommit, onCancel, existingRegs }) {
   };
 
   return (
-    <div className="ar-modal-backdrop">
+    <div className="ar-modal-overlay">
       <div className="ar-modal">
-        {/* Modal header */}
         <div className="ar-modal-header">
           <div className="ar-modal-title">
-            <span className="ar-modal-title-icon"></span>
-            Add Students {courseCode ? `to ${courseCode.toUpperCase()}` : ""}
+            <PlusCircle size={24} className="ar-modal-icon" />
+            <div>
+               <h3>Add Students</h3>
+               <p>{courseCode || "Result Compilation"}</p>
+            </div>
           </div>
-          <button className="ar-modal-close" onClick={onCancel}>✕</button>
+          <button className="ar-modal-close" onClick={onCancel}><X size={20}/></button>
         </div>
 
-        {/* Tabs */}
         <div className="ar-tabs">
-          {[["bulk", "Bulk Entry"], ["range", "Range"], ["individual", "Individual"]].map(([key, label]) => (
+          {[["bulk", "Bulk"], ["range", "Range"], ["individual", "One"]].map(([key, label]) => (
             <button
               key={key}
-              className={`ar-tab ${tab === key ? "ar-tab--active" : ""}`}
+              className={`ar-tab ${tab === key ? "active" : ""}`}
               onClick={() => { setTab(key); setPreview([]); setModalError(""); }}
             >
               {label}
@@ -99,75 +119,67 @@ function AddStudentModal({ courseCode, onCommit, onCancel, existingRegs }) {
           ))}
         </div>
 
-        {/* Tab content */}
         <div className="ar-modal-body">
           {tab === "bulk" && (
-            <div className="ar-modal-field">
-              <label className="ar-modal-label">ENTER E-NUMBERS (ONE PER LINE OR COMMA SEPARATED)</label>
+            <div className="ar-input-group">
+              <label>REGISTRATION NUMBERS (Line separated)</label>
               <textarea
-                className="ar-modal-textarea"
-                rows={5}
-                placeholder={"2020/E/001\n2020/E/002"}
+                placeholder={"2021/E/001\n2021/E/002"}
                 value={bulkText}
                 onChange={(e) => setBulkText(e.target.value)}
               />
             </div>
           )}
           {tab === "range" && (
-            <div className="ar-modal-range">
-              <div className="ar-modal-field">
-                <label className="ar-modal-label">START REG NUMBER</label>
-                <input className="ar-modal-input" placeholder="2021/E/001" value={rangeStart} onChange={(e) => setRangeStart(e.target.value)} />
+            <div className="ar-input-grid">
+              <div className="ar-input-group">
+                <label>START ID</label>
+                <input placeholder="2021/E/001" value={rangeStart} onChange={(e) => setRangeStart(e.target.value)} />
               </div>
-              <div className="ar-modal-field">
-                <label className="ar-modal-label">END REG NUMBER</label>
-                <input className="ar-modal-input" placeholder="2021/E/050" value={rangeEnd} onChange={(e) => setRangeEnd(e.target.value)} />
+              <div className="ar-input-group">
+                <label>END ID</label>
+                <input placeholder="2021/E/050" value={rangeEnd} onChange={(e) => setRangeEnd(e.target.value)} />
               </div>
             </div>
           )}
           {tab === "individual" && (
-            <div className="ar-modal-field">
-              <label className="ar-modal-label">REGISTRATION NUMBER</label>
-              <input className="ar-modal-input" placeholder="2021/E/042" value={individual} onChange={(e) => setIndividual(e.target.value)} />
+            <div className="ar-input-group">
+              <label>SINGLE REGISTRATION NUMBER</label>
+              <input placeholder="2021/E/042" value={individual} onChange={(e) => setIndividual(e.target.value)} />
             </div>
           )}
 
-          {modalError && <div className="ar-modal-alert">{modalError}</div>}
+          {modalError && <div className="ar-modal-alert"><AlertCircle size={14}/> {modalError}</div>}
 
           <button className="ar-parse-btn" onClick={parseAndPreview}>
-            Parse &amp; Add to List
+            Parse & Preview
           </button>
 
-          {/* Preview */}
-          <div className="ar-preview-box">
-            <div className="ar-preview-title">PREVIEW LIST ({preview.length})</div>
-            {preview.length === 0 ? (
-              <p className="ar-preview-empty">No students added to preview yet.</p>
-            ) : (
-              <div className="ar-preview-chips">
-                {preview.map((r) => (
+          <div className="ar-preview">
+            <div className="ar-preview-header">PREVIEW LIST ({preview.length})</div>
+            <div className="ar-preview-chips">
+              {preview.length === 0 ? (
+                <span className="ar-preview-placeholder">No students added to preview.</span>
+              ) : (
+                preview.map((r) => (
                   <span key={r} className="ar-chip">
                     {r}
-                    <button
-                      className="ar-chip-remove"
-                      onClick={() => setPreview((p) => p.filter((x) => x !== r))}
-                    >×</button>
+                    <button onClick={() => setPreview((p) => p.filter((x) => x !== r))}><X size={12}/></button>
                   </span>
-                ))}
-              </div>
-            )}
+                ))
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Footer */}
         <div className="ar-modal-footer">
-          <button className="ar-cancel-btn" onClick={onCancel}>Cancel</button>
+          <button className="ar-modal-btn cancel" onClick={onCancel}>Cancel</button>
           <button
-            className={`ar-commit-btn ${preview.length === 0 ? "ar-commit-btn--disabled" : ""}`}
+            className="ar-modal-btn commit"
             onClick={handleCommit}
             disabled={preview.length === 0}
           >
-            Confirm &amp; Commit to Table
+            Add to Table
           </button>
         </div>
       </div>
@@ -181,12 +193,10 @@ function Results() {
   const [semester, setSemester] = useState("");
   const [batch, setBatch] = useState("");
   const [lecturerEmail, setLecturerEmail] = useState("");
-
-  // Table rows: { _id (if from DB), regNum, grade, isNew, editing }
   const [rows, setRows] = useState([]);
   const [showModal, setShowModal] = useState(false);
-
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: "", type: "success" });
 
   const token = localStorage.getItem("token");
@@ -197,9 +207,8 @@ function Results() {
     setTimeout(() => setToast({ visible: false, message: "", type: "success" }), 3500);
   };
 
-  // Commit students from modal → add rows
   const handleCommitStudents = (regNums) => {
-    const newRows = regNums.map((r) => ({ _id: null, regNum: r, grade: "", isNew: true, editing: false }));
+    const newRows = regNums.map((r) => ({ _id: null, regNum: r, grade: "", isNew: true }));
     setRows((prev) => [...prev, ...newRows]);
     setShowModal(false);
   };
@@ -215,50 +224,47 @@ function Results() {
   const handleDeleteRow = async (idx) => {
     const row = rows[idx];
     if (row._id) {
-      // Saved in DB — delete via API
       if (!window.confirm(`Delete result for ${row.regNum}?`)) return;
       try {
         const res = await fetch(`${API_BASE}/delete-result/${row._id}`, {
           method: "DELETE", headers: authHeaders,
         });
-        const data = await res.json();
-        if (!res.ok) { showToast(data.message || "Delete failed", "error"); return; }
-        showToast("Result deleted.");
-      } catch { showToast("Network error.", "error"); return; }
+        if (res.ok) showToast("Result deleted.");
+        else return;
+      } catch { return; }
     }
     setRows((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const handleUpdateRow = async (idx) => {
     const row = rows[idx];
-    if (!row._id) { showToast("Save all results first before updating individually.", "error"); return; }
-    if (!row.grade) { showToast("Enter a grade before updating.", "error"); return; }
+    if (!row._id) { showToast("Save all results first.", "error"); return; }
+    if (!row.grade) { showToast("Enter a grade.", "error"); return; }
     try {
       const res = await fetch(`${API_BASE}/update-result/${row._id}`, {
         method: "PUT",
         headers: authHeaders,
         body: JSON.stringify({ grade: row.grade }),
       });
-      const data = await res.json();
       if (res.ok) {
-        showToast(`Grade updated for ${row.regNum}`);
+        showToast(`Updated ${row.regNum}`);
         setRows((prev) => prev.map((r, i) => i === idx ? { ...r, isNew: false } : r));
       } else {
-        showToast(data.message || "Update failed.", "error");
+        showToast("Update failed.", "error");
       }
     } catch { showToast("Network error.", "error"); }
   };
 
   const handleFinalize = async () => {
     if (!courseCode || !semester || !batch || !lecturerEmail) {
-      showToast("Fill in all header fields before finalizing.", "error"); return;
+      showToast("Fill in all header fields.", "error"); return;
     }
     if (rows.length === 0) {
-      showToast("Add at least one student result before finalizing.", "error"); return;
+      showToast("Add student results first.", "error"); return;
     }
     const incomplete = rows.filter((r) => !r.grade);
     if (incomplete.length > 0) {
-      showToast(`${incomplete.length} row(s) missing a grade.`, "error"); return;
+      showToast(`${incomplete.length} rows missing grades.`, "error"); return;
     }
 
     setSaving(true);
@@ -269,20 +275,22 @@ function Results() {
         headers: authHeaders,
         body: JSON.stringify({ courseCode, semester, batch, lecturerEmail, results }),
       });
-      const data = await res.json();
       if (res.ok) {
-        showToast(data.message || "Results saved successfully!");
-        // Reload to get IDs
+        showToast("Saved successfully!");
         await loadExisting();
       } else {
-        showToast(data.message || "Save failed.", "error");
+        showToast("Save failed.", "error");
       }
     } catch { showToast("Network error.", "error"); }
     finally { setSaving(false); }
   };
 
   const loadExisting = async () => {
-    if (!courseCode || !semester || !batch) return;
+    if (!courseCode || !semester || !batch) {
+      showToast("Provide Level/Code/Batch to load.", "error");
+      return;
+    }
+    setLoading(true);
     try {
       const params = `?courseCode=${encodeURIComponent(courseCode)}&batch=${encodeURIComponent(batch)}&semester=${encodeURIComponent(semester)}`;
       const res = await fetch(`${API_BASE}/get-results${params}`, { headers: authHeaders });
@@ -293,179 +301,186 @@ function Results() {
           regNum: r.studentRegNum,
           grade: r.grade,
           isNew: false,
-          editing: false,
         })));
         if (data.data.length > 0) setLecturerEmail(data.data[0].lecturerEmail || lecturerEmail);
-        showToast(`Loaded ${data.data.length} existing results.`);
+        showToast(`Loaded ${data.data.length} records.`);
       }
-    } catch { showToast("Failed to load existing results.", "error"); }
+    } catch { showToast("Failed to load records.", "error"); }
+    finally { setLoading(false); }
   };
 
-  const existingRegs = rows.map((r) => r.regNum.toUpperCase());
-
   return (
-    <div className="results-page">
-      <Navbar />
-
-      {toast.visible && (
-        <div className={`ar-toast ar-toast--${toast.type}`}>{toast.message}</div>
-      )}
-
-      {showModal && (
-        <AddStudentModal
-          courseCode={courseCode}
-          onCommit={handleCommitStudents}
-          onCancel={() => setShowModal(false)}
-          existingRegs={existingRegs}
-        />
-      )}
-
-      <div className="results-content">
-        {/* Sidebar */}
-        <aside className="sidebar">
-          <div className="sidebar-title">Management</div>
-          <ul className="sidebar-menu">
-            <li><Link to="/adminhome"><span className="sidebar-icon"></span>Admin Home</Link></li>
-            <li><Link to="/adduser"><span className="sidebar-icon"></span>Add User</Link></li>
-            <li><Link to="/admincomplaint"><span className="sidebar-icon"></span>Complaint</Link></li>
-            <li className="active"><Link to="/adminresults"><span className="sidebar-icon"></span>Results</Link></li>
-            <li><Link to="/adminprofile"><span className="sidebar-icon"></span>Profile</Link></li>
-          </ul>
-        </aside>
-
-        <main className="results-main">
-          <div className="results-main-content">
-
-            {/* Page title */}
-            <div className="ar-page-header">
-              <div>
-                <h1 className="ar-page-title">Final Result Entry</h1>
-                <p className="ar-page-sub">Enter course details and add student grades</p>
-              </div>
-              <button className="ar-load-btn" onClick={loadExisting} title="Load existing results from DB">
-                Load Existing
-              </button>
-            </div>
-
-            {/* Top form */}
-            <div className="ar-form-card">
-              <div className="ar-form-grid">
-                <div className="ar-field">
-                  <label className="ar-label">Course Code</label>
-                  <input className="ar-input" placeholder="e.g. CS3042" value={courseCode} onChange={(e) => setCourseCode(e.target.value)} />
-                </div>
-                <div className="ar-field">
-                  <label className="ar-label">Batch</label>
-                  <input className="ar-input" placeholder="e.g. 2021/22" value={batch} onChange={(e) => setBatch(e.target.value)} />
-                </div>
-                <div className="ar-field">
-                  <label className="ar-label">Semester</label>
-                  <input className="ar-input" placeholder="e.g. 1 or 2" value={semester} onChange={(e) => setSemester(e.target.value)} />
-                </div>
-                <div className="ar-field">
-                  <label className="ar-label">Lecturer Email</label>
-                  <input className="ar-input" type="email" placeholder="lecturer@eng.jfn.ac.lk" value={lecturerEmail} onChange={(e) => setLecturerEmail(e.target.value)} />
-                </div>
-              </div>
-            </div>
-
-            {/* Table header with Add Student button */}
-            <div className="ar-table-header">
-              <div className="ar-table-header-left">
-                <h2 className="ar-table-title">Grade Sheet</h2>
-                <span className="ar-row-count">{rows.length} student{rows.length !== 1 ? "s" : ""}</span>
-              </div>
-              <button className="ar-add-student-btn" onClick={() => setShowModal(true)}>
-                Add Students
-              </button>
-            </div>
-
-            {/* Grade table */}
-            <div className="ar-table-wrapper">
-              {rows.length === 0 ? (
-                <div className="ar-empty-table">
-                  <span className="ar-empty-icon"></span>
-                  <p>No students added yet.<br />Click <strong>Add Students</strong> to begin.</p>
-                </div>
-              ) : (
-                <table className="ar-table">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Registration No.</th>
-                      <th>Final Grade</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.map((row, idx) => (
-                      <tr key={`${row.regNum}-${idx}`} className={row.isNew ? "ar-row-new" : ""}>
-                        <td className="ar-td-num">{idx + 1}</td>
-                        <td className="ar-td-reg">{row.regNum}</td>
-                        <td className="ar-td-grade">
-                          <select
-                            className={`ar-grade-select ${!row.grade ? "ar-grade-select--empty" : ""}`}
-                            value={row.grade}
-                            onChange={(e) => handleGradeChange(idx, e.target.value)}
-                          >
-                            <option value="">— Select Grade —</option>
-                            {GRADES.map((g) => (
-                              <option key={g} value={g}>{g}</option>
-                            ))}
-                          </select>
-                        </td>
-                        <td className="ar-td-actions">
-                          {row._id && (
-                            <button
-                              className="ar-update-btn"
-                              onClick={() => handleUpdateRow(idx)}
-                              title="Update this grade in DB"
-                            >
-                              Update
-                            </button>
-                          )}
-                          <button
-                            className="ar-del-row-btn"
-                            onClick={() => handleDeleteRow(idx)}
-                            title="Remove row"
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-
-            {/* Finalize */}
-            {rows.length > 0 && (
-              <div className="ar-finalize-bar">
-                <div className="ar-finalize-info">
-                  <span className="ar-finalize-info-dot" />
-                  {rows.filter((r) => !r.grade).length > 0
-                    ? `${rows.filter((r) => !r.grade).length} grade(s) still missing`
-                    : "All grades filled ✓"}
-                </div>
-                <button
-                  className={`ar-finalize-btn ${saving ? "ar-finalize-btn--loading" : ""}`}
-                  onClick={handleFinalize}
-                  disabled={saving}
-                >
-                  {saving ? (
-                    <><span className="ar-btn-spinner" /> Saving…</>
-                  ) : (
-                    " Finalize Marks"
-                  )}
-                </button>
-              </div>
-            )}
-
+    <AdminLayout>
+      <div className="ar-page">
+        {toast.visible && (
+          <div className={`ar-floating-toast ${toast.type}`}>
+             {toast.type === "success" ? <CheckCircle2 size={18}/> : <AlertCircle size={18}/>}
+             <span>{toast.message}</span>
           </div>
-        </main>
+        )}
+
+        {showModal && (
+          <AddStudentModal
+            courseCode={courseCode}
+            onCommit={handleCommitStudents}
+            onCancel={() => setShowModal(false)}
+            existingRegs={rows.map((r) => r.regNum.toUpperCase())}
+          />
+        )}
+
+        {/* Header */}
+        <header className="ar-header">
+           <div className="ar-header-left">
+              <div className="ar-breadcrumb">
+                 <FileText size={14} />
+                 <span>Management</span>
+                 <ChevronRight size={14} />
+                 <span className="ar-breadcrumb-current">Compilation</span>
+              </div>
+              <h1 className="ar-title">Senate Submissions</h1>
+           </div>
+           <div className="ar-header-right">
+              <button className="ar-btn-secondary" onClick={loadExisting} disabled={loading}>
+                 <RotateCw size={18} className={loading ? "animate-spin" : ""} />
+                 Sync Database
+              </button>
+           </div>
+        </header>
+
+        {/* Multi-step form grid */}
+        <div className="ar-config-grid">
+           <section className="ar-card ar-config-card">
+              <div className="ar-card-header">
+                 <div className="ar-card-icon-wrap">
+                    <Layers size={18} />
+                 </div>
+                 <h3>Header Configuration</h3>
+              </div>
+              <div className="ar-form-grid">
+                 <div className="ar-input-group">
+                    <label>Course Code</label>
+                    <input placeholder="e.g. CS3042" value={courseCode} onChange={(e) => setCourseCode(e.target.value)} />
+                 </div>
+                 <div className="ar-input-group">
+                    <label>Batch</label>
+                    <input placeholder="e.g. 2021/22" value={batch} onChange={(e) => setBatch(e.target.value)} />
+                 </div>
+                 <div className="ar-input-group">
+                    <label>Semester</label>
+                    <input placeholder="e.g. 1" value={semester} onChange={(e) => setSemester(e.target.value)} />
+                 </div>
+                 <div className="ar-input-group">
+                    <label>Lecturer Email</label>
+                    <input type="email" placeholder="lecturer@eng.jfn.ac.lk" value={lecturerEmail} onChange={(e) => setLecturerEmail(e.target.value)} />
+                 </div>
+              </div>
+           </section>
+
+           <div className="ar-side-controls">
+              <div className="ar-summary-card">
+                 <div className="ar-summary-row">
+                    <span className="ar-summary-label">Total Entries</span>
+                    <span className="ar-summary-value">{rows.length}</span>
+                 </div>
+                 <div className="ar-summary-row">
+                    <span className="ar-summary-label">Missing Grades</span>
+                    <span className="ar-summary-value alert">{rows.filter(r => !r.grade).length}</span>
+                 </div>
+                 <button className="ar-btn-primary full" onClick={() => setShowModal(true)}>
+                    <Plus size={20} /> Add Students
+                 </button>
+              </div>
+              
+              <div className="ar-tip-card">
+                 <Info size={16} />
+                 <p>Load existing results first to avoid duplicates when updating a course collection.</p>
+              </div>
+           </div>
+        </div>
+
+        {/* Results Table Section */}
+        <div className="ar-table-card">
+          <div className="ar-table-header">
+             <div className="ar-table-title-group">
+                <Database size={18} />
+                <h3>Compilation Sheet</h3>
+             </div>
+             {rows.length > 0 && (
+               <div className="ar-table-actions">
+                  <span className="ar-status-indicator filled">
+                     {rows.every(r => r.grade) ? "Complete ✓" : "Drafting..."}
+                  </span>
+               </div>
+             )}
+          </div>
+
+          <div className="ar-table-container">
+            {rows.length === 0 ? (
+              <div className="ar-empty-state">
+                <Users size={64} />
+                <p>No student records added to this compilation.</p>
+                <button className="ar-btn-outline" onClick={() => setShowModal(true)}>Begin Entry</button>
+              </div>
+            ) : (
+              <table className="ar-table">
+                <thead>
+                  <tr>
+                    <th><Hash size={14}/></th>
+                    <th>Registration ID</th>
+                    <th>Compilation Grade</th>
+                    <th>Manage</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((row, idx) => (
+                    <tr key={`${row.regNum}-${idx}`} className={row.isNew ? "is-new" : ""}>
+                      <td className="ar-td-num">{idx + 1}</td>
+                      <td className="ar-td-reg">{row.regNum}</td>
+                      <td className="ar-td-grade">
+                        <select
+                          className={!row.grade ? "empty" : ""}
+                          value={row.grade}
+                          onChange={(e) => handleGradeChange(idx, e.target.value)}
+                        >
+                          <option value="">Select Grade</option>
+                          {GRADES.map((g) => (
+                            <option key={g} value={g}>{g}</option>
+                          ))}
+                        </select>
+                      </td>
+                      <td className="ar-td-actions">
+                        <div className="ar-action-group">
+                           {row._id && (
+                             <button className="ar-row-btn update" onClick={() => handleUpdateRow(idx)} title="Sync individual grade">
+                                <Save size={16} />
+                             </button>
+                           )}
+                           <button className="ar-row-btn delete" onClick={() => handleDeleteRow(idx)} title="Remove student">
+                              <Trash2 size={16} />
+                           </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          {rows.length > 0 && (
+            <div className="ar-table-footer">
+               <button
+                 className="ar-finalize-btn"
+                 onClick={handleFinalize}
+                 disabled={saving}
+               >
+                 {saving ? <RotateCw className="animate-spin" size={20} /> : <><Download size={20} /> Finalize Mark Sheet</>}
+               </button>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }
 
