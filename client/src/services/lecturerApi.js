@@ -69,6 +69,26 @@ export const createSubject = (subjectData) => {
 };
 
 /*
+Get subject by ID
+*/
+export const getSubjectById = (id) => {
+    const token = localStorage.getItem("token");
+    return axios.get(`${API}/subjects/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
+
+/*
+Update an existing subject
+*/
+export const updateSubject = (id, subjectData) => {
+    const token = localStorage.getItem("token");
+    return axios.put(`${API}/subjects/${id}`, subjectData, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
+
+/*
 Save or update incourse results for a student
 */
 export const saveIncourseResult = (resultData) => {

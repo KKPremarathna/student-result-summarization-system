@@ -3,26 +3,25 @@
 .lecturer-layout {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  background-color: #0B2E33;
-  /* Original dark teal base */
+  height: 100vh;
+  overflow: hidden;
+  background-color: #0a7f92;
 }
 
 .lecturer-layout__body {
   display: flex;
   flex: 1;
   position: relative;
-  /* Allow sticky children */
+  overflow: hidden;
 }
 
 .lecturer-layout__content {
   flex: 1;
   position: relative;
-  overflow: auto;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   background-color: rgba(0, 0, 0, 0.4);
-  /* Original overlay */
 }
 
 .lecturer-layout__inner {

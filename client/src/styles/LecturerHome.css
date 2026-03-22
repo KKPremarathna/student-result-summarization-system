@@ -269,6 +269,34 @@
   border-color: var(--lh-dark);
 }
 
+.lh-subject-item__info {
+  flex: 1;
+}
+
+.lh-subject-item__actions {
+  display: flex;
+  align-items: center;
+}
+
+.lh-subject-item__edit {
+  color: #64748b;
+  background: white;
+  padding: 0.5rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  border: 1px solid var(--lh-border);
+}
+
+.lh-subject-item__edit:hover {
+  color: var(--lh-primary);
+  border-color: var(--lh-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(33, 158, 188, 0.15);
+}
+
 .lh-subject-item__name {
   font-size: 1.1rem;
   font-weight: 800;

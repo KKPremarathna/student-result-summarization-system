@@ -13,7 +13,8 @@ import {
   Search,
   LayoutDashboard,
   Calendar,
-  Loader2
+  Loader2,
+  Edit3
 } from "lucide-react";
 
 function LecturerHome() {
@@ -168,9 +169,18 @@ function LecturerHome() {
                       <div className="lh-subject-item__initial">
                         {subject.courseCode?.charAt(0) || "S"}
                       </div>
-                      <div>
+                      <div className="lh-subject-item__info">
                         <h4 className="lh-subject-item__name">{subject.courseName}</h4>
                         <p className="lh-subject-item__year">{subject.courseCode} | {subject.batch} | {subject.semester}</p>
+                      </div>
+                      <div className="lh-subject-item__actions">
+                        <Link 
+                          to={`/lecturer/edit-subject/${subject._id}`} 
+                          className="lh-subject-item__edit" 
+                          title="Edit Subject"
+                        >
+                          <Edit3 size={18} />
+                        </Link>
                       </div>
                     </div>
                   ))
