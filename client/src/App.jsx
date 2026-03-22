@@ -22,6 +22,7 @@ import Setting from "./pages/Setting";
 import LecturerHome from "./pages/LecturerHome";
 import ViewResult from "./pages/ViewResult";
 import AddSubject from "./pages/AddSubject";
+import EditSubject from "./pages/EditSubject";
 import AddIncourse from "./pages/Addincourse";
 import LecturerComplaints from "./pages/LecturerComplaints";
 import FinalResult from "./pages/FinalResult";
@@ -92,6 +93,7 @@ function App() {
         <Route path="/lecturer/home" element={<ProtectedRoute allowedRoles={['lecturer']}><LecturerHome /></ProtectedRoute>} />
         <Route path="/lecturer/results" element={<ProtectedRoute allowedRoles={['lecturer']}><ViewResult /></ProtectedRoute>} />
         <Route path="/lecturer/addsubject" element={<ProtectedRoute allowedRoles={['lecturer']}><AddSubject /></ProtectedRoute>} />
+        <Route path="/lecturer/edit-subject/:id" element={<ProtectedRoute allowedRoles={['lecturer']}><EditSubject /></ProtectedRoute>} />
         <Route path="/lecturer/addincourse" element={<ProtectedRoute allowedRoles={['lecturer']}><AddIncourse /></ProtectedRoute>} />
         <Route path="/lecturer/complaints" element={<ProtectedRoute allowedRoles={['lecturer']}><LecturerComplaints /></ProtectedRoute>} />
         <Route path="/lecturer/final" element={<ProtectedRoute allowedRoles={['lecturer']}><FinalResult /></ProtectedRoute>} />

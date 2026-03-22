@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import LecturerLayout from "../components/LecturerLayout.jsx";
-import { createSubject } from "../services/lecturerApi.js";
+import { getSubjectById, updateSubject } from "../services/lecturerApi.js";
 import "../styles/AddSubject.css";
 import "../styles/Toast.css";
 import {
-  PlusCircle,
+  Edit3,
   BookOpen,
   Settings2,
   Percent,
@@ -16,8 +17,11 @@ import {
   X
 } from "lucide-react";
 
-function AddSubject() {
+function EditSubject() {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const [toast, setToast] = useState({ visible: false, message: "", type: "" });
 
   const showToast = (msg, type = "success") => {
@@ -29,16 +33,47 @@ function AddSubject() {
     batch: "",
     courseName: "",
     credit: "",
-    assignments: "",
-    labs: "",
-    quizzes: "",
-    percentAssignments: "",
-    percentLabs: "",
-    percentQuizzes: "",
-    percentMid: "",
-    percentEndExam: "",
+    assignments: "0",
+    labs: "0",
+    quizzes: "0",
+    percentAssignments: "0",
+    percentLabs: "0",
+    percentQuizzes: "0",
+    percentMid: "0",
+    percentEndExam: "0",
     semester: "",
   });
+
+  useEffect(() => {
+    const fetchSubject = async () => {
+      try {
+        const res = await getSubjectById(id);
+        const data = res.data;
+        const assess = data.assessments || {};
+        setSubjectDetails({
+          courseCode: data.courseCode || "",
+          batch: data.batch || "",
+          courseName: data.courseName || "",
+          credit: data.credit !== undefined ? String(data.credit) : "",
+          semester: data.semester || "",
+          assignments: assess.assignmentCount !== undefined ? String(assess.assignmentCount) : "0",
+          labs: assess.labCount !== undefined ? String(assess.labCount) : "0",
+          quizzes: assess.quizCount !== undefined ? String(assess.quizCount) : "0",
+          percentAssignments: assess.assignmentWeight !== undefined ? String(assess.assignmentWeight) : "0",
+          percentLabs: assess.labWeight !== undefined ? String(assess.labWeight) : "0",
+          percentQuizzes: assess.quizWeight !== undefined ? String(assess.quizWeight) : "0",
+          percentMid: assess.midWeight !== undefined ? String(assess.midWeight) : "0",
+          percentEndExam: assess.endExamWeight !== undefined ? String(assess.endExamWeight) : "0",
+        });
+      } catch (err) {
+        console.error(err);
+        showToast("Failed to load subject details.", "error");
+      } finally {
+        setFetching(false);
+      }
+    };
+    fetchSubject();
+  }, [id]);
 
   const handleChange = (e) => {
     setSubjectDetails({ ...subjectDetails, [e.target.name]: e.target.value });
@@ -61,7 +96,6 @@ function AddSubject() {
       return;
     }
 
-    // Format data for backend
     const formattedData = {
       courseCode: subjectDetails.courseCode.toUpperCase(),
       courseName: subjectDetails.courseName,
@@ -81,37 +115,28 @@ function AddSubject() {
     };
 
     try {
-      await createSubject(formattedData);
-      showToast("Subject registered successfully!", "success");
-      // Reset form
-      setSubjectDetails({
-        courseCode: "",
-        batch: "",
-        courseName: "",
-        credit: "",
-        assignments: "",
-        labs: "",
-        quizzes: "",
-        percentAssignments: "",
-        percentLabs: "",
-        percentQuizzes: "",
-        percentMid: "",
-        percentEndExam: "",
-        semester: "",
-      });
+      await updateSubject(id, formattedData);
+      showToast("Subject updated successfully!", "success");
+      setTimeout(() => navigate('/lecturer/home'), 1500);
     } catch (err) {
-      const errorMsg = err.response?.data?.message || "Failed to register subject.";
+      const errorMsg = err.response?.data?.message || "Failed to update subject.";
       showToast(errorMsg, "error");
     } finally {
       setLoading(false);
     }
   };
 
+  if (fetching) {
+    return (
+      <LecturerLayout>
+        <div style={{ padding: "3rem", textAlign: "center", fontStyle: "italic", opacity: 0.7 }}>Loading subject details...</div>
+      </LecturerLayout>
+    );
+  }
+
   return (
     <LecturerLayout>
       <div className="as-page">
-
-        {/* Page Header */}
         <div className="as-header">
           <div className="as-breadcrumb">
             <LayoutDashboard size={14} />
@@ -120,8 +145,8 @@ function AddSubject() {
             <span className="as-breadcrumb__current">Course Management</span>
           </div>
           <h2 className="as-title">
-            <PlusCircle className="as-title__icon" size={32} />
-            Add New Subject
+            <Edit3 className="as-title__icon" size={32} />
+            Edit Subject
           </h2>
         </div>
 
@@ -143,8 +168,6 @@ function AddSubject() {
         )}
 
         <form onSubmit={handleSubmit} className="as-form">
-
-          {/* Section 1: Core Details */}
           <div className="as-card">
             <div className="as-card__header">
               <div className="as-card__icon-wrap">
@@ -223,7 +246,6 @@ function AddSubject() {
             </div>
           </div>
 
-          {/* Section 2: Component Structure */}
           <div className="as-card">
             <div className="as-card__header">
               <div className="as-card__icon-wrap">
@@ -234,7 +256,7 @@ function AddSubject() {
 
             <div className="as-grid as-grid--3col">
               <div className="as-field">
-                <label className="as-label">Assignments</label>
+                <label className="as-label">Compulsory Assignments</label>
                 <input
                   type="number"
                   name="assignments"
@@ -248,7 +270,7 @@ function AddSubject() {
               </div>
 
               <div className="as-field">
-                <label className="as-label">Labs</label>
+                <label className="as-label">Compulsory Labs</label>
                 <input
                   type="number"
                   name="labs"
@@ -262,7 +284,7 @@ function AddSubject() {
               </div>
 
               <div className="as-field">
-                <label className="as-label">Quizzes</label>
+                <label className="as-label">Compulsory Quizzes</label>
                 <input
                   type="number"
                   name="quizzes"
@@ -277,7 +299,6 @@ function AddSubject() {
             </div>
           </div>
 
-          {/* Section 3: Evaluation Percentages */}
           <div className="as-card">
             <div className="as-card__header">
               <div className="as-card__icon-wrap">
@@ -315,7 +336,6 @@ function AddSubject() {
             </div>
           </div>
 
-          {/* Submit Button */}
           <div className="as-submit-row">
             <button
               type="submit"
@@ -323,7 +343,7 @@ function AddSubject() {
               disabled={loading}
             >
               <ClipboardList size={24} />
-              {loading ? "Registering..." : "Register Subject"}
+              {loading ? "Updating..." : "Update Subject"}
             </button>
           </div>
         </form>
@@ -332,4 +352,4 @@ function AddSubject() {
   );
 }
 
-export default AddSubject;
+export default EditSubject;
