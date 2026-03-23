@@ -55,7 +55,7 @@ function InnerNavbar() {
       </div>
 
       <nav className="inner-navbar__nav">
-        <div className="home-navbar__links">
+        <div className="inner-navbar__links">
           <Link to="/">Home</Link>
           <Link to="/about">About</Link>
           <Link to="/calendar">Academic Calendar</Link>

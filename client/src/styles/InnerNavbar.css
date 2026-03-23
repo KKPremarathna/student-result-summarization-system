@@ -48,13 +48,13 @@
   gap: 2rem;
 }
 
-.home-navbar__links {
+.inner-navbar__links {
   display: flex;
   gap: 2rem;
   align-items: center;
 }
 
-.home-navbar__links a {
+.inner-navbar__links a {
   text-decoration: none;
   font-size: 0.95rem;
   font-weight: 600;
@@ -62,7 +62,7 @@
   transition: all 0.2s ease;
 }
 
-.home-navbar__links a:hover {
+.inner-navbar__links a:hover {
   color: #0B2E33;
 }
 
@@ -233,7 +233,7 @@
   .inner-navbar {
     padding: 0 1.5rem;
   }
-  .home-navbar__links {
+  .inner-navbar__links {
     display: none;
   }
 }
