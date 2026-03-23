@@ -4,6 +4,7 @@ import "./styles/global.css";
 import Home from "./pages/home";
 import SignIn from "./pages/signIn";
 import SignUp from "./pages/signUp";
+import About from "./pages/About";
 
 // Admin Pages
 import AdminHome from "./pages/AdminHome";
@@ -61,6 +62,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/about" element={<About />} />
         
         {/* Auth Routes */}
         <Route path="/signin" element={<SignIn />} />
