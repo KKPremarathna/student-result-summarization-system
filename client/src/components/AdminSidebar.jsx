@@ -1,12 +1,12 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { 
-  LayoutDashboard, 
-  UserPlus, 
-  Users, 
-  MessageSquare, 
-  FileText, 
-  User, 
+import {
+  LayoutDashboard,
+  UserPlus,
+  Users,
+  MessageSquare,
+  FileText,
+  User,
   ChevronRight
 } from "lucide-react";
 import "../styles/AdminLayout.css";
