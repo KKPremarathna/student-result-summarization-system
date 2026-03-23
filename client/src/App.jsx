@@ -4,6 +4,7 @@ import "./styles/global.css";
 import Home from "./pages/home";
 import SignIn from "./pages/signIn";
 import SignUp from "./pages/signUp";
+import About from "./pages/About";
 
 // Admin Pages
 import AdminHome from "./pages/AdminHome";
@@ -18,6 +19,7 @@ import AdminProfile from "./pages/AdminProfile";
 import ResetPassword from "./pages/AdminResetpassword";
 import Setting from "./pages/Setting";
 import AdminAcademicCalendar from "./pages/AdminAcademicCalendar";
+import ViewAcademicCalendar from "./pages/ViewAcademicCalendar.jsx";
 
 // Lecturer Pages
 import LecturerHome from "./pages/LecturerHome";
@@ -28,7 +30,6 @@ import AddIncourse from "./pages/Addincourse";
 import LecturerComplaints from "./pages/LecturerComplaints";
 import FinalResult from "./pages/FinalResult";
 import LecturerSetting from "./pages/LecturerSetting";
-import ViewAcademicCalendar from "./pages/ViewAcademicCalendar.jsx";
 
 // Student Pages
 import StudentHome from "./pages/StudentHome";
@@ -63,6 +64,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/about" element={<About />} />
 
         {/* Auth Routes */}
         <Route path="/signin" element={<SignIn />} />
@@ -90,8 +92,6 @@ function App() {
         <Route path="/adminresetpassword" element={<ProtectedRoute allowedRoles={['admin']}><ResetPassword /></ProtectedRoute>} />
 
         <Route path="/setting" element={<ProtectedRoute allowedRoles={['admin', 'lecturer']}><Setting /></ProtectedRoute>} />
-        <Route path="/AdminCalendar" element={<AdminAcademicCalendar />} />
-        <Route path="/calendar" element={<ViewAcademicCalendar />} />
 
         {/* Protected Lecturer Routes */}
         <Route path="/lecturer/home" element={<ProtectedRoute allowedRoles={['lecturer']}><LecturerHome /></ProtectedRoute>} />
@@ -102,6 +102,8 @@ function App() {
         <Route path="/lecturer/complaints" element={<ProtectedRoute allowedRoles={['lecturer']}><LecturerComplaints /></ProtectedRoute>} />
         <Route path="/lecturer/final" element={<ProtectedRoute allowedRoles={['lecturer']}><FinalResult /></ProtectedRoute>} />
         <Route path="/lecturer/setting" element={<ProtectedRoute allowedRoles={['lecturer']}><LecturerSetting /></ProtectedRoute>} />
+        <Route path="/AdminCalendar" element={<AdminAcademicCalendar />} />
+        <Route path="/calendar" element={<ViewAcademicCalendar />} />
 
         {/* Student Routes */}
         <Route path="/student/home" element={<ProtectedRoute allowedRoles={['student']}><StudentHome /></ProtectedRoute>} />
