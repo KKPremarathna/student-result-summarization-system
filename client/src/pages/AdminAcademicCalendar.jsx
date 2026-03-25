@@ -53,6 +53,12 @@ function AdminAcademicCalendar() {
       return;
     }
 
+    const yearRegex = /^\d{4}\/\d{4}$/;
+    if (!yearRegex.test(formData.year)) {
+      setMessage({ type: "error", text: "Academic Year must be in YYYY/YYYY format (e.g., 2025/2026)." });
+      return;
+    }
+
     setUploadLoading(true);
     setMessage({ type: "", text: "" });
 
