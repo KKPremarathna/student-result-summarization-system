@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import AdminLayout from "../components/AdminLayout";
 import { getCalendars, uploadCalendar, deleteCalendar } from "../services/calendarApi";
 import { Calendar, FileText, Upload, Trash2, ExternalLink, AlertCircle, CheckCircle2, Plus } from "lucide-react";
+import ConfirmModal from "../components/ConfirmModal";
 import "../styles/AcademicCalendar.css";
 
 function AdminAcademicCalendar() {
@@ -14,6 +15,12 @@ function AdminAcademicCalendar() {
     title: "",
     year: "",
     pdfFile: null
+  });
+
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    calendarId: null,
+    calendarTitle: ""
   });
 
   useEffect(() => {
@@ -72,15 +79,24 @@ function AdminAcademicCalendar() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this calendar?")) {
-      try {
-        await deleteCalendar(id);
-        setMessage({ type: "success", text: "Calendar deleted successfully." });
-        fetchCalendars();
-      } catch (err) {
-        setMessage({ type: "error", text: "Failed to delete from storage." });
-      }
+  const handleDeleteClick = (id, title) => {
+    setDeleteModal({
+      isOpen: true,
+      calendarId: id,
+      calendarTitle: title
+    });
+  };
+
+  const confirmDelete = async () => {
+    const { calendarId } = deleteModal;
+    setDeleteModal({ ...deleteModal, isOpen: false });
+    
+    try {
+      await deleteCalendar(calendarId);
+      setMessage({ type: "success", text: "Calendar deleted successfully." });
+      fetchCalendars();
+    } catch (err) {
+      setMessage({ type: "error", text: "Failed to delete from storage." });
     }
   };
 
@@ -214,7 +230,7 @@ function AdminAcademicCalendar() {
                       <a href={cal.fileUrl} target="_blank" rel="noopener noreferrer" className="ac-icon-btn view" title="View Document">
                         <ExternalLink size={18} />
                       </a>
-                      <button onClick={() => handleDelete(cal._id)} className="ac-icon-btn delete" title="Remove Document">
+                      <button onClick={() => handleDeleteClick(cal._id, cal.title)} className="ac-icon-btn delete" title="Remove Document">
                         <Trash2 size={18} />
                       </button>
                     </div>
@@ -232,6 +248,17 @@ function AdminAcademicCalendar() {
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ ...deleteModal, isOpen: false })}
+        onConfirm={confirmDelete}
+        title="Delete Academic Calendar"
+        message={`Are you sure you want to delete "${deleteModal.calendarTitle}"? This action cannot be undone.`}
+        confirmText="Yes, Delete"
+        cancelText="Cancel"
+        type="danger"
+      />
     </AdminLayout>
   );
 }
