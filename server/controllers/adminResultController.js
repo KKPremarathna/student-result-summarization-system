@@ -212,6 +212,9 @@ exports.importFromDepartment = async (req, res) => {
         }
 
         // 2. Fetch all finalized results from this subject
+        // We also need the lecturer email for the Admin compilation UI
+        const populatedSubject = await Subject.findById(subject._id).populate('createdBy', 'firstName lastName email');
+
         const departmentalResults = await FinalResult.find({ subject: subject._id })
             .select('studentENo grade')
             .sort({ studentENo: 1 });
@@ -229,7 +232,9 @@ exports.importFromDepartment = async (req, res) => {
         res.status(200).json({
             success: true,
             message: `Successfully imported ${results.length} results from department records.`,
-            data: results
+            data: results,
+            lecturerEmail: populatedSubject.createdBy.email,
+            lecturerName: `${populatedSubject.createdBy.firstName} ${populatedSubject.createdBy.lastName}`
         });
     } catch (error) {
         console.error("[Internal Import Error]", error);

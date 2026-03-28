@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import AdminLayout from "../components/AdminLayout";
 import "../styles/AdminResult.css";
@@ -207,6 +207,32 @@ function Results() {
     setTimeout(() => setToast({ visible: false, message: "", type: "success" }), 3500);
   };
 
+  // ── Auto-fill Lecturer Details ──────────────────────────────────────────
+  useEffect(() => {
+    const fetchSubjectDetails = async () => {
+      if (courseCode.length >= 4 && batch && semester) {
+        try {
+          const res = await axios.get(`${API_BASE}/subject-details`, {
+            params: { 
+              courseCode: courseCode.trim().toUpperCase(), 
+              batch, 
+              semester 
+            },
+            headers: authHeaders
+          });
+          
+          if (res.data.success && res.data.data.lecturerEmail) {
+            setLecturerEmail(res.data.data.lecturerEmail);
+          }
+        } catch (err) {
+          console.log("Auto-lookup: Subject not found for combination:", courseCode, batch, semester);
+        }
+      }
+    };
+
+    fetchSubjectDetails();
+  }, [courseCode, batch, semester]);
+
   const handleCommitStudents = (regNums) => {
     const newRows = regNums.map((r) => ({ _id: null, regNum: r, grade: "", isNew: true }));
     setRows((prev) => [...prev, ...newRows]);
@@ -344,6 +370,11 @@ function Results() {
           });
           
           showToast(`Imported ${addedCount} new and updated ${updatedCount} existing marks.`);
+          
+          if (data.lecturerEmail) {
+            setLecturerEmail(data.lecturerEmail);
+          }
+
           return updated;
         });
       } else {

@@ -3,7 +3,6 @@ import axios from "axios";
 import AdminLayout from "../components/AdminLayout";
 import "../styles/AdminProfile.css";
 import { 
-  Shield, 
   Eye, 
   EyeOff, 
   Camera, 
@@ -206,11 +205,6 @@ function AdminProfile() {
                     </button>
                  </div>
               </div>
-
-              <div className="ap-security-hint">
-                 <Shield size={20} />
-                 <p>Your session is protected by 256-bit encryption. Keep your credentials private.</p>
-              </div>
            </div>
 
            {/* Right Column: Details List */}
@@ -257,20 +251,6 @@ function AdminProfile() {
                        </div>
                        <ChevronRight size={18} className="ap-detail-arrow" />
                     </div>
-                 </div>
-              </div>
-
-              <div className="ap-audit-card">
-                 <div className="ap-audit-header">
-                    <h3>Recent Access Logs</h3>
-                 </div>
-                 <div className="ap-audit-row">
-                    <span>IP Address</span>
-                    <span className="mono">192.168.1.45</span>
-                 </div>
-                 <div className="ap-audit-row">
-                    <span>Last Login</span>
-                    <span>Today, 10:45 AM</span>
                  </div>
               </div>
            </div>
