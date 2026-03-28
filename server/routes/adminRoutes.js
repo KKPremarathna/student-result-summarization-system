@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { addAllowedEmail, addBulkAllowedEmails, addLecturerEmail, getAllowedEmails, getRegisteredUsers, getAdminComplaints, updateComplaintStatus, getAdminSubjects } = require('../controllers/adminController');
 const { deleteAllowedEmail, deleteBulkAllowedEmails, deleteLecturerEmail } = require('../controllers/adminDeleteController');
-const { addBatchResults, updateResult, deleteResult, deleteSubjectResults, getResults } = require('../controllers/adminResultController');
+const { addBatchResults, updateResult, deleteResult, deleteSubjectResults, getResults, importFromDepartment } = require('../controllers/adminResultController');
 const authMiddleware = require('../middleware/authMiddleware');
 const requireRole = require('../middleware/requireRole');
 
@@ -23,6 +23,7 @@ router.get('/allowed-emails', getAllowedEmails);
 router.get('/registered-users', getRegisteredUsers);
 router.get('/complaints', getAdminComplaints);
 router.get('/get-results', getResults);
+router.get('/import-results', importFromDepartment);
 router.get('/subjects', getAdminSubjects);
 router.put('/complaints/:id', updateComplaintStatus);
 

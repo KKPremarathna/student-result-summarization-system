@@ -309,6 +309,54 @@ function Results() {
     finally { setLoading(false); }
   };
 
+  const handleImport = async () => {
+    if (!courseCode || !semester || !batch) {
+      showToast("Select Code, Batch, and Sem first.", "error");
+      return;
+    }
+    setLoading(true);
+    try {
+      const params = `?courseCode=${encodeURIComponent(courseCode)}&batch=${encodeURIComponent(batch)}&semester=${encodeURIComponent(semester)}`;
+      const res = await fetch(`${API_BASE}/import-results${params}`, { headers: authHeaders });
+      const data = await res.json();
+      
+      if (res.ok) {
+        const importedData = data.data; // List of { regNum, grade }
+        
+        setRows(prev => {
+          const updated = [...prev];
+          let addedCount = 0;
+          let updatedCount = 0;
+          
+          importedData.forEach(imp => {
+            const existingIdx = updated.findIndex(r => r.regNum.toUpperCase() === imp.regNum.toUpperCase());
+            if (existingIdx !== -1) {
+              // Only update if grade was empty or changed
+              if (updated[existingIdx].grade !== imp.grade) {
+                updated[existingIdx] = { ...updated[existingIdx], grade: imp.grade, isNew: true };
+                updatedCount++;
+              }
+            } else {
+              // Add new row
+              updated.push({ _id: null, regNum: imp.regNum, grade: imp.grade, isNew: true });
+              addedCount++;
+            }
+          });
+          
+          showToast(`Imported ${addedCount} new and updated ${updatedCount} existing marks.`);
+          return updated;
+        });
+      } else {
+        showToast(data.message || "No department records found.", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to connect to department records.", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="ar-page">
@@ -339,12 +387,16 @@ function Results() {
               </div>
               <h1 className="ar-title">Senate Submissions</h1>
            </div>
-           <div className="ar-header-right">
-              <button className="ar-btn-secondary" onClick={loadExisting} disabled={loading}>
-                 <RotateCw size={18} className={loading ? "animate-spin" : ""} />
-                 Sync Database
-              </button>
-           </div>
+            <div className="ar-header-right">
+               <button className="ar-btn-secondary" style={{ marginRight: '1rem' }} onClick={handleImport} disabled={loading}>
+                  <Download size={18} />
+                  Import from Department
+               </button>
+               <button className="ar-btn-secondary" onClick={loadExisting} disabled={loading}>
+                  <RotateCw size={18} className={loading ? "animate-spin" : ""} />
+                  Sync Database
+               </button>
+            </div>
         </header>
 
         {/* Multi-step form grid */}

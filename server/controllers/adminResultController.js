@@ -1,4 +1,6 @@
 const AdminResult = require('../models/AdminResult');
+const Subject = require('../models/Subject');
+const FinalResult = require('../models/FinalResult');
 const { isValidRegNum } = require('../utils/regUtils');
 
 /**
@@ -21,10 +23,13 @@ exports.addBatchResults = async (req, res) => {
             }
         }
 
+        // Standardize Semester format (e.g., "Semester 01" -> "1")
+        const standardizedSemester = semester.replace(/\D/g, '').replace(/^0+/, '') || semester;
+
         const formattedResults = results.map(item => ({
             courseCode: courseCode.toUpperCase(),
-            semester,
-            batch,
+            semester: standardizedSemester,
+            batch: batch.toUpperCase(),
             lectureId: finalLecturer,
             studentRegNum: item.regNum.toUpperCase(),
             grade: item.grade.toUpperCase(),
@@ -128,7 +133,7 @@ exports.deleteSubjectResults = async(req, res) => {
     }
 };
 
-// Get results for a specific subject/batch/semester
+// Get results for a specific subject/batch/semester from the published AdminResult collection
 exports.getResults = async (req, res) => {
     try {
         const { courseCode, batch, semester } = req.query;
@@ -145,6 +150,89 @@ exports.getResults = async (req, res) => {
 
         res.status(200).json({ success: true, data: results });
     } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+/**
+ * NEW: Import results from the FinalResult collection (Lecturer finalized data)
+ * GET /api/admin/import-results?courseCode=CS3042&batch=2021/22&semester=1
+ */
+exports.importFromDepartment = async (req, res) => {
+    try {
+        const { courseCode, batch, semester } = req.query;
+
+        if (!courseCode || !batch || !semester) {
+            return res.status(400).json({ message: 'Missing query parameters' });
+        }
+
+        // 1. Normalize Input for Search
+        const searchBatch = batch.trim();
+        const searchSem = semester.trim();
+        
+        // 2. Case-insensitive Regex for flexible matching
+        const batchRegex = new RegExp(`^${searchBatch}$`, "i");
+        const semRegex = new RegExp(`^${searchSem}$`, "i");
+        
+        // Helper to extract numbers for fallback matching (e.g., "Semester 01" -> "1")
+        const getNumeric = (s) => s.replace(/\D/g, '').replace(/^0+/, '') || s;
+
+        console.log(`[Import] Searching for: ${courseCode.toUpperCase()}, Batch: ${searchBatch}, Sem: ${searchSem}`);
+
+        // 3. Find the subject ID
+        let subject = await Subject.findOne({
+            courseCode: courseCode.toUpperCase(),
+            batch: batchRegex,
+            semester: semRegex
+        });
+
+        if (!subject) {
+            // FALLBACK 1: Try numeric matching (maybe they typed '01' but DB has '1' or vice versa)
+            const allSubjects = await Subject.find({ courseCode: courseCode.toUpperCase() });
+            
+            subject = allSubjects.find(s => 
+                s.batch.toLowerCase() === searchBatch.toLowerCase() && 
+                getNumeric(s.semester) === getNumeric(searchSem)
+            );
+
+            if (!subject) {
+                // FALLBACK 2: Find any subject with this code to give helpful error
+                const anyBatchMatch = allSubjects.find(s => s.batch.toLowerCase() === searchBatch.toLowerCase());
+                
+                let message = `No department record found for subject ${courseCode} / Batch ${searchBatch}.`;
+                if (anyBatchMatch) {
+                    message = `Found subject ${courseCode} for batch ${anyBatchMatch.batch}, but the Semester in our records is "${anyBatchMatch.semester}" instead of "${searchSem}". Try changing your Semester input.`;
+                } else if (allSubjects.length > 0) {
+                    const batches = allSubjects.map(s => s.batch).join(', ');
+                    message = `Subject ${courseCode} found, but for different Batches: [${batches}]. Please check your Batch input.`;
+                }
+                
+                return res.status(404).json({ message });
+            }
+        }
+
+        // 2. Fetch all finalized results from this subject
+        const departmentalResults = await FinalResult.find({ subject: subject._id })
+            .select('studentENo grade')
+            .sort({ studentENo: 1 });
+
+        if (departmentalResults.length === 0) {
+            return res.status(404).json({ message: `Subject exists, but no finalized results found for ${subject.batch} Semester ${subject.semester}.` });
+        }
+
+        // 3. Format for the Admin compilation UI
+        const results = departmentalResults.map(r => ({
+            regNum: r.studentENo,
+            grade: r.grade
+        }));
+
+        res.status(200).json({
+            success: true,
+            message: `Successfully imported ${results.length} results from department records.`,
+            data: results
+        });
+    } catch (error) {
+        console.error("[Internal Import Error]", error);
         res.status(500).json({ message: error.message });
     }
 };
