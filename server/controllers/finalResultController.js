@@ -8,13 +8,15 @@ const { normalizeRegNo, extractRegNoFromEmail, generateRegNoRegex } = require(".
 
 function calcGrade(mark) {
   if (mark >= 85) return "A+";
-  if (mark >= 70) return "A";
-  if (mark >= 65) return "A-";
-  if (mark >= 60) return "B+";
-  if (mark >= 55) return "B";
-  if (mark >= 50) return "B-";
-  if (mark >= 45) return "C+";
-  if (mark >= 40) return "C";
+  if (mark >= 80) return "A";
+  if (mark >= 75) return "A-";
+  if (mark >= 70) return "B+";
+  if (mark >= 65) return "B";
+  if (mark >= 60) return "B-";
+  if (mark >= 55) return "C+";
+  if (mark >= 50) return "C";
+  if (mark >= 45) return "C-";
+  if (mark >= 40) return "D+";
   if (mark >= 35) return "D";
   return "E";
 }
@@ -533,7 +535,8 @@ exports.getSubjectAnalytics = async (req, res) => {
     const gradeDistribution = {
       "A+": 0, "A": 0, "A-": 0,
       "B+": 0, "B": 0, "B-": 0,
-      "C+": 0, "C": 0, "D": 0, "E": 0
+      "C+": 0, "C": 0, "C-": 0,
+      "D+": 0, "D": 0, "E": 0
     };
 
     let passed = 0;
