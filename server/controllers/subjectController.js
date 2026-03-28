@@ -24,7 +24,7 @@ function validateSubjectBody(body) {
 
   const a = body.assessments || {};
   const total = calcTotalWeight(a);
-  if (total > 100) return "Total percentage cannot exceed 100";
+  if (total !== 100) return "Total percentage must be exactly 100";
 
   const weightFields = ["assignmentWeight", "labWeight", "quizWeight", "midWeight", "endExamWeight"];
   for (const w of weightFields) {

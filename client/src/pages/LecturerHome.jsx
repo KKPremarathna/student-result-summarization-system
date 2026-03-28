@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import LecturerLayout from "../components/LecturerLayout.jsx";
 import { getLecturerDetails } from "../services/lecturerApi.js";
-import profile from '../assets/profile.png';
 import "../styles/LecturerHome.css";
 import { Link } from "react-router-dom";
 import {
@@ -12,8 +11,8 @@ import {
   Bell,
   Search,
   LayoutDashboard,
-  Calendar,
-  Loader2
+  Loader2,
+  Edit3
 } from "lucide-react";
 
 function LecturerHome() {
@@ -47,9 +46,8 @@ function LecturerHome() {
   if (loading) {
     return (
       <LecturerLayout>
-        <div className="lh-loading">
-          <Loader2 className="lh-loader-icon" />
-          <p>Loading dashboard...</p>
+        <div className="sh-loading">
+          <Loader2 className="animate-spin" size={48} />
         </div>
       </LecturerLayout>
     );
@@ -66,14 +64,15 @@ function LecturerHome() {
           <div className="lh-profile-col">
             <div className="lh-card lh-card--center">
               <div className="lh-avatar-wrap">
-                <div className="lh-avatar-glow"></div>
-                <div className="lh-avatar">
-                  <img
-                    src={lecturer?.profilePicture || DEFAULT_AVATAR}
-                    alt="Lecturer Profile"
-                    className="lh-avatar__img"
-                    onError={handleImageError}
-                  />
+                <div className="lh-avatar-ring">
+                  <div className="lh-avatar">
+                    <img
+                      src={lecturer?.profilePicture || DEFAULT_AVATAR}
+                      alt="Lecturer Profile"
+                      className="lh-avatar__img"
+                      onError={handleImageError}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -101,14 +100,12 @@ function LecturerHome() {
                 </div>
               </div>
 
-              <div className="lh-profile__actions">
-                <Link to="/lecturer/setting">
-                  <button className="lh-settings-btn">
-                    <Settings size={18} />
-                    Settings
-                  </button>
-                </Link>
-              </div>
+              <Link to="/lecturer/setting" className="lh-settings-btn-wrap">
+                 <button className="lh-settings-btn">
+                   <Settings size={18} />
+                   <span>Profile Settings</span>
+                 </button>
+              </Link>
             </div>
           </div>
 
@@ -118,41 +115,39 @@ function LecturerHome() {
             {/* Stats Cards */}
             <div className="lh-stats">
               <div className="lh-stat-card lh-stat-card--teal">
-                <div className="lh-stat-card__top">
-                  <div className="lh-stat-card__icon">
-                    <BookOpen size={28} />
-                  </div>
-                  <span className="lh-stat-card__number">
-                    {subjects.length.toString().padStart(2, '0')}
-                  </span>
+                <div className="lh-stat-card__icon-wrap">
+                  <BookOpen size={28} />
                 </div>
-                <h3 className="lh-stat-card__label">Total Subjects</h3>
-                <p className="lh-stat-card__sub">Modules Managed</p>
-                <div className="lh-stat-card__blob"></div>
+                <div className="lh-stat-card__content">
+                  <h3 className="lh-stat-card__label">Total Subjects</h3>
+                  <p className="lh-stat-card__sub">MODULES MANAGED</p>
+                </div>
+                <span className="lh-stat-card__number">
+                  {subjects.length.toString().padStart(2, '0')}
+                </span>
               </div>
 
               <div className="lh-stat-card lh-stat-card--dark">
-                <div className="lh-stat-card__top">
-                  <div className="lh-stat-card__icon">
-                    <Bell size={28} />
-                  </div>
-                  <span className="lh-stat-card__number">00</span>
+                <div className="lh-stat-card__icon-wrap">
+                  <Bell size={28} />
                 </div>
-                <h3 className="lh-stat-card__label">Recent Activities</h3>
-                <p className="lh-stat-card__sub">Pending Tasks</p>
-                <div className="lh-stat-card__blob"></div>
+                <div className="lh-stat-card__content">
+                  <h3 className="lh-stat-card__label">Recent Activities</h3>
+                  <p className="lh-stat-card__sub">PENDING TASKS</p>
+                </div>
+                <span className="lh-stat-card__number">00</span>
               </div>
             </div>
 
             {/* Assigned Subjects */}
-            <div className="lh-card">
+            <div className="lh-subjects-card">
               <div className="lh-subjects__header">
                 <h3 className="lh-subjects__title">
-                  <BookOpen className="lh-subjects__title-icon" />
+                  <BookOpen size={24} className="lh-subjects__title-icon" />
                   Assigned Subjects
                 </h3>
                 <div className="lh-search-wrap">
-                  <Search className="lh-search__icon" size={16} />
+                  <Search className="lh-search__icon" size={18} />
                   <input
                     type="text"
                     placeholder="Search modules..."
@@ -168,9 +163,18 @@ function LecturerHome() {
                       <div className="lh-subject-item__initial">
                         {subject.courseCode?.charAt(0) || "S"}
                       </div>
-                      <div>
+                      <div className="lh-subject-item__info">
                         <h4 className="lh-subject-item__name">{subject.courseName}</h4>
-                        <p className="lh-subject-item__year">{subject.courseCode} | {subject.batch} | {subject.semester}</p>
+                        <p className="lh-subject-item__year">{subject.courseCode} | {subject.batch}</p>
+                      </div>
+                      <div className="lh-subject-item__actions">
+                        <Link 
+                          to={`/lecturer/edit-subject/${subject._id}`} 
+                          className="lh-subject-item__edit" 
+                          title="Edit Subject"
+                        >
+                          <Edit3 size={18} />
+                        </Link>
                       </div>
                     </div>
                   ))

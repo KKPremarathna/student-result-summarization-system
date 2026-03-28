@@ -16,8 +16,14 @@ import {
   GraduationCap,
   LayoutDashboard,
   ClipboardCheck,
-  ChevronRight
+  ChevronRight,
+  Database,
+  Calendar,
+  AlertCircle,
+  Loader2,
+  Table as TableIcon
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function ViewResult() {
   const [courseCodes, setCourseCodes] = useState([]);
@@ -71,7 +77,6 @@ function ViewResult() {
 
   const fetchResults = async () => {
     if (!selectedCourse || !selectedBatch) {
-      alert("Please select both course and batch");
       return;
     }
 
@@ -102,22 +107,16 @@ function ViewResult() {
         } else {
           setResults(fetchedResults);
         }
-      } else {
-        alert("Subject configuration not found");
       }
     } catch (err) {
       console.error("Error fetching results:", err);
-      alert("Failed to fetch results. Check backend connection.");
     } finally {
       setLoading(false);
     }
   };
 
   const downloadPDF = () => {
-    if (results.length === 0) {
-      alert("No data to export");
-      return;
-    }
+    if (results.length === 0) return;
 
     const doc = new jsPDF('p', 'mm', 'a4'); // Portrait orientation
     const columns = ["E.No", "Mid Exam", "Incourse", "End Exam", "Grade"];
@@ -151,11 +150,10 @@ function ViewResult() {
       <div className="vr-page">
 
         {/* Page Header */}
-        <div className="vr-header">
-          <div>
+        <header className="vr-header">
+          <div className="vr-header__left">
             <div className="vr-breadcrumb">
-              <LayoutDashboard size={14} />
-              <span>Lecturer Portal</span>
+              <Link to="/lecturer/home">Dashboard</Link>
               <ChevronRight size={14} />
               <span className="vr-breadcrumb__current">View Results</span>
             </div>
@@ -170,13 +168,13 @@ function ViewResult() {
             <FileDown size={20} />
             Export to PDF
           </button>
-        </div>
+        </header>
 
         {/* Filters Card */}
         <div className="vr-card">
           <div className="vr-card__header">
             <div className="vr-card__icon-wrap">
-              <Filter size={20} />
+              <Filter size={24} />
             </div>
             <h3 className="vr-card__title">Search Filters</h3>
           </div>
@@ -184,7 +182,7 @@ function ViewResult() {
           <div className="vr-filters">
             <div className="vr-field">
               <label className="vr-label">
-                <ClipboardCheck size={14} />
+                <Database size={16} />
                 Course Code
               </label>
               <select
@@ -203,7 +201,7 @@ function ViewResult() {
 
             <div className="vr-field">
               <label className="vr-label">
-                <GraduationCap size={14} />
+                <Calendar size={16} />
                 Batch
               </label>
               <select
@@ -221,8 +219,8 @@ function ViewResult() {
 
             <div className="vr-field">
               <label className="vr-label">
-                <Search size={14} />
-                E Registration No
+                <Search size={16} />
+                E-Number Filter
               </label>
               <input
                 type="text"
@@ -236,70 +234,73 @@ function ViewResult() {
             <button
               onClick={fetchResults}
               className="vr-filter-btn"
-              disabled={loading}
+              disabled={loading || !selectedCourse || !selectedBatch}
             >
-              <Search size={18} />
-              {loading ? "Loading..." : "Apply Filter"}
+              {loading ? (
+                <Loader2 className="animate-spin" size={20} />
+              ) : (
+                <>
+                  <Search size={20} />
+                  Find Data
+                </>
+              )}
             </button>
           </div>
         </div>
 
         {/* Results Table Card */}
         <div className="vr-table-card">
-          <div className="vr-table-scroll">
-            {results.length > 0 ? (
+          {results.length > 0 ? (
+            <div className="vr-table-container">
               <table className="vr-table">
                 <thead>
                   <tr className="vr-thead-primary">
-                    <th rowSpan="2" className="vr-th vr-th--border-r">E.No</th>
-                    <th colSpan={structure.assignments} className="vr-th vr-th--border-r vr-th--border-b">Assignments</th>
-                    <th colSpan={structure.quizzes} className="vr-th vr-th--border-r vr-th--border-b">Quizzes</th>
-                    <th colSpan={structure.labs} className="vr-th vr-th--border-r vr-th--border-b">Labs</th>
-                    <th rowSpan="2" className="vr-th vr-th--border-r">Mid</th>
-                    <th rowSpan="2" className="vr-th vr-th--border-r">Incourse</th>
-                    <th rowSpan="2" className="vr-th vr-th--border-r">End</th>
-                    <th colSpan="2" className="vr-th vr-th--border-b">Final Status</th>
+                    <th rowSpan="2" className="vr-th">E.No</th>
+                    {structure.assignments > 0 && <th colSpan={structure.assignments} className="vr-th">Assignments</th>}
+                    {structure.quizzes > 0 && <th colSpan={structure.quizzes} className="vr-th">Quizzes</th>}
+                    {structure.labs > 0 && <th colSpan={structure.labs} className="vr-th">Labs</th>}
+                    <th rowSpan="2" className="vr-th">Mid</th>
+                    <th rowSpan="2" className="vr-th">Incourse</th>
+                    <th rowSpan="2" className="vr-th">End Exam</th>
+                    <th colSpan="2" className="vr-th">Final Result</th>
                   </tr>
                   <tr className="vr-thead-secondary">
-                    {[...Array(structure.assignments)].map((_, i) => <th key={i} className="vr-th-sm vr-th--border-r">A{i + 1}</th>)}
-                    {[...Array(structure.quizzes)].map((_, i) => <th key={i} className="vr-th-sm vr-th--border-r">Q{i + 1}</th>)}
-                    {[...Array(structure.labs)].map((_, i) => <th key={i} className="vr-th-sm vr-th--border-r">L{i + 1}</th>)}
-                    <th className="vr-th-sm vr-th--border-r">Mark</th>
+                    {[...Array(structure.assignments)].map((_, i) => <th key={i} className="vr-th-sm">A{i + 1}</th>)}
+                    {[...Array(structure.quizzes)].map((_, i) => <th key={i} className="vr-th-sm">Q{i + 1}</th>)}
+                    {[...Array(structure.labs)].map((_, i) => <th key={i} className="vr-th-sm">L{i + 1}</th>)}
+                    <th className="vr-th-sm">Mark</th>
                     <th className="vr-th-sm">Grade</th>
                   </tr>
                 </thead>
 
                 <tbody className="vr-tbody">
                   {results.map((r, index) => (
-                    <tr key={index} className="vr-row">
+                    <tr key={index}>
                       <td className="vr-td vr-td--enumber">{r.studentENo}</td>
-                      {/* Assignments */}
                       {[...Array(structure.assignments)].map((_, i) => (
-                        <td key={`a-${i}`} className="vr-td vr-td--data">
-                          {r.assignments && r.assignments[i] !== undefined ? r.assignments[i] : "-"}
+                        <td key={`a-${i}`} className="vr-td">
+                          {r.assignments?.[i] !== undefined ? r.assignments[i] : "-"}
                         </td>
                       ))}
-                      {/* Quizzes */}
                       {[...Array(structure.quizzes)].map((_, i) => (
-                        <td key={`q-${i}`} className="vr-td vr-td--data">
-                          {r.quizzes && r.quizzes[i] !== undefined ? r.quizzes[i] : "-"}
+                        <td key={`q-${i}`} className="vr-td">
+                          {r.quizzes?.[i] !== undefined ? r.quizzes[i] : "-"}
                         </td>
                       ))}
-                      {/* Labs */}
                       {[...Array(structure.labs)].map((_, i) => (
-                        <td key={`l-${i}`} className="vr-td vr-td--data">
-                          {r.labs && r.labs[i] !== undefined ? r.labs[i] : "-"}
+                        <td key={`l-${i}`} className="vr-td">
+                          {r.labs?.[i] !== undefined ? r.labs[i] : "-"}
                         </td>
                       ))}
-                      <td className="vr-td vr-td--mid">{r.mid ?? "-"}</td>
-                      <td className="vr-td vr-td--incourse">{r.incourseTotal?.toFixed(1)}</td>
-                      <td className="vr-td vr-td--mid">{r.endExamMark ?? "-"}</td>
-                      <td className="vr-td vr-td--center">
+                      <td className="vr-td">{r.mid ?? "-"}</td>
+                      <td className="vr-td">{r.incourseTotal?.toFixed(1) || "-"}</td>
+                      <td className="vr-td">{r.endExamMark ?? "-"}</td>
+                      <td className="vr-td">
                         <span className="vr-badge vr-badge--done">
                           {r.finalMark ?? "-"}
                         </span>
                       </td>
-                      <td className="vr-td vr-td--center">
+                      <td className="vr-td">
                         <span className={`vr-badge ${r.grade === 'E' ? 'vr-badge--fail' : 'vr-badge--done'}`}>
                           {r.grade ?? "N/A"}
                         </span>
@@ -308,27 +309,20 @@ function ViewResult() {
                   ))}
                 </tbody>
               </table>
-            ) : (
-              <div className="vr-empty-state">
-                <div className="vr-empty-icon-wrap">
-                  <ClipboardCheck size={48} className="vr-empty-icon" />
-                  <Search size={24} className="vr-empty-icon-sub" />
-                </div>
-                <h3 className="vr-empty-title">Ready to View Results?</h3>
-                <p className="vr-empty-text">
-                  {loading 
-                    ? "We're fetching the academic data for you..." 
-                    : "Please select a course and batch from the filters above to retrieve the results table."}
-                </p>
-                {!loading && (
-                  <div className="vr-empty-hint">
-                    <Filter size={14} />
-                    <span>Use the search filters to get started</span>
-                  </div>
-                )}
+            </div>
+          ) : (
+            <div className="vr-empty-state">
+              <div className="vr-empty-icon-wrap">
+                <TableIcon size={80} />
               </div>
-            )}
-          </div>
+              <h3>Data Preview Ready</h3>
+              <p>
+                {loading 
+                  ? "Retrieving and processing academic records..." 
+                  : "Select a module and batch to view the comprehensive result table."}
+              </p>
+            </div>
+          )}
         </div>
 
       </div>

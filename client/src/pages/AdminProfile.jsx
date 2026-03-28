@@ -3,7 +3,6 @@ import axios from "axios";
 import AdminLayout from "../components/AdminLayout";
 import "../styles/AdminProfile.css";
 import { 
-  Shield, 
   Eye, 
   EyeOff, 
   Camera, 
@@ -89,9 +88,13 @@ function AdminProfile() {
     try {
       await axios.put("http://localhost:5000/api/user/update-profile", editForm, getHeaders());
       const localUser = JSON.parse(localStorage.getItem("user") || "{}");
-      localUser.firstName = editForm.firstName;
-      localUser.lastName = editForm.lastName;
-      localStorage.setItem("user", JSON.stringify(localUser));
+      const updatedLocalUser = {
+        ...localUser,
+        firstName: editForm.firstName,
+        lastName: editForm.lastName,
+        profilePicture: editForm.profilePicture
+      };
+      localStorage.setItem("user", JSON.stringify(updatedLocalUser));
 
       await fetchProfile();
       setStatusMsg({ type: "success", text: "Profile updated successfully!" });
@@ -202,11 +205,6 @@ function AdminProfile() {
                     </button>
                  </div>
               </div>
-
-              <div className="ap-security-hint">
-                 <Shield size={20} />
-                 <p>Your session is protected by 256-bit encryption. Keep your credentials private.</p>
-              </div>
            </div>
 
            {/* Right Column: Details List */}
@@ -253,20 +251,6 @@ function AdminProfile() {
                        </div>
                        <ChevronRight size={18} className="ap-detail-arrow" />
                     </div>
-                 </div>
-              </div>
-
-              <div className="ap-audit-card">
-                 <div className="ap-audit-header">
-                    <h3>Recent Access Logs</h3>
-                 </div>
-                 <div className="ap-audit-row">
-                    <span>IP Address</span>
-                    <span className="mono">192.168.1.45</span>
-                 </div>
-                 <div className="ap-audit-row">
-                    <span>Last Login</span>
-                    <span>Today, 10:45 AM</span>
                  </div>
               </div>
            </div>

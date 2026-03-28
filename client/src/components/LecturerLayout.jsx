@@ -17,12 +17,12 @@ function LecturerLayout({ children }) {
   };
 
   return (
-    <div className="student-layout"> {/* Unified layout container */}
+    <div className="lecturer-layout">
       <Navbar />
-      <div className="student-layout__body">
+      <div className="lecturer-layout__body">
         <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-        <main className="student-layout__content">
-          <div className="student-layout__inner">
+        <main className="lecturer-layout__content">
+          <div className="lecturer-layout__inner">
             {children}
           </div>
         </main>

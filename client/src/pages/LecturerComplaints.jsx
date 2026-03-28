@@ -15,7 +15,6 @@ import {
   Send,
   LayoutDashboard,
   ChevronRight,
-  Search,
   BookOpen,
   Calendar,
   AlertCircle,
@@ -23,8 +22,12 @@ import {
   Loader2,
   Clock,
   User,
-  Info
+  Info,
+  ArrowRight,
+  Shield,
+  X
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function LecturerComplaints() {
   const [activeTab, setActiveTab] = useState("student");
@@ -158,37 +161,37 @@ function LecturerComplaints() {
     <LecturerLayout>
       <div className="lc-page">
         {/* Header */}
-        <div className="lc-header">
+        <header className="lc-header">
           <div className="lc-breadcrumb">
-            <LayoutDashboard size={14} />
-            <span>Lecturer Portal</span>
+            <Link to="/lecturer/home">Dashboard</Link>
             <ChevronRight size={14} />
             <span className="lc-breadcrumb__current">Complaints</span>
           </div>
           <div className="lc-header__main">
             <h2 className="lc-title">
               <MessageSquare size={32} className="lc-title__icon" />
-              Complaints Management
+              Complaints Center
             </h2>
             {activeTab === "admin" && !showReportForm && (
               <button 
-                className="lc-btn lc-btn--primary"
+                className="sc-add-btn"
                 onClick={() => setShowReportForm(true)}
               >
                 <Send size={18} />
-                New Report to Admin
+                New Admin Report
               </button>
             )}
             {activeTab === "admin" && showReportForm && (
               <button 
-                className="lc-btn lc-btn--secondary"
+                className="sc-add-btn active"
                 onClick={() => setShowReportForm(false)}
               >
+                <X size={18} />
                 Cancel Report
               </button>
             )}
           </div>
-        </div>
+        </header>
 
         {status.message && (
           <div className={`lc-status-bar ${status.type}`}>
@@ -204,13 +207,13 @@ function LecturerComplaints() {
             onClick={() => setActiveTab("student")}
           >
             <Users size={18} />
-            Student Complaints
+            Student Queries
           </button>
           <button 
             className={`lc-tab ${activeTab === "admin" ? "active" : ""}`}
             onClick={() => setActiveTab("admin")}
           >
-            <Send size={18} />
+            <Shield size={18} />
             My Admin Reports
           </button>
         </div>
@@ -220,12 +223,12 @@ function LecturerComplaints() {
           <div className="lc-students-view">
             {loading && complaints.length === 0 ? (
               <div className="lc-empty">
-                <Loader2 className="animate-spin lc-empty__icon" size={48} />
+                <Loader2 className="animate-spin" size={48} />
                 <p>Loading complaints...</p>
               </div>
             ) : filteredComplaints.length === 0 ? (
               <div className="lc-empty">
-                <MessageSquare className="lc-empty__icon" size={48} />
+                <MessageSquare className="lc-empty__icon" size={64} />
                 <p>No student complaints found.</p>
               </div>
             ) : (
@@ -235,7 +238,7 @@ function LecturerComplaints() {
                     <div className="lc-complaint-card__header">
                       <div className="lc-complaint-card__user">
                         <div className="lc-complaint-card__avatar">
-                          <User size={20} />
+                          <User size={24} />
                         </div>
                         <div className="lc-complaint-card__info">
                           <span className="lc-complaint-card__name">
@@ -264,7 +267,7 @@ function LecturerComplaints() {
                     <div className="lc-complaint-card__footer">
                       <div className="lc-complaint-card__meta">
                         <span className="lc-complaint-card__date">
-                          <Clock size={12} />
+                          <Clock size={14} />
                           {new Date(comp.createdAt).toLocaleDateString()}
                         </span>
                       </div>
@@ -277,7 +280,7 @@ function LecturerComplaints() {
                               onClick={() => handleStatusUpdate(comp._id, "In Progress")}
                               title="Set In Progress"
                             >
-                              <Clock size={14} />
+                              <Clock size={16} />
                             </button>
                           )}
                           <button 
@@ -285,7 +288,7 @@ function LecturerComplaints() {
                             onClick={() => handleStatusUpdate(comp._id, "Resolved")}
                             title="Mark Resolved"
                           >
-                            <CheckCircle2 size={14} />
+                            <CheckCircle2 size={16} />
                           </button>
                         </div>
                       )}
@@ -302,108 +305,88 @@ function LecturerComplaints() {
                 <div className="lc-form-header">
                   <h3 className="lc-form-title">Report Issue to Admin</h3>
                   <p className="lc-form-subtitle">Submit technical errors, policy disputes, or senate review requests.</p>
+                  <p className="lc-form-hint">Note: Linking a course/batch is optional and only required for mark-specific queries.</p>
                 </div>
 
-                <form onSubmit={handleReportSubmit}>
-                  <div className="lc-form-grid">
-                    <div className="lc-field">
-                      <label className="lc-label">
-                        <BookOpen size={14} />
-                        Course Code (Optional)
-                      </label>
-                      <select 
-                        className="lc-select"
-                        value={reportForm.courseCode}
-                        onChange={(e) => handleCourseChange(e.target.value)}
-                      >
-                        <option value="">Select Course</option>
-                        {courseCodes.map(c => (
-                          <option key={c.courseCode} value={c.courseCode}>{c.courseCode} - {c.courseName}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="lc-field">
-                      <label className="lc-label">
-                        <Users size={14} />
-                        Batch (Optional)
-                      </label>
-                      <select 
-                        className="lc-select"
-                        value={reportForm.batch}
-                        onChange={(e) => handleBatchChange(e.target.value)}
-                        disabled={!reportForm.courseCode}
-                      >
-                        <option value="">Select Batch</option>
-                        {batches.map(b => (
-                          <option key={b} value={b}>{b}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="lc-field lc-field--full">
-                      <label className="lc-label">
-                        <Info size={14} />
-                        Complaint Title
-                      </label>
-                      <input 
-                        type="text" 
-                        className="lc-input"
-                        placeholder="e.g. Discrepancy in Final Result Calculation"
-                        value={reportForm.title}
-                        onChange={(e) => setReportForm(prev => ({ ...prev, title: e.target.value }))}
-                        required
-                      />
-                    </div>
-
-                    <div className="lc-field lc-field--full">
-                      <label className="lc-label">
-                        <MessageSquare size={14} />
-                        Detailed Description
-                      </label>
-                      <textarea 
-                        className="lc-textarea"
-                        placeholder="Explain the issue in detail..."
-                        value={reportForm.description}
-                        onChange={(e) => setReportForm(prev => ({ ...prev, description: e.target.value }))}
-                        required
-                      ></textarea>
-                    </div>
+                <form onSubmit={handleReportSubmit} className="sc-form">
+                  <div className="sc-field">
+                    <label className="sc-label">Course Code (Optional)</label>
+                    <select 
+                      className="sc-select"
+                      value={reportForm.courseCode}
+                      onChange={(e) => handleCourseChange(e.target.value)}
+                    >
+                      <option value="">Select Course</option>
+                      {courseCodes.map(c => (
+                        <option key={c.courseCode} value={c.courseCode}>{c.courseCode} - {c.courseName}</option>
+                      ))}
+                    </select>
                   </div>
 
-                  <div className="lc-form-actions">
-                    <button 
-                      type="button" 
-                      className="lc-btn lc-btn--secondary"
-                      onClick={() => setShowReportForm(false)}
+                  <div className="sc-field">
+                    <label className="sc-label">Batch (Optional)</label>
+                    <select 
+                      className="sc-select"
+                      value={reportForm.batch}
+                      onChange={(e) => handleBatchChange(e.target.value)}
+                      disabled={!reportForm.courseCode}
                     >
-                      Back to Reports
-                    </button>
-                    <button 
-                      type="submit" 
-                      className="lc-btn lc-btn--primary"
-                      disabled={loading}
-                    >
-                      {loading ? <Loader2 className="animate-spin" size={18} /> : <Send size={18} />}
-                      Submit Report
-                    </button>
+                      <option value="">Select Batch</option>
+                      {batches.map(b => (
+                        <option key={b} value={b}>{b}</option>
+                      ))}
+                    </select>
                   </div>
+
+                  <div className="sc-field">
+                    <label className="sc-label">Complaint Title</label>
+                    <input 
+                      type="text" 
+                      className="sc-input"
+                      placeholder="e.g. Discrepancy in Final Result Calculation"
+                      value={reportForm.title}
+                      onChange={(e) => setReportForm(prev => ({ ...prev, title: e.target.value }))}
+                      required
+                    />
+                  </div>
+
+                  <div className="sc-field" style={{ gridColumn: 'span 2' }}>
+                    <label className="sc-label">Detailed Description</label>
+                    <textarea 
+                      className="sc-textarea"
+                      placeholder="Explain the issue in detail..."
+                      value={reportForm.description}
+                      onChange={(e) => setReportForm(prev => ({ ...prev, description: e.target.value }))}
+                      rows={5}
+                      required
+                    ></textarea>
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    className="sc-submit-btn"
+                    disabled={loading}
+                    style={{ gridColumn: 'span 2' }}
+                  >
+                    {loading ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
+                    Submit Report to Admin
+                  </button>
                 </form>
               </div>
             ) : (
               <div className="lc-reports-list">
                 {loading && complaints.length === 0 ? (
                   <div className="lc-empty">
-                    <Loader2 className="animate-spin lc-empty__icon" size={48} />
+                    <Loader2 className="animate-spin" size={48} />
                     <p>Loading your reports...</p>
                   </div>
                 ) : filteredComplaints.length === 0 ? (
                   <div className="lc-empty">
-                    <MessageSquare className="lc-empty__icon" size={48} />
+                    <MessageSquare className="lc-empty__icon" size={64} />
                     <p>You haven't sent any reports to the admin yet.</p>
                     <button 
-                      className="lc-btn lc-btn--primary" 
-                      style={{ marginTop: '1.5rem', display: 'inline-flex' }}
+                      className="sc-add-btn" 
+                      style={{ marginTop: '2rem', marginInline: 'auto' }}
                       onClick={() => setShowReportForm(true)}
                     >
                       Send Your First Report
@@ -416,7 +399,7 @@ function LecturerComplaints() {
                         <div className="lc-complaint-card__header">
                           <div className="lc-complaint-card__user">
                             <div className="lc-complaint-card__avatar" style={{ background: '#fef3c7', color: '#d97706' }}>
-                              <MessageSquare size={20} />
+                              <Shield size={24} />
                             </div>
                             <div className="lc-complaint-card__info">
                               <span className="lc-complaint-card__name">Report to Admin</span>
@@ -441,7 +424,7 @@ function LecturerComplaints() {
                         <div className="lc-complaint-card__footer">
                           <div className="lc-complaint-card__meta">
                             <span className="lc-complaint-card__date">
-                              <Clock size={12} />
+                              <Clock size={14} />
                               {new Date(comp.createdAt).toLocaleDateString()}
                             </span>
                           </div>
