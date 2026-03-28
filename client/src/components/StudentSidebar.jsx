@@ -16,11 +16,11 @@ function StudentSidebar({ isOpen, toggleSidebar }) {
   const location = useLocation();
 
   const menuItems = [
-    { path: "/student/home", label: "Dashboard", icon: <Home size={20} /> },
-    { path: "/student/subject-wise", label: "Subject Results", icon: <BookOpen size={20} /> },
-    { path: "/student/student-wise", label: "My Results", icon: <FileText size={20} /> },
-    { path: "/student/complaints", label: "Complaints", icon: <MessageSquare size={20} /> },
-    { path: "/student/profile", label: "Profile Settings", icon: <Settings size={20} /> },
+    { name: "Dashboard", path: "/student/home", icon: Home },
+    { name: "Subject Results", path: "/student/subject-wise", icon: BookOpen },
+    { name: "My Results", path: "/student/student-wise", icon: FileText },
+    { name: "Complaints", path: "/student/complaints", icon: MessageSquare },
+    { name: "Profile Settings", path: "/student/profile", icon: Settings },
   ];
 
   return (
@@ -38,14 +38,18 @@ function StudentSidebar({ isOpen, toggleSidebar }) {
       <nav className="sidebar-nav">
         {isOpen && <div className="nav-label">Main Menu</div>}
         <ul className="nav-list">
-          {menuItems.map((item) => (
-            <li key={item.path} className={location.pathname === item.path ? "active" : ""}>
-              <Link to={item.path} className="nav-link">
-                <span className="nav-icon">{item.icon}</span>
-                {isOpen && <span className="nav-text">{item.label}</span>}
-              </Link>
-            </li>
-          ))}
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+            return (
+              <li key={item.path} className={isActive ? "active" : ""}>
+                <Link to={item.path} className="nav-link">
+                  <Icon size={20} className="nav-icon" />
+                  {isOpen && <span className="nav-text">{item.name}</span>}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </nav>
       
