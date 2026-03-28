@@ -73,7 +73,7 @@ function Signup() {
       setMessage({ type: "error", text: "Please enter your email first." });
       return;
     }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@eng\.jfn\.ac\.lk$/i;
     if (!emailRegex.test(formData.email)) {
       setMessage({ type: "error", text: "Please enter a valid academic email." });
       return;
@@ -187,8 +187,10 @@ function Signup() {
                   <input
                     name="email"
                     type="email"
-                    placeholder="john@university.ac.lk"
+                    placeholder="john@eng.jfn.ac.lk"
                     required
+                    pattern="^[^\s@]+@eng\.jfn\.ac\.lk$"
+                    title="Please use your official university email ending in @eng.jfn.ac.lk"
                     value={formData.email}
                     onChange={handleChange}
                   />

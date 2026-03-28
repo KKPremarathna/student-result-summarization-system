@@ -154,7 +154,12 @@ const AddSubject = () => {
                   name="courseCode"
                   placeholder="e.g. EC6060"
                   value={formData.courseCode}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    e.target.value = e.target.value.toUpperCase();
+                    handleChange(e);
+                  }}
+                  pattern="^[A-Z]{2,4}\d{3,4}$"
+                  title="Course code must be 2-4 uppercase letters followed by 3-4 numbers (e.g., EC6060)"
                   className="as-input"
                   required
                 />

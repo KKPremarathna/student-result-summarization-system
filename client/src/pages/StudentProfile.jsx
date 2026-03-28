@@ -356,8 +356,10 @@ function StudentProfile() {
                       <input 
                         className="st-modal__input"
                         value={editForm.studentENo}
-                        onChange={(e) => setEditForm({...editForm, studentENo: e.target.value})}
+                        onChange={(e) => setEditForm({...editForm, studentENo: e.target.value.toUpperCase()})}
                         placeholder="e.g. 2021/E/162"
+                        pattern="^\d{4}/E/\d{3,}$"
+                        title="Registration Number must be in format YYYY/E/XXX"
                       />
                     </div>
                     <div className="st-modal__field">

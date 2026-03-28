@@ -12,12 +12,14 @@ import {
   GraduationCap,
   Building2,
   MapPin,
-  ChevronRight
+  ChevronRight,
+  Award
 } from "lucide-react";
 import { extractRegNoFromEmail, formatRegNo } from "../utils/regUtils";
 
 function StudentHome() {
   const [student, setStudent] = useState(null);
+  const [stats, setStats] = useState({ cgpa: "0.00", totalCredits: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,6 +37,17 @@ function StudentHome() {
         faculty: data.faculty || "Faculty of Engineering",
         university: "University of Jaffna"
       });
+
+      try {
+        const { getStudentFinalResults } = await import("../services/studentApi");
+        const resultsRes = await getStudentFinalResults();
+        if (resultsRes.data && resultsRes.data.summary) {
+           setStats({ cgpa: resultsRes.data.summary.cgpa, totalCredits: resultsRes.data.summary.totalCredits });
+        }
+      } catch (err) {
+        console.error("Failed to fetch CGPA", err);
+      }
+
     } catch (err) {
       console.error("Home data fetch failed", err);
     } finally {
@@ -110,6 +123,17 @@ function StudentHome() {
 
           {/* Action Cards (Right) */}
           <div className="sh-actions-grid">
+            <div className="sh-action-card cgpa-card" style={{ background: "var(--bg-card)", border: "1px solid var(--admin-border)", cursor: "default" }}>
+              <div className="sh-action-icon-wrap" style={{ background: "rgba(33, 158, 188, 0.1)", color: "var(--primary)" }}>
+                <Award size={24} />
+              </div>
+              <div className="sh-action-content">
+                <h3 className="sh-action-title">Cumulative GPA</h3>
+                <div style={{ fontSize: "2rem", fontWeight: "800", color: "var(--text-main)", marginTop: "0.25rem" }}>{stats.cgpa}</div>
+                <p className="sh-action-subtitle" style={{ marginTop: "0.25rem", color: "var(--text-muted)", fontSize: "0.75rem", letterSpacing: "1px", fontWeight: "600" }}>BASED ON {stats.totalCredits} CREDITS</p>
+              </div>
+            </div>
+
             <Link to="/student/subject-wise" className="sh-action-card-link">
               <div className="sh-action-card teal">
                 <div className="sh-action-icon-wrap">

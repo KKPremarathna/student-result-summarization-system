@@ -21,6 +21,16 @@ function calcGrade(mark) {
   return "E";
 }
 
+function calcGPV(grade) {
+  const map = {
+    "A+": 4.0, "A": 4.0, "A-": 3.7,
+    "B+": 3.3, "B": 3.0, "B-": 2.7,
+    "C+": 2.3, "C": 2.0, "C-": 1.7,
+    "D+": 1.3, "D": 1.0, "E": 0.0, "F": 0.0
+  };
+  return map[grade] !== undefined ? map[grade] : 0.0;
+}
+
 // GET /api/final-results/incourse-list?subject=<subjectId>
 exports.getIncourseList = async (req, res) => {
   try {
@@ -469,9 +479,11 @@ exports.getStudentFinalResults = async (req, res) => {
         if (!r.subject) return r;
         const batchNum = getNumeric(r.subject.batch);
         const key = `${r.subject.courseCode.toUpperCase()}-${batchNum}-${getNumeric(r.subject.semester)}`;
+        const finalGrade = adminMap[key] || r.grade;
         return {
             ...r,
-            afterSenateGrade: adminMap[key] || null
+            afterSenateGrade: adminMap[key] || null,
+            gpv: calcGPV(finalGrade)
         };
     });
 
@@ -490,6 +502,9 @@ exports.getStudentFinalResults = async (req, res) => {
       "D+": 0, "D": 0, "E": 0
     };
 
+    // Keep highest GPV attempt per courseCode for CGPA
+    const courseAttempts = {};
+
     results.forEach(r => {
         const finalGrade = r.afterSenateGrade || r.grade;
         if (gradeDistribution[finalGrade] !== undefined) {
@@ -502,7 +517,27 @@ exports.getStudentFinalResults = async (req, res) => {
         } else {
             summary.failed++;
         }
+
+        // Collect attempts for CGPA
+        if (r.subject && r.subject.courseCode) {
+            const code = r.subject.courseCode;
+            const credit = r.subject.credit || 0;
+            const currentGPV = r.gpv || 0;
+            if (!courseAttempts[code] || currentGPV > courseAttempts[code].gpv) {
+                courseAttempts[code] = { gpv: currentGPV, credit };
+            }
+        }
     });
+
+    let totalPoints = 0;
+    let totalCredits = 0;
+    Object.values(courseAttempts).forEach(attempt => {
+        totalPoints += attempt.gpv * attempt.credit;
+        totalCredits += attempt.credit;
+    });
+
+    summary.cgpa = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : "0.00";
+    summary.totalCredits = totalCredits;
 
     return res.json({
         summary,
