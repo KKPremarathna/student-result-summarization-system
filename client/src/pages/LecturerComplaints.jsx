@@ -305,6 +305,7 @@ function LecturerComplaints() {
                 <div className="lc-form-header">
                   <h3 className="lc-form-title">Report Issue to Admin</h3>
                   <p className="lc-form-subtitle">Submit technical errors, policy disputes, or senate review requests.</p>
+                  <p className="lc-form-hint">Note: Linking a course/batch is optional and only required for mark-specific queries.</p>
                 </div>
 
                 <form onSubmit={handleReportSubmit} className="sc-form">

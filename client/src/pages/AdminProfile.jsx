@@ -89,9 +89,13 @@ function AdminProfile() {
     try {
       await axios.put("http://localhost:5000/api/user/update-profile", editForm, getHeaders());
       const localUser = JSON.parse(localStorage.getItem("user") || "{}");
-      localUser.firstName = editForm.firstName;
-      localUser.lastName = editForm.lastName;
-      localStorage.setItem("user", JSON.stringify(localUser));
+      const updatedLocalUser = {
+        ...localUser,
+        firstName: editForm.firstName,
+        lastName: editForm.lastName,
+        profilePicture: editForm.profilePicture
+      };
+      localStorage.setItem("user", JSON.stringify(updatedLocalUser));
 
       await fetchProfile();
       setStatusMsg({ type: "success", text: "Profile updated successfully!" });

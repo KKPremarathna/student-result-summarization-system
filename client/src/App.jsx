@@ -46,12 +46,24 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   const user = userString ? JSON.parse(userString) : null;
 
   if (!token || !user) {
-    console.log("No token or user, redirecting to /signin");
+    console.log("[ProtectedRoute] No session found. Redirecting to /signin.");
     return <Navigate to="/signin" replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    console.log(`Role ${user.role} not allowed, redirecting to /`);
+  // Normalize role and allowedRoles for case-insensitive comparison
+  const rawRole = user.role || "";
+  const userRole = rawRole.toLowerCase().trim();
+  const normalizedAllowedRoles = (allowedRoles || []).map(r => r.toLowerCase().trim());
+
+  // Fail-safe: If user object exists but role is missing, it's a corrupted session
+  if (!rawRole && token) {
+     console.error("[ProtectedRoute] Session corruption: User exists but 'role' is missing.", user);
+     return <Navigate to="/signin" replace />;
+  }
+
+  if (normalizedAllowedRoles.length > 0 && !normalizedAllowedRoles.includes(userRole)) {
+    console.warn(`[ProtectedRoute] Access Denied. Role: "${rawRole}", Required: [${normalizedAllowedRoles.join(", ")}].`);
+    console.log("[ProtectedRoute] Full User Context:", user); // Log the full object for debugging
     return <Navigate to="/" replace />;
   }
 

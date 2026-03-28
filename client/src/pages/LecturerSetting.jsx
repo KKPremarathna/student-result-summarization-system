@@ -90,6 +90,17 @@ function LecturerSetting() {
       const res = await updateLecturerProfile(editForm);
       const updatedUser = res.data.data;
       setUserData(updatedUser);
+      
+      // Update localStorage to keep session in sync
+      const localUser = JSON.parse(localStorage.getItem("user") || "{}");
+      const updatedLocalUser = {
+        ...localUser,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        profilePicture: updatedUser.profilePicture
+      };
+      localStorage.setItem("user", JSON.stringify(updatedLocalUser));
+
       setEditForm({
         firstName: updatedUser.firstName || "",
         lastName: updatedUser.lastName || "",
