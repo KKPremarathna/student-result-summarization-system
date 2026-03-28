@@ -398,7 +398,7 @@ function LecturerComplaints() {
                       <div key={comp._id} className="lc-complaint-card">
                         <div className="lc-complaint-card__header">
                           <div className="lc-complaint-card__user">
-                            <div className="lc-complaint-card__avatar" style={{ background: '#fef3c7', color: '#d97706' }}>
+                            <div className="lc-complaint-card__avatar lc-complaint-card__avatar--admin">
                               <Shield size={24} />
                             </div>
                             <div className="lc-complaint-card__info">

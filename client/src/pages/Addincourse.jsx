@@ -240,7 +240,7 @@ function Addincourse() {
         </header>
 
         {status.message && (
-          <div className={`as-alert as-alert--${status.type}`} style={{ marginBottom: '2.5rem' }}>
+          <div className={`as-alert as-alert--${status.type}`}>
             {status.type === "success" ? <CheckCircle2 size={24} /> : <AlertCircle size={24} />}
             <span>{status.message}</span>
           </div>

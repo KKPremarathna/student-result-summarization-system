@@ -1,16 +1,16 @@
 /* LecturerHome.css - Premium Winter Chill Dashboard */
 
-:root {
-  --lh-primary: #219EBC;
-  --lh-dark: #0B2E33;
-  --lh-bg: #f8fafc;
-  --lh-border: rgba(226, 232, 240, 0.6);
-  --lh-shadow: 0 10px 30px rgba(11, 46, 51, 0.05);
-  --lh-radius: 2rem;
-}
-
 .lh-page {
+  --lh-primary: var(--primary);
+  --lh-dark: var(--text-main);
+  --lh-bg: var(--bg-main);
+  --lh-border: var(--admin-border);
+  --lh-shadow: var(--shadow-md);
+  --lh-radius: var(--radius-lg);
+  
   animation: fadeIn 0.6s ease-out;
+  color: var(--text-main);
+  transition: var(--theme-transition);
 }
 
 @keyframes fadeIn {
@@ -33,11 +33,12 @@
 }
 
 .lh-card {
-  background: white;
+  background: var(--bg-card);
   border-radius: var(--lh-radius);
   padding: 3rem 2rem;
   box-shadow: var(--lh-shadow);
   border: 1px solid var(--lh-border);
+  transition: var(--theme-transition);
 }
 
 .lh-card--center {
@@ -58,18 +59,20 @@
   height: 150px;
   border-radius: 50%;
   padding: 5px;
-  background: linear-gradient(135deg, var(--lh-primary), var(--lh-dark));
+  background: var(--lh-primary);
   margin: 0 auto;
-  box-shadow: 0 8px 25px rgba(33, 158, 188, 0.25);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transition: var(--theme-transition);
 }
 
 .lh-avatar {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: white;
+  background: var(--bg-card);
   padding: 4px;
   overflow: hidden;
+  transition: var(--theme-transition);
 }
 
 .lh-avatar__img {
@@ -91,12 +94,12 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: #64748b;
+  color: var(--text-muted);
   font-weight: 700;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  background: #f1f5f9;
+  background: var(--bg-hover);
   padding: 0.5rem 1.25rem;
   border-radius: 2rem;
   margin-bottom: 2.5rem;
@@ -115,13 +118,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.25rem;
-  background: #f8fafc;
+  background: var(--bg-hover);
   border-radius: 1.25rem;
   transition: all 0.2s ease;
 }
 
 .lh-info-row:hover {
-  background: #f1f5f9;
+  background: var(--bg-card);
+  box-shadow: var(--lh-shadow);
 }
 
 .lh-info-row__key {
@@ -130,7 +134,7 @@
   gap: 0.75rem;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .lh-info-row__value {
@@ -148,7 +152,7 @@
   width: 100%;
   padding: 1.25rem;
   border-radius: 1.25rem;
-  background: var(--lh-dark);
+  background: var(--primary);
   color: white;
   font-weight: 700;
   border: none;
@@ -162,7 +166,8 @@
 }
 
 .lh-settings-btn:hover {
-  background: var(--lh-primary);
+  background: var(--primary);
+  opacity: 0.9;
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(33, 158, 188, 0.3);
 }
@@ -201,14 +206,15 @@
 }
 
 .lh-stat-card--teal { 
-  background: white; 
+  background: var(--bg-card); 
   color: var(--lh-dark);
   border: 1px solid var(--lh-border);
 }
 
 .lh-stat-card--dark { 
-  background: var(--lh-dark);
-  color: white;
+  background: var(--primary-light);
+  color: var(--text-main);
+  border: 1px solid var(--lh-border);
 }
 
 .lh-stat-card__icon-wrap {
@@ -222,14 +228,15 @@
 }
 
 .lh-stat-card--teal .lh-stat-card__icon-wrap {
-  background: #e0f2fe;
-  color: #0284c7;
+  background: rgba(var(--primary-rgb, 79, 124, 130), 0.1);
+  color: var(--primary);
 }
 
 .lh-stat-card--dark .lh-stat-card__icon-wrap {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(var(--primary-rgb, 56, 189, 248), 0.2);
   color: white;
   backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .lh-stat-card:hover .lh-stat-card__icon-wrap {
@@ -262,7 +269,7 @@
 
 /* Assigned Subjects Section */
 .lh-subjects-card {
-  background: white;
+  background: var(--bg-card);
   border-radius: var(--lh-radius);
   padding: 3rem;
   box-shadow: var(--lh-shadow);
@@ -302,7 +309,7 @@
   left: 1.25rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 .lh-search__input {
@@ -310,16 +317,17 @@
   padding: 1rem 1.25rem 1rem 3.5rem;
   border-radius: 1.25rem;
   border: 1px solid var(--lh-border);
-  background: #f8fafc;
+  background: var(--bg-main);
   font-weight: 600;
+  color: var(--text-main);
   transition: all 0.2s ease;
 }
 
 .lh-search__input:focus {
   outline: none;
-  background: white;
+  background: var(--bg-card);
   border-color: var(--lh-primary);
-  box-shadow: 0 0 0 4px rgba(33, 158, 188, 0.1);
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
 }
 
 .lh-subjects-grid {
@@ -333,7 +341,7 @@
   align-items: center;
   gap: 1.5rem;
   padding: 1.5rem;
-  background: #f8fafc;
+  background: var(--bg-hover);
   border: 1px solid var(--lh-border);
   border-radius: 1.5rem;
   transition: all 0.3s ease;
@@ -341,16 +349,16 @@
 }
 
 .lh-subject-item:hover {
-  background: white;
+  background: var(--bg-card);
   border-color: var(--lh-primary);
   transform: translateY(-5px);
-  box-shadow: 0 12px 25px rgba(11, 46, 51, 0.05);
+  box-shadow: var(--lh-shadow);
 }
 
 .lh-subject-item__initial {
   width: 4rem;
   height: 4rem;
-  background: white;
+  background: var(--bg-card);
   color: var(--lh-dark);
   border-radius: 1.25rem;
   display: flex;
@@ -388,7 +396,7 @@
 .lh-subject-item__year {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #94a3b8;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -399,8 +407,8 @@
 }
 
 .lh-subject-item__edit {
-  color: #94a3b8;
-  background: white;
+  color: var(--text-muted);
+  background: var(--bg-card);
   width: 42px;
   height: 42px;
   border-radius: 12px;
@@ -422,19 +430,20 @@
   grid-column: 1 / -1;
   text-align: center;
   padding: 5rem 2rem;
-  background: #f8fafc;
+  background: var(--bg-hover);
   border-radius: 2rem;
   border: 2px dashed var(--lh-border);
 }
 
 .lh-empty-state__icon {
-  color: #cbd5e1;
+  color: var(--text-muted);
+  opacity: 0.3;
   margin-bottom: 1.5rem;
 }
 
 .lh-empty-state__text {
   font-weight: 700;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 1.1rem;
 }
 

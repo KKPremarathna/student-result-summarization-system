@@ -1,15 +1,13 @@
 /* LecturerLayout.css - Premium Winter Chill Layout Styling */
 
-:root {
-  --lp-bg: #f8fafc;
-  --lp-dark: #0B2E33;
-  --lp-primary: #219EBC;
-  --lp-border: rgba(226, 232, 240, 0.8);
-  --lp-shadow: 0 10px 30px rgba(11, 46, 51, 0.05);
-  --lp-radius: 2rem;
-}
-
 .lecturer-layout {
+  --lp-bg: var(--bg-main);
+  --lp-dark: var(--text-main);
+  --lp-primary: var(--primary);
+  --lp-border: var(--admin-border);
+  --lp-shadow: var(--shadow-md);
+  --lp-radius: var(--radius-lg);
+
   display: flex;
   flex-direction: column;
   height: 100vh;

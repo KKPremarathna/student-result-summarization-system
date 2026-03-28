@@ -15,10 +15,10 @@
   max-width: 550px;
   padding: 1.5rem 2rem;
   border-radius: 20px;
-  background: rgba(20, 20, 20, 0.95);
+  background: var(--bg-card);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
+  border: 1px solid var(--admin-border);
+  color: var(--text-main);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -61,7 +61,7 @@
 }
 
 .toast-close:hover {
-  color: white;
+  color: var(--primary);
 }
 
 @keyframes toastIn {

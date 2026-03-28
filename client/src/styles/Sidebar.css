@@ -1,24 +1,41 @@
 /* Sidebar.css - Premium Winter Chill Sidebar Styles */
 
 :root {
-  --sidebar-bg: #0B2E33;
-  --sidebar-active: #219EBC;
-  --sidebar-hover: rgba(255, 255, 255, 0.08);
-  --sidebar-text: #e2e8f0;
-  --sidebar-text-muted: #94a3b8;
+  --sidebar-bg: var(--bg-card);
+  --sidebar-active: var(--primary);
+  --sidebar-hover: var(--bg-hover);
+  --sidebar-text: var(--text-main);
+  --sidebar-text-muted: var(--text-muted);
+  --sidebar-border: 1px solid rgba(0, 0, 0, 0.08);
   --sidebar-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.dark-theme {
+  /* Use bg-card (#0f172a) so the sidebar is visually distinct from
+     bg-main (#020617) which is the same value as bg-dark in dark mode */
+  --sidebar-bg: var(--bg-card);
+  --sidebar-active: var(--primary);
+  --sidebar-hover: var(--bg-hover);
+  --sidebar-text: var(--text-main);
+  --sidebar-text-muted: var(--text-muted);
+  --sidebar-border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .sidebar-premium {
   height: 100%;
   background-color: var(--sidebar-bg);
-  color: white;
-  transition: var(--sidebar-transition);
+  color: var(--sidebar-text);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease, border-color 0.3s ease;
   display: flex;
   flex-direction: column;
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
   z-index: 50;
   overflow: hidden;
+  border-right: var(--sidebar-border);
+}
+
+body.dark-theme .sidebar-premium {
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.6);
 }
 
 .sidebar-premium.open {
@@ -35,8 +52,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 0 1.25rem;
+  border-bottom: var(--sidebar-border);
+}
+
+.sidebar-premium.closed .sidebar-header {
+  flex-direction: column;
+  height: auto;
+  gap: 1.5rem;
+  padding: 2rem 0;
+  justify-content: center;
 }
 
 .sidebar-logo {
@@ -47,33 +72,53 @@
 
 .logo-icon {
   color: var(--sidebar-active);
-  filter: drop-shadow(0 0 8px rgba(33, 158, 188, 0.3));
+  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.2));
 }
 
 .logo-text {
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1rem;
   letter-spacing: -0.5px;
   white-space: nowrap;
+  color: var(--sidebar-text);
 }
 
-.sidebar-toggle-btn {
-  background: rgba(255, 255, 255, 0.05);
+.sidebar-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sidebar-premium.closed .sidebar-header-actions {
+  flex-direction: column;
+}
+
+.theme-toggle-btn, .sidebar-toggle-btn {
+  background: var(--sidebar-hover);
   border: none;
-  color: white;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  color: var(--sidebar-text-muted);
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: var(--sidebar-transition);
+  transition: all 0.2s ease;
 }
 
-.sidebar-toggle-btn:hover {
+.theme-toggle-btn:hover, .sidebar-toggle-btn:hover {
   background: var(--sidebar-active);
-  transform: scale(1.05);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.theme-toggle-btn svg {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-toggle-btn:hover svg {
+  transform: rotate(15deg);
 }
 
 /* Navigation */
@@ -116,7 +161,7 @@
 
 .nav-link:hover {
   background-color: var(--sidebar-hover);
-  color: white;
+  color: var(--sidebar-active);
 }
 
 .nav-icon {
@@ -130,7 +175,7 @@
 .active .nav-link {
   background-color: var(--sidebar-active);
   color: white;
-  box-shadow: 0 4px 15px rgba(33, 158, 188, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .active .nav-icon {
@@ -145,7 +190,7 @@
 /* Footer */
 .sidebar-footer {
   padding: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: var(--sidebar-border);
   text-align: center;
 }
 
@@ -165,7 +210,7 @@
 }
 
 .sidebar-nav::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-hover);
   border-radius: 2px;
 }
 

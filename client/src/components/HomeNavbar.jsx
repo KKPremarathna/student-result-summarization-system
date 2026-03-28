@@ -1,9 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/images/campus-logo.png";
+import { useTheme } from "../context/ThemeContext";
+import { Sun, Moon } from "lucide-react";
 import "../styles/HomeNavbar.css";
 
 function HomeNavbar() {
+  const { isDarkMode, toggleTheme } = useTheme();
   return (
     <header className="home-navbar">
       <div className="home-navbar__brand">
@@ -20,6 +23,13 @@ function HomeNavbar() {
         <Link to="/calendar">Academic Calendar</Link>
         <Link to="/signin">SignIn</Link>
         <Link to="/signup">SignUp</Link>
+        <button 
+          className="home-navbar__theme-toggle" 
+          onClick={toggleTheme}
+          aria-label="Toggle Theme"
+        >
+          {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+        </button>
       </nav>
     </header>
   );

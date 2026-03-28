@@ -1,13 +1,11 @@
 /* StudentLayout.css - Premium Winter Chill Dashboard */
 
-:root {
-  --sp-bg: #f8fafc;
-  --sp-dark: #0B2E33;
-  --sp-primary: #219EBC;
-  --sp-border: rgba(226, 232, 240, 0.8);
-}
-
 .student-layout {
+  --sp-bg: var(--bg-main);
+  --sp-dark: var(--text-main);
+  --sp-primary: var(--primary);
+  --sp-border: var(--admin-border);
+
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -49,16 +47,16 @@
 }
 
 .student-layout__content::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--bg-hover);
 }
 
 .student-layout__content::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--admin-border);
   border-radius: 4px;
 }
 
 .student-layout__content::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--text-muted);
 }
 
 @media (max-width: 768px) {

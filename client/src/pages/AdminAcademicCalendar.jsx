@@ -175,11 +175,11 @@ function AdminAcademicCalendar() {
                 <div className="ac-form-group">
                   <label className="ac-form-label">Calendar Document (PDF)</label>
                   <div className="ac-file-upload-wrapper" onClick={() => document.getElementById('pdfFileInput').click()}>
-                    <Upload size={32} style={{ marginBottom: '12px', color: '#6366f1' }} />
-                    <p style={{ margin: 0, fontWeight: 500 }}>
+                    <Upload size={32} className="ac-upload-icon" />
+                    <p className="ac-upload-text">
                       {formData.pdfFile ? formData.pdfFile.name : "Click here or drag file to upload"}
                     </p>
-                    <p style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>Support only PDF files (Max 10MB)</p>
+                    <p className="ac-upload-hint">Support only PDF files (Max 10MB)</p>
                     <input
                       type="file"
                       id="pdfFileInput"
@@ -207,7 +207,7 @@ function AdminAcademicCalendar() {
         <div className="ac-section">
           <div className="ac-section-header">
             <h3 className="ac-section-title">Published Schedules</h3>
-            <span className="ac-tag" style={{ background: '#eef2ff', color: '#4f46e5' }}>
+            <span className="ac-tag ac-tag--count">
               {calendars.length} Documents
             </span>
           </div>

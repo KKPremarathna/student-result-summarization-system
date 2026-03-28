@@ -15,18 +15,19 @@
   text-align: center;
   margin-bottom: 5rem;
   padding: 4rem 0;
-  background: linear-gradient(135deg, var(--bg-dark) 0%, #1a4048 100%);
+  background: linear-gradient(135deg, var(--bg-dark) 0%, var(--primary) 100%);
   border-radius: var(--radius-lg);
   color: white;
   box-shadow: var(--shadow-xl);
-  border: 1px solid rgba(184, 227, 233, 0.1);
+  border: 1px solid var(--admin-border);
 }
 
 .about-hero h1 {
   font-size: 3.5rem;
   margin-bottom: 1rem;
-  background: linear-gradient(to right, #ffffff, var(--primary-light));
+  background: linear-gradient(to right, white, var(--primary-light));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   letter-spacing: -1px;
 }
@@ -59,7 +60,7 @@
   margin-bottom: 1.5rem;
   font-size: 2rem;
   display: inline-block;
-  border-bottom: 3px solid var(--primary-light);
+  border-bottom: 3px solid var(--primary);
   padding-bottom: 0.5rem;
 }
 

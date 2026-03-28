@@ -214,7 +214,7 @@ function FinalResult() {
               <label className="fr-label">
                 <Info size={16} /> Assessment Split
               </label>
-              <div className="fr-select" style={{ background: '#f1f5f9', cursor: 'default' }}>
+              <div className="fr-input fr-input--readonly">
                 {subjectInfo ? `In-Course: ${100 - subjectInfo.assessments.finalExamWeight}% | Final: ${subjectInfo.assessments.finalExamWeight}%` : "Split N/A"}
               </div>
             </div>
@@ -274,10 +274,10 @@ function FinalResult() {
               </table>
             </div>
           ) : (
-            <div className="vr-empty-state" style={{ padding: '6rem 2rem', textAlign: 'center' }}>
-               <FileText size={80} style={{ opacity: 0.1, marginBottom: '2rem' }} />
-               <h3 style={{ color: '#64748b' }}>Awaiting Data Finalization</h3>
-               <p style={{ color: '#94a3b8' }}>Select the subject context to load student in-course performances and enter project/exam marks.</p>
+            <div className="vr-empty-state">
+               <FileText size={80} className="vr-empty-icon" />
+               <h3>Awaiting Data Finalization</h3>
+               <p>Select the subject context to load student in-course performances and enter project/exam marks.</p>
             </div>
           )}
         </div>
@@ -285,11 +285,11 @@ function FinalResult() {
         {/* Info/Summary Bar */}
         {results.length > 0 && (
           <div className="fr-info-bar">
-            <div className="fr-info-bar__item" style={{ flex: 1, display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+            <div className="fr-info-bar__item">
               <div className="fr-info-bar__icon-wrap">
                 <FileText size={24} />
               </div>
-              <div>
+              <div className="fr-info-bar__content">
                 <p className="fr-info-bar__label">Summary Overview</p>
                 <p className="fr-info-bar__text">
                   Processing results for {results.length} students in {selectedCourse}
@@ -297,16 +297,16 @@ function FinalResult() {
               </div>
             </div>
             
-            <div style={{ display: 'flex', gap: '3rem' }}>
-              <div>
+            <div className="fr-info-bar__stats">
+              <div className="fr-info-bar__stat">
                 <p className="fr-info-bar__label">Pass Ratio</p>
-                <p className="fr-info-bar__text" style={{ color: '#16a34a' }}>
+                <p className="fr-info-bar__text fr-info-bar__text--success">
                   {passCount} Students
                 </p>
               </div>
-              <div>
+              <div className="fr-info-bar__stat">
                 <p className="fr-info-bar__label">Failures</p>
-                <p className="fr-info-bar__text" style={{ color: '#dc2626' }}>
+                <p className="fr-info-bar__text fr-info-bar__text--danger">
                   {failCount} Students
                 </p>
               </div>

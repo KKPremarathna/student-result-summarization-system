@@ -35,8 +35,8 @@ function ViewAcademicCalendar() {
               Create Account
             </Link>
           </div>
-          <p style={{ marginTop: '24px', fontSize: '13px', color: '#94a3b8' }}>
-            <Info size={14} style={{ verticalAlign: 'middle', marginRight: '4px' }} />
+          <p className="ac-auth-footer">
+            <Info size={14} className="ac-auth-footer-icon" />
             Only registered members can access academic schedules.
           </p>
         </div>
@@ -86,7 +86,7 @@ function ViewAcademicCalendar() {
         <div className="ac-section">
           <div className="ac-section-header">
             <h3 className="ac-section-title">Available Documents</h3>
-            <div className="ac-tag" style={{ border: '1px solid #e2e8f0' }}>Official Records</div>
+            <div className="ac-tag ac-tag--official">Official Records</div>
           </div>
 
           {loading ? (
@@ -98,7 +98,7 @@ function ViewAcademicCalendar() {
               {calendars.map(cal => (
                 <div key={cal._id} className="ac-calendar-item">
                   <div className="ac-item-top">
-                    <div className="ac-icon-box" style={{ background: '#f0f9ff', color: '#0ea5e9' }}>
+                    <div className="ac-icon-box ac-icon-box--blue">
                       <FileText size={24} />
                     </div>
                     <div className="ac-item-main">
@@ -110,7 +110,7 @@ function ViewAcademicCalendar() {
                   <div className="ac-item-footer">
                     <span className="ac-tag">PDF View</span>
                     <div className="ac-action-group">
-                      <a href={cal.fileUrl} target="_blank" rel="noopener noreferrer" className="ac-btn-view" style={{ padding: '10px 20px', fontSize: '14px', fontWeight: '600', gap: '8px' }}>
+                      <a href={cal.fileUrl} target="_blank" rel="noopener noreferrer" className="ac-btn-view">
                         <ExternalLink size={18} /> Open Schedule
                       </a>
                     </div>

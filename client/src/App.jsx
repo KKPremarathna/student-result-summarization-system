@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { ThemeProvider } from "./context/ThemeContext";
 import "./styles/global.css";
 import Home from "./pages/home";
 import SignIn from "./pages/signIn";
@@ -72,64 +73,66 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/about" element={<About />} />
+    <ThemeProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/about" element={<About />} />
 
-        {/* Auth Routes */}
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="/signup" element={<SignUp />} />
+          {/* Auth Routes */}
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
 
-        {/* Protected Admin Routes */}
-        <Route path="/adminhome" element={<ProtectedRoute allowedRoles={['admin']}><AdminHome /></ProtectedRoute>} />
+          {/* Protected Admin Routes */}
+          <Route path="/adminhome" element={<ProtectedRoute allowedRoles={['admin']}><AdminHome /></ProtectedRoute>} />
 
-        <Route path="/adduser" element={<ProtectedRoute allowedRoles={['admin']}><AddUser /></ProtectedRoute>} />
+          <Route path="/adduser" element={<ProtectedRoute allowedRoles={['admin']}><AddUser /></ProtectedRoute>} />
 
-        <Route path="/addstudent" element={<ProtectedRoute allowedRoles={['admin']}><AddStudent /></ProtectedRoute>} />
+          <Route path="/addstudent" element={<ProtectedRoute allowedRoles={['admin']}><AddStudent /></ProtectedRoute>} />
 
-        <Route path="/studentlist" element={<ProtectedRoute allowedRoles={['admin']}><StudentList /></ProtectedRoute>} />
+          <Route path="/studentlist" element={<ProtectedRoute allowedRoles={['admin']}><StudentList /></ProtectedRoute>} />
 
-        <Route path="/addlecture" element={<ProtectedRoute allowedRoles={['admin']}><AddLecture /></ProtectedRoute>} />
+          <Route path="/addlecture" element={<ProtectedRoute allowedRoles={['admin']}><AddLecture /></ProtectedRoute>} />
 
-        <Route path="/lecturelist" element={<ProtectedRoute allowedRoles={['admin']}><LectureList /></ProtectedRoute>} />
+          <Route path="/lecturelist" element={<ProtectedRoute allowedRoles={['admin']}><LectureList /></ProtectedRoute>} />
 
-        <Route path="/admincomplaint" element={<ProtectedRoute allowedRoles={['admin']}><Complaint /></ProtectedRoute>} />
+          <Route path="/admincomplaint" element={<ProtectedRoute allowedRoles={['admin']}><Complaint /></ProtectedRoute>} />
 
-        <Route path="/adminresults" element={<ProtectedRoute allowedRoles={['admin']}><Results /></ProtectedRoute>} />
+          <Route path="/adminresults" element={<ProtectedRoute allowedRoles={['admin']}><Results /></ProtectedRoute>} />
 
-        <Route path="/adminprofile" element={<ProtectedRoute allowedRoles={['admin']}><AdminProfile /></ProtectedRoute>} />
+          <Route path="/adminprofile" element={<ProtectedRoute allowedRoles={['admin']}><AdminProfile /></ProtectedRoute>} />
 
-        <Route path="/adminresetpassword" element={<ProtectedRoute allowedRoles={['admin']}><ResetPassword /></ProtectedRoute>} />
+          <Route path="/adminresetpassword" element={<ProtectedRoute allowedRoles={['admin']}><ResetPassword /></ProtectedRoute>} />
 
-        <Route path="/setting" element={<ProtectedRoute allowedRoles={['admin', 'lecturer']}><Setting /></ProtectedRoute>} />
+          <Route path="/setting" element={<ProtectedRoute allowedRoles={['admin', 'lecturer']}><Setting /></ProtectedRoute>} />
 
-        {/* Protected Lecturer Routes */}
-        <Route path="/lecturer/home" element={<ProtectedRoute allowedRoles={['lecturer']}><LecturerHome /></ProtectedRoute>} />
-        <Route path="/lecturer/results" element={<ProtectedRoute allowedRoles={['lecturer']}><ViewResult /></ProtectedRoute>} />
-        <Route path="/lecturer/addsubject" element={<ProtectedRoute allowedRoles={['lecturer']}><AddSubject /></ProtectedRoute>} />
-        <Route path="/lecturer/edit-subject/:id" element={<ProtectedRoute allowedRoles={['lecturer']}><EditSubject /></ProtectedRoute>} />
-        <Route path="/lecturer/addincourse" element={<ProtectedRoute allowedRoles={['lecturer']}><AddIncourse /></ProtectedRoute>} />
-        <Route path="/lecturer/complaints" element={<ProtectedRoute allowedRoles={['lecturer']}><LecturerComplaints /></ProtectedRoute>} />
-        <Route path="/lecturer/final" element={<ProtectedRoute allowedRoles={['lecturer']}><FinalResult /></ProtectedRoute>} />
-        <Route path="/lecturer/setting" element={<ProtectedRoute allowedRoles={['lecturer']}><LecturerSetting /></ProtectedRoute>} />
-        <Route path="/AdminCalendar" element={<AdminAcademicCalendar />} />
-        <Route path="/calendar" element={<ViewAcademicCalendar />} />
+          {/* Protected Lecturer Routes */}
+          <Route path="/lecturer/home" element={<ProtectedRoute allowedRoles={['lecturer']}><LecturerHome /></ProtectedRoute>} />
+          <Route path="/lecturer/results" element={<ProtectedRoute allowedRoles={['lecturer']}><ViewResult /></ProtectedRoute>} />
+          <Route path="/lecturer/addsubject" element={<ProtectedRoute allowedRoles={['lecturer']}><AddSubject /></ProtectedRoute>} />
+          <Route path="/lecturer/edit-subject/:id" element={<ProtectedRoute allowedRoles={['lecturer']}><EditSubject /></ProtectedRoute>} />
+          <Route path="/lecturer/addincourse" element={<ProtectedRoute allowedRoles={['lecturer']}><AddIncourse /></ProtectedRoute>} />
+          <Route path="/lecturer/complaints" element={<ProtectedRoute allowedRoles={['lecturer']}><LecturerComplaints /></ProtectedRoute>} />
+          <Route path="/lecturer/final" element={<ProtectedRoute allowedRoles={['lecturer']}><FinalResult /></ProtectedRoute>} />
+          <Route path="/lecturer/setting" element={<ProtectedRoute allowedRoles={['lecturer']}><LecturerSetting /></ProtectedRoute>} />
+          <Route path="/AdminCalendar" element={<AdminAcademicCalendar />} />
+          <Route path="/calendar" element={<ViewAcademicCalendar />} />
 
-        {/* Student Routes */}
-        <Route path="/student/home" element={<ProtectedRoute allowedRoles={['student']}><StudentHome /></ProtectedRoute>} />
-        <Route path="/student/subject-wise" element={<ProtectedRoute allowedRoles={['student']}><SubjectWiseResult /></ProtectedRoute>} />
-        <Route path="/student/student-wise" element={<ProtectedRoute allowedRoles={['student']}><StudentWiseResult /></ProtectedRoute>} />
-        <Route path="/student/incourse-marks" element={<ProtectedRoute allowedRoles={['student']}><IncourseMarks /></ProtectedRoute>} />
-        <Route path="/student/profile" element={<ProtectedRoute allowedRoles={['student']}><StudentProfile /></ProtectedRoute>} />
-        <Route path="/student/complaints" element={<ProtectedRoute allowedRoles={['student']}><StudentComplaints /></ProtectedRoute>} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+          {/* Student Routes */}
+          <Route path="/student/home" element={<ProtectedRoute allowedRoles={['student']}><StudentHome /></ProtectedRoute>} />
+          <Route path="/student/subject-wise" element={<ProtectedRoute allowedRoles={['student']}><SubjectWiseResult /></ProtectedRoute>} />
+          <Route path="/student/student-wise" element={<ProtectedRoute allowedRoles={['student']}><StudentWiseResult /></ProtectedRoute>} />
+          <Route path="/student/incourse-marks" element={<ProtectedRoute allowedRoles={['student']}><IncourseMarks /></ProtectedRoute>} />
+          <Route path="/student/profile" element={<ProtectedRoute allowedRoles={['student']}><StudentProfile /></ProtectedRoute>} />
+          <Route path="/student/complaints" element={<ProtectedRoute allowedRoles={['student']}><StudentComplaints /></ProtectedRoute>} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 }
 
