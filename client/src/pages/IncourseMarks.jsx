@@ -154,7 +154,7 @@ const IncourseMarks = () => {
         </div>
 
         {error && (
-          <div className="sh-status-bar error" style={{ marginBottom: '2rem' }}>
+          <div className="sh-status-bar error">
             <AlertCircle size={18} />
             <span>{error}</span>
           </div>
@@ -256,8 +256,8 @@ const IncourseMarks = () => {
           </div>
         ) : (
           !loading && courseList.length === 0 && (
-            <div className="sh-empty-state" style={{ textAlign: 'center', padding: '4rem 0' }}>
-               <AlertCircle size={48} style={{ opacity: 0.3, marginBottom: '1rem' }} />
+            <div className="sh-empty-state">
+               <AlertCircle size={48} className="sh-empty-icon" />
                <h3>No marks recorded yet</h3>
                <p>Once results are published, participants' marks will appear here.</p>
             </div>

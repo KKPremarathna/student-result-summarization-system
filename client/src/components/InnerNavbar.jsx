@@ -19,6 +19,7 @@ function InnerNavbar() {
 
   const userString = localStorage.getItem("user");
   const user = userString ? JSON.parse(userString) : null;
+  const calendarLink = user?.role === "admin" ? "/AdminCalendar" : "/calendar";
 
   const authPaths = ["/signin", "/signup"];
   const isAuthPage = authPaths.includes(location.pathname);
@@ -58,21 +59,21 @@ function InnerNavbar() {
         <div className="home-navbar__links">
           <Link to="/">Home</Link>
           <Link to="/about">About</Link>
-          <Link to="/calendar">Academic Calendar</Link>
+          <Link to={calendarLink}>Academic Calendar</Link>
         </div>
 
         {showUserActions && (
           <div className="inner-navbar__user-actions">
             <div className="notification-wrapper">
-              <button 
-                className="navbar-icon-btn" 
+              <button
+                className="navbar-icon-btn"
                 onClick={() => setIsNotifOpen(!isNotifOpen)}
                 title="Notifications"
               >
                 <Bell size={24} />
                 {notifications.length > 0 && <span className="notif-badge">{notifications.length}</span>}
               </button>
-              
+
               {isNotifOpen && (
                 <div className="navbar-dropdown notif-dropdown">
                   <div className="dropdown-header">
@@ -98,8 +99,8 @@ function InnerNavbar() {
                           ))}
                         </div>
                         <div className="notif-footer">
-                          <button 
-                            className="notif-mark-btn" 
+                          <button
+                            className="notif-mark-btn"
                             onClick={markAsRead}
                           >
                             Mark As Read
@@ -113,8 +114,8 @@ function InnerNavbar() {
             </div>
 
             <div className="profile-wrapper">
-              <button 
-                className="navbar-profile-btn" 
+              <button
+                className="navbar-profile-btn"
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
               >
                 <div className="navbar-avatar">

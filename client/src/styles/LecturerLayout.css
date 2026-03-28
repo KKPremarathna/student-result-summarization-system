@@ -1,35 +1,42 @@
-/* LecturerLayout.css */
+/* LecturerLayout.css - Premium Winter Chill Layout Styling */
 
 .lecturer-layout {
+  --lp-bg: var(--bg-main);
+  --lp-dark: var(--text-main);
+  --lp-primary: var(--primary);
+  --lp-border: var(--admin-border);
+  --lp-shadow: var(--shadow-md);
+  --lp-radius: var(--radius-lg);
+
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  background-color: #0B2E33;
-  /* Original dark teal base */
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--lp-bg);
 }
 
 .lecturer-layout__body {
   display: flex;
   flex: 1;
   position: relative;
-  /* Allow sticky children */
+  overflow: hidden;
 }
 
 .lecturer-layout__content {
   flex: 1;
   position: relative;
-  overflow: auto;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  background-color: rgba(0, 0, 0, 0.4);
-  /* Original overlay */
+  background-color: transparent; /* Removed the old dark overlay */
 }
 
 .lecturer-layout__inner {
   position: relative;
   z-index: 1;
-  padding: 40px;
-  max-width: 1400px;
+  padding: 2.5rem;
+  max-width: 1600px;
   margin: 0 auto;
   width: 100%;
   flex: 1;

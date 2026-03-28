@@ -1,10 +1,17 @@
 /* StudentLayout.css - Premium Winter Chill Dashboard */
 
 .student-layout {
+  --sp-bg: var(--bg-main);
+  --sp-dark: var(--text-main);
+  --sp-primary: var(--primary);
+  --sp-border: var(--admin-border);
+
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  background-color: #f1f5f9; /* Muted slate background to reduce brightness */
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--sp-bg);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
@@ -12,21 +19,26 @@
   display: flex;
   flex: 1;
   position: relative;
-  height: calc(100vh - 80px); /* Adjust for navbar height */
+  overflow: hidden;
 }
 
 .student-layout__content {
   flex: 1;
   position: relative;
   overflow-y: auto;
-  padding: 2.5rem;
-  background-color: #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  background-color: transparent;
 }
 
 .student-layout__inner {
-  max-width: 1400px;
+  position: relative;
+  z-index: 1;
+  padding: 2.5rem;
+  max-width: 1600px;
   margin: 0 auto;
   width: 100%;
+  flex: 1;
 }
 
 /* Scrollbar Styling for Content area */
@@ -35,16 +47,16 @@
 }
 
 .student-layout__content::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--bg-hover);
 }
 
 .student-layout__content::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--admin-border);
   border-radius: 4px;
 }
 
 .student-layout__content::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--text-muted);
 }
 
 @media (max-width: 768px) {

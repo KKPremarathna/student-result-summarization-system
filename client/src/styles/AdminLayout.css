@@ -1,16 +1,22 @@
 /* AdminLayout.css - Premium Winter Chill Styling */
 
-:root {
-  --admin-primary: #219EBC;
-  --admin-dark: #0B2E33;
-  --admin-bg: #f8fafc;
-  --admin-sidebar-bg: #0B2E33; /* Reverted to dark teal to match Lecturer Portal */
-  --admin-sidebar-text: #e2e8f0;
-  --admin-sidebar-muted: #94a3b8;
-  --admin-card-bg: #ffffff;
-  --admin-border: rgba(226, 232, 240, 0.8);
-  --admin-shadow: 0 10px 30px rgba(11, 46, 51, 0.05);
-  --admin-radius: 1.5rem;
+.admin-page-root {
+  --admin-primary: var(--primary);
+  --admin-dark: var(--bg-dark);
+  --admin-bg: var(--bg-main);
+  --admin-sidebar-bg: var(--bg-card);
+  --admin-sidebar-text: var(--text-main);
+  --admin-sidebar-muted: var(--text-muted);
+  --admin-sidebar-border: rgba(0, 0, 0, 0.08);
+  --admin-card-bg: var(--bg-card);
+  --admin-shadow: var(--shadow-md);
+  --admin-radius: var(--radius-md);
+}
+
+body.dark-theme {
+  --admin-sidebar-bg: var(--bg-dark);
+  --admin-sidebar-text: var(--text-main);
+  --admin-sidebar-border: rgba(255, 255, 255, 0.1);
 }
 
 .admin-page-root {
@@ -19,13 +25,17 @@
   height: 100vh;
   width: 100vw;
   background-color: var(--admin-bg);
+  color: var(--text-main);
   overflow: hidden;
+  transition: var(--theme-transition);
 }
 
 .admin-layout-body {
   display: flex;
   flex: 1;
   overflow: hidden;
+  background-color: var(--admin-bg);
+  transition: var(--theme-transition);
 }
 
 /* Sidebar Styling */
@@ -35,10 +45,104 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 1.5rem 1rem;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
+  border-right: 1px solid var(--admin-sidebar-border);
   z-index: 100;
+  color: var(--admin-sidebar-text);
+  overflow: hidden;
+}
+
+.sb-container.open {
+  width: 280px;
+}
+
+.sb-container.closed {
+  width: 80px;
+}
+
+/* Header */
+.sidebar-header {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+  border-bottom: 1px solid var(--admin-border);
+  margin-bottom: 1.5rem;
+}
+
+.sb-container.closed .sidebar-header {
+  padding: 0;
+  flex-direction: column;
+  height: auto;
+  gap: 1.5rem;
+  padding: 2rem 0;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-icon {
+  color: var(--admin-primary);
+  filter: drop-shadow(0 0 8px rgba(33, 158, 188, 0.3));
+}
+
+.logo-text {
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+  color: var(--admin-sidebar-text);
+}
+
+.sidebar-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sb-container.closed .sidebar-header-actions {
+  flex-direction: column;
+}
+
+.theme-toggle-btn, .sidebar-toggle-btn {
+  background: var(--bg-hover);
+  border: none;
+  color: var(--admin-sidebar-text);
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle-btn:hover, .sidebar-toggle-btn:hover {
+  background: var(--bg-hover);
   color: white;
+  transform: translateY(-1px);
+}
+
+.theme-toggle-btn svg {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-toggle-btn:hover svg {
+  transform: rotate(15deg);
+}
+
+.sidebar-toggle-btn:hover {
+  background: var(--admin-primary);
+  transform: scale(1.05);
+}
+
+.sb-container.closed .sidebar-logo {
+  display: none;
 }
 
 .sb-nav-section {
@@ -46,7 +150,7 @@
   font-weight: 800;
   color: var(--admin-sidebar-muted);
   letter-spacing: 1.5px;
-  margin: 1rem 0 1rem 1rem;
+  margin: 1rem 0 1rem 1.5rem;
   text-transform: uppercase;
 }
 
@@ -54,19 +158,26 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1rem 1.25rem;
+  padding: 1rem 1.5rem;
   border-radius: 12px;
   color: var(--admin-sidebar-text);
   text-decoration: none;
   font-weight: 700;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-bottom: 0.25rem;
+  margin: 0 0.75rem 0.25rem 0.75rem;
   position: relative;
+  white-space: nowrap;
+}
+
+.sb-container.closed .sb-item {
+  justify-content: center;
+  padding: 1.25rem;
+  margin: 0 0.5rem 0.25rem 0.5rem;
 }
 
 .sb-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: white;
+  background: var(--bg-hover);
+  color: var(--admin-primary);
 }
 
 .sb-item.active {
@@ -103,7 +214,7 @@
   overflow-y: auto;
   padding: 3rem;
   scroll-behavior: smooth;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: var(--bg-main);
 }
 
 .admin-content-container {

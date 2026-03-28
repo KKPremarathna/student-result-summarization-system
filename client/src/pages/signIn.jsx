@@ -41,9 +41,10 @@ function Signin() {
         setMessage({ type: "success", text: "Login successful! Redirecting..." });
 
         setTimeout(() => {
-          if (user.role === "admin") navigate("/adminhome");
-          else if (user.role === "lecturer") navigate("/lecturer/home");
-          else if (user.role === "student") navigate("/student/home");
+          const role = (user.role || "").toLowerCase().trim();
+          if (role === "admin") navigate("/adminhome");
+          else if (role === "lecturer") navigate("/lecturer/home");
+          else if (role === "student") navigate("/student/home");
           else navigate("/");
         }, 1500);
       }

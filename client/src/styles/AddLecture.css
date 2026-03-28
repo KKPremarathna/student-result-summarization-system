@@ -14,7 +14,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -32,22 +32,22 @@
 }
 
 .al-back-link:hover {
-  color: var(--admin-primary);
+  color: var(--primary);
 }
 
 .al-breadcrumb-current {
-  color: var(--admin-dark);
+  color: var(--text-main);
 }
 
 .al-title {
   font-size: 2.25rem;
   font-weight: 900;
-  color: var(--admin-dark);
+  color: var(--text-main);
   margin-bottom: 0.5rem;
 }
 
 .al-subtitle {
-  color: #64748b;
+  color: var(--text-muted);
   font-weight: 600;
   font-size: 1.1rem;
 }
@@ -86,11 +86,12 @@
 
 /* Form Card */
 .al-card {
-  background: white;
+  background: var(--bg-card);
   border-radius: var(--admin-radius);
   padding: 3rem;
   border: 1px solid var(--admin-border);
   box-shadow: var(--admin-shadow);
+  transition: var(--theme-transition);
 }
 
 .al-card-header {
@@ -103,8 +104,8 @@
 .al-card-icon-wrap {
   width: 56px;
   height: 56px;
-  background: #f1f5f9;
-  color: var(--admin-dark);
+  background: var(--bg-hover);
+  color: var(--text-muted);
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -114,7 +115,7 @@
 .al-card-title {
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--admin-dark);
+  color: var(--text-main);
   margin: 0;
 }
 
@@ -133,7 +134,7 @@
 .al-form-group label {
   font-size: 0.75rem;
   font-weight: 800;
-  color: #64748b;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   display: flex;
@@ -145,25 +146,25 @@
   width: 100%;
   padding: 1rem 1.25rem;
   border-radius: 1rem;
-  border: 1px solid #e2e8f0;
-  background: #f8fafc;
+  border: 1px solid var(--admin-border);
+  background: var(--bg-main);
   font-weight: 600;
-  color: var(--admin-dark);
+  color: var(--text-main);
   transition: all 0.2s;
   font-size: 1rem;
 }
 
 .al-form-group input:focus, .al-form-group select:focus {
   outline: none;
-  border-color: var(--admin-primary);
-  background: white;
-  box-shadow: 0 0 0 4px rgba(33, 158, 188, 0.1);
+  border-color: var(--primary);
+  background: var(--bg-card);
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
 }
 
 .al-submit-btn {
   padding: 1.15rem;
   border-radius: 1rem;
-  background: var(--admin-dark);
+  background: var(--primary);
   color: white;
   border: none;
   font-weight: 800;
@@ -175,13 +176,13 @@
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  box-shadow: 0 10px 25px rgba(11, 46, 51, 0.15);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
 .al-submit-btn:hover:not(:disabled) {
-  background: var(--admin-primary);
+  opacity: 0.9;
   transform: translateY(-3px);
-  box-shadow: 0 15px 30px rgba(33, 158, 188, 0.25);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
 }
 
 .al-submit-btn:disabled {
@@ -197,7 +198,7 @@
 }
 
 .al-info-card {
-  background: white;
+  background: var(--bg-card);
   padding: 2.5rem;
   border-radius: 1.5rem;
   border: 1px solid var(--admin-border);
@@ -208,24 +209,24 @@
 .al-info-icon {
   width: 60px;
   height: 60px;
-  background: #f1f5f9;
+  background: var(--bg-hover);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.5rem;
-  color: var(--admin-dark);
+  color: var(--text-main);
 }
 
 .al-info-card h3 {
   font-size: 1.25rem;
   font-weight: 800;
-  color: var(--admin-dark);
+  color: var(--text-main);
   margin-bottom: 0.75rem;
 }
 
 .al-info-card p {
-  color: #64748b;
+  color: var(--text-muted);
   font-weight: 600;
   font-size: 0.95rem;
   line-height: 1.6;
@@ -233,13 +234,13 @@
 }
 
 .al-tip-box {
-  background: #fffbeb;
-  border: 1px solid #fef3c7;
+  background: var(--primary-light);
+  border: 1px solid var(--admin-border);
   padding: 1.5rem;
   border-radius: 1.25rem;
   display: flex;
   gap: 1rem;
-  color: #92400e;
+  color: var(--text-main);
 }
 
 .al-tip-box p {
@@ -252,17 +253,17 @@
 .al-btn-outline {
   display: block;
   padding: 0.85rem;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--admin-border);
   border-radius: 1rem;
-  color: var(--admin-dark);
+  color: var(--text-main);
   font-weight: 800;
   text-decoration: none;
   transition: all 0.2s;
 }
 
 .al-btn-outline:hover {
-  border-color: var(--admin-primary);
-  color: var(--admin-primary);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 @media (max-width: 900px) {

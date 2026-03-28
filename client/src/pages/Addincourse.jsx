@@ -1,353 +1,248 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import LecturerLayout from "../components/LecturerLayout.jsx";
 import { 
   getCourseCodes, 
   getBatches, 
-  getSubjectByCodeAndBatch,
-  getIncourseResultsBySubject,
-  saveIncourseResult,
-  deleteIncourseResult
-} from "../services/lecturerApi.js";
+  getSubjectByCodeAndBatch, 
+  getIncourseResults, 
+  saveIncourseResult 
+} from "../services/lecturerApi";
 import "../styles/Addincourse.css";
 import {
-  Save,
-  Filter,
-  Search,
-  GraduationCap,
-  LayoutDashboard,
-  ChevronRight,
-  ClipboardCheck,
-  Edit3,
-  UserPlus,
+  Plus,
   Trash2,
-  Users,
-  User,
+  Save,
+  ChevronRight,
+  Database,
+  Calendar,
+  LayoutDashboard,
+  Filter,
+  UserPlus,
+  Edit,
+  FileUp,
   X,
-  Calendar
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  Info,
+  Table as TableIcon
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
-function AddIncourse() {
+function Addincourse() {
   const [courseCodes, setCourseCodes] = useState([]);
   const [batches, setBatches] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState("");
   const [selectedBatch, setSelectedBatch] = useState("");
-  const [eNumberSearch, setENumberSearch] = useState("");
-  
-  const [loading, setLoading] = useState(false);
-  const [saveLoading, setSaveLoading] = useState(false);
-  const [results, setResults] = useState([]);
   const [subjectInfo, setSubjectInfo] = useState(null);
-  const [message, setMessage] = useState({ type: "", text: "" });
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [entryMode, setEntryMode] = useState("range"); // "range" or "bulk"
+  const [rangeInput, setRangeInput] = useState({ start: "", end: "" });
+  const [bulkInput, setBulkInput] = useState("");
+  const [parsedStudents, setParsedStudents] = useState([]);
+  const [status, setStatus] = useState({ type: null, message: "" });
 
-  const [structure, setStructure] = useState({
-    assignments: 0,
-    quizzes: 0,
-    labs: 0
-  });
-  
-  // New modal state
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [studentInput, setStudentInput] = useState("");
-  const [rangeStart, setRangeStart] = useState("");
-  const [rangeEnd, setRangeEnd] = useState("");
-  const [tempList, setTempList] = useState([]);
-  const [inputType, setInputType] = useState("bulk"); // "bulk", "individual", or "range"
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [deletedIds, setDeletedIds] = useState([]);
-
-  // Fetch initial course codes
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const res = await getCourseCodes();
-        setCourseCodes(res.data);
-      } catch (err) {
-        console.error("Error fetching courses:", err);
-      }
-    };
-    fetchCourses();
+    fetchCourseCodes();
   }, []);
 
-  // Auto-hide message after 3 seconds
-  useEffect(() => {
-    if (message.text) {
-      const timer = setTimeout(() => {
-        setMessage({ type: "", text: "" });
-      }, 3000);
-      return () => clearTimeout(timer);
+  const fetchCourseCodes = async () => {
+    try {
+      const res = await getCourseCodes();
+      setCourseCodes(res.data);
+    } catch (err) {
+      console.error("Failed to fetch course codes", err);
     }
-  }, [message]);
+  };
 
-  // Fetch batches when course changes
-  useEffect(() => {
-    if (selectedCourse) {
-      const fetchBatches = async () => {
-        try {
-          const res = await getBatches(selectedCourse);
-          setBatches(res.data);
-          setSelectedBatch("");
-        } catch (err) {
-          console.error("Error fetching batches:", err);
-        }
-      };
-      fetchBatches();
-    } else {
-      setBatches([]);
-      setSelectedBatch("");
+  const handleCourseChange = async (code) => {
+    setSelectedCourse(code);
+    setSelectedBatch("");
+    setBatches([]);
+    setSubjectInfo(null);
+    setResults([]);
+    if (code) {
+      try {
+        const res = await getBatches(code);
+        setBatches(res.data);
+      } catch (err) {
+        console.error("Failed to fetch batches", err);
+      }
     }
-  }, [selectedCourse]);
-
-  // Fetch results and structure when course/batch selected
-  useEffect(() => {
-    if (selectedCourse && selectedBatch) {
-      fetchData();
-    } else {
-      setResults([]);
-      setSubjectInfo(null);
-      setStructure({ assignments: 0, quizzes: 0, labs: 0 });
-    }
-  }, [selectedCourse, selectedBatch]);
+  };
 
   const fetchData = async () => {
+    if (!selectedCourse || !selectedBatch) return;
     setLoading(true);
-    setMessage({ type: "", text: "" });
+    setStatus({ type: null, message: "" });
     try {
       const subRes = await getSubjectByCodeAndBatch(selectedCourse, selectedBatch);
-      if (subRes.data && subRes.data.length > 0) {
+      if (subRes.data.length > 0) {
         const subject = subRes.data[0];
         setSubjectInfo(subject);
-        setStructure({
-          assignments: subject.assessments?.assignmentCount || 0,
-          quizzes: subject.assessments?.quizCount || 0,
-          labs: subject.assessments?.labCount || 0
-        });
-
-        const res = await getIncourseResultsBySubject(subject._id);
-        
-        // Ensure we have a row for every student index if needed, 
-        // but typically the backend provides the list for that subject
-        const fetchedResults = res.data.results || [];
-        fetchedResults.sort((a, b) => a.studentENo.localeCompare(b.studentENo));
-        setResults(fetchedResults);
+        const res = await getIncourseResults(subject._id);
+        setResults(res.data.results || []);
+        if (res.data.results?.length > 0) {
+          setIsEditing(true);
+        } else {
+          setIsEditing(false);
+        }
       }
     } catch (err) {
-      console.error("Error fetching data:", err);
-      setMessage({ type: "error", text: "Failed to load subjects or students." });
+      console.error("Failed to fetch data", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleMarkChange = (studentIndex, field, value, subIndex = null) => {
-    const newResults = [...results];
+  useEffect(() => {
+    if (selectedCourse && selectedBatch) {
+      fetchData();
+    }
+  }, [selectedCourse, selectedBatch]);
+
+  const handleMarkChange = (index, type, subIndex, value) => {
+    const updatedResults = [...results];
     const val = value === "" ? "" : Number(value);
     
-    if (field === "mid") {
-      newResults[studentIndex][field] = val;
-    } else if (subIndex !== null) {
-      // For arrays: assignments, quizzes, labs
-      if (!newResults[studentIndex][field]) {
-          newResults[studentIndex][field] = [];
-      }
-      newResults[studentIndex][field][subIndex] = val;
+    if (type === "assignments") {
+      updatedResults[index].assignments[subIndex] = val;
+    } else if (type === "quizzes") {
+      updatedResults[index].quizzes[subIndex] = val;
+    } else if (type === "labs") {
+      updatedResults[index].labs[subIndex] = val;
+    } else {
+      updatedResults[index][type] = val;
     }
-    setResults(newResults);
-  };
-
-  const handleSaveAll = async () => {
-    if (!subjectInfo) return;
-    setSaveLoading(true);
-    setMessage({ type: "", text: "" });
     
-    try {
-      let successCount = 0;
-
-      // 1. Process deletions first
-      for (const id of deletedIds) {
-        await deleteIncourseResult(id);
-      }
-
-      // 2. Process saves/updates
-      for (const res of results) {
-        // If student exists in results but has no marks yet, it's a new entry
-        await saveIncourseResult({
-          subject: subjectInfo._id,
-          studentENo: res.studentENo,
-          assignments: res.assignments || [],
-          quizzes: res.quizzes || [],
-          labs: res.labs || [],
-          mid: res.mid === "" || res.mid === null ? null : res.mid
-        });
-        successCount++;
-      }
-      setMessage({ type: "success", text: `Successfully saved marks for ${successCount} students.` });
-      setIsEditMode(false); // Auto-lock after save
-      setDeletedIds([]); // Clear deleted tracking
-      fetchData(); // Refresh to get recalculated totals
-    } catch (err) {
-      console.error("Save error:", err);
-      const errorMsg = err.response?.data?.message || "Failed to save marks. Values must be between 0 and 100.";
-      setMessage({ type: "error", text: errorMsg });
-    } finally {
-      setSaveLoading(false);
-    }
+    // Calculate total incourse mark on the fly
+    const r = updatedResults[index];
+    const assess = subjectInfo.assessments;
+    
+    let total = 0;
+    
+    const sum = (arr) => arr.reduce((a, b) => (Number(a) || 0) + (Number(b) || 0), 0);
+    const avg = (arr, count) => count > 0 ? sum(arr) / count : 0;
+    
+    total += avg(r.assignments || [], assess.assignmentCount) * (assess.assignmentWeight / 100);
+    total += avg(r.quizzes || [], assess.quizCount) * (assess.quizWeight / 100);
+    total += avg(r.labs || [], assess.labCount) * (assess.labWeight / 100);
+    total += (Number(r.mid) || 0) * (assess.midTermWeight / 100);
+    
+    updatedResults[index].incourseTotal = total;
+    setResults(updatedResults);
   };
 
-  const handleAddStudentsToList = () => {
-    if (!studentInput.trim()) return;
-
-    // Split by newlines, commas, or spaces and normalize
-    const rawList = studentInput.split(/[\n,\s]+/).map(s => s.trim().toUpperCase()).filter(s => s !== "");
-
-    // Simple E-number validation (e.g., 2020/E/001)
-    const validENumberFormat = /^\d{4}\/[A-Z]\/\d{3}$/;
-
-    const newENumbers = rawList.filter(eno => {
-      if (!validENumberFormat.test(eno)) {
-        setMessage({ type: "error", text: `Invalid format: ${eno}. Use 20XX/E/XXX` });
-        return false;
+  const handleParse = () => {
+    if (entryMode === "range") {
+      const start = parseInt(rangeInput.start);
+      const end = parseInt(rangeInput.end);
+      if (isNaN(start) || isNaN(end) || start > end) {
+        alert("Invalid range");
+        return;
       }
-      if (tempList.includes(eno) || results.some(r => r.studentENo === eno)) {
-        return false; // Skip duplicates
+      const students = [];
+      for (let i = start; i <= end; i++) {
+        const eNo = `E/${new Date().getFullYear().toString().slice(-2)}/${String(i).padStart(3, '0')}`;
+        students.push(eNo);
       }
-      return true;
-    });
-
-    const updatedTempList = [...tempList, ...newENumbers];
-    updatedTempList.sort((a, b) => a.localeCompare(b));
-    setTempList(updatedTempList);
-    setStudentInput("");
-    if (newENumbers.length > 0) setMessage({ type: "", text: "" });
-  };
-
-  const handleAddRangeStudents = () => {
-    if (!rangeStart.trim() || !rangeEnd.trim()) return;
-
-    const validENumberFormat = /^(\d{4}\/[A-Z]\/)(\d{3})$/;
-    const startMatch = rangeStart.toUpperCase().match(validENumberFormat);
-    const endMatch = rangeEnd.toUpperCase().match(validENumberFormat);
-
-    if (!startMatch || !endMatch) {
-      setMessage({ type: "error", text: "Invalid range format. Use 20XX/E/XXX" });
-      return;
+      setParsedStudents(students);
+    } else {
+      const students = bulkInput.split(/[\n,]+/).map(s => s.trim()).filter(s => s.length > 0);
+      setParsedStudents(students);
     }
-
-    const prefix = startMatch[1];
-    const endPrefix = endMatch[1];
-
-    if (prefix !== endPrefix) {
-      setMessage({ type: "error", text: "Range must have the same prefix (e.g., 2022/E/)" });
-      return;
-    }
-
-    const startNum = parseInt(startMatch[2]);
-    const endNum = parseInt(endMatch[2]);
-
-    if (startNum > endNum) {
-      setMessage({ type: "error", text: "Start number must be less than end number" });
-      return;
-    }
-
-    const newENumbers = [];
-    for (let i = startNum; i <= endNum; i++) {
-      const eno = `${prefix}${String(i).padStart(3, '0')}`;
-      if (!tempList.includes(eno) && !results.some(r => r.studentENo === eno)) {
-        newENumbers.push(eno);
-      }
-    }
-
-    const updatedTempList = [...tempList, ...newENumbers];
-    updatedTempList.sort((a, b) => a.localeCompare(b));
-    setTempList(updatedTempList);
-    setRangeStart("");
-    setRangeEnd("");
-    if (newENumbers.length > 0) setMessage({ type: "", text: "" });
-  };
-
-  const removeFromTempList = (eno) => {
-    setTempList(tempList.filter(t => t !== eno));
   };
 
   const commitStudents = () => {
-    const newResults = tempList.map(eno => ({
-      studentENo: eno,
-      assignments: Array(structure.assignments).fill(""),
-      quizzes: Array(structure.quizzes).fill(""),
-      labs: Array(structure.labs).fill(""),
-      mid: "",
-      incourseTotal: 0
-    }));
-
-    const updatedResults = [...results, ...newResults];
-    updatedResults.sort((a, b) => a.studentENo.localeCompare(b.studentENo));
-    setResults(updatedResults);
-    setTempList([]);
-    setIsAddModalOpen(false);
-    setMessage({ type: "success", text: `${newResults.length} students added to the list.` });
+    const newResults = parsedStudents
+      .filter(eNo => !results.some(r => r.studentENo === eNo))
+      .map(eNo => ({
+        studentENo: eNo,
+        assignments: new Array(subjectInfo.assessments.assignmentCount).fill(0),
+        quizzes: new Array(subjectInfo.assessments.quizCount).fill(0),
+        labs: new Array(subjectInfo.assessments.labCount).fill(0),
+        mid: 0,
+        incourseTotal: 0
+      }));
+    
+    setResults([...results, ...newResults]);
+    setIsModalOpen(false);
+    setParsedStudents([]);
+    setRangeInput({ start: "", end: "" });
+    setBulkInput("");
   };
 
-  const deleteResultRow = (index) => {
-    const rowToDelete = results[index];
-    if (rowToDelete._id) {
-      setDeletedIds(prev => [...prev, rowToDelete._id]);
+  const removeRow = (index) => {
+    setResults(results.filter((_, i) => i !== index));
+  };
+
+  const handleSave = async () => {
+    setLoading(true);
+    setStatus({ type: null, message: "" });
+    try {
+      if (isEditing) {
+        await saveIncourseResult({ subjectId: subjectInfo._id, results });
+        setStatus({ type: "success", message: "Incourse results updated successfully." });
+      } else {
+        await saveIncourseResult({
+          subjectId: subjectInfo._id,
+          results
+        });
+        setStatus({ type: "success", message: "Incourse results saved successfully." });
+        setIsEditing(true);
+      }
+    } catch (err) {
+      console.error("Save failed", err);
+      setStatus({ type: "error", message: "Failed to save results. Please try again." });
+    } finally {
+      setLoading(false);
     }
-    const newResults = results.filter((_, i) => i !== index);
-    setResults(newResults);
   };
-
-  const filteredResults = eNumberSearch
-    ? results.filter(r => r.studentENo.toLowerCase().includes(eNumberSearch.toLowerCase()))
-    : results;
 
   return (
     <LecturerLayout>
       <div className="aic-page">
-
-        {/* Page Header */}
-        <div className="aic-header">
+        {/* Header */}
+        <header className="aic-header">
           <div>
             <div className="aic-breadcrumb">
-              <LayoutDashboard size={14} />
-              <span>Lecturer Portal</span>
+              <Link to="/lecturer/home">Dashboard</Link>
               <ChevronRight size={14} />
-              <span className="aic-breadcrumb__current">Incourse Entry</span>
+              <span className="aic-breadcrumb__current">Manage Marks</span>
             </div>
             <h2 className="aic-title">
-              <Edit3 size={32} className="aic-title__icon" />
-              Add Incourse Marks
+              <Edit size={32} className="aic-title__icon" />
+              In-Course Assessment
             </h2>
           </div>
 
           <div className="aic-header-actions">
-            <button
-              className="aic-add-btn"
-              onClick={() => setIsAddModalOpen(true)}
-              disabled={!subjectInfo || !isEditMode}
+            <button 
+              className={`aic-edit-toggle-btn ${isEditing ? 'active' : ''}`}
+              onClick={() => setIsEditing(!isEditing)}
+              disabled={results.length === 0}
             >
-              <UserPlus size={20} />
-              Add Students
+              <Edit size={18} />
+              {isEditing ? "Disable Editing" : "Enable Editing"}
             </button>
             <button 
-              className={`aic-edit-toggle-btn ${isEditMode ? 'active' : ''}`} 
-              onClick={() => {
-                if (isEditMode) {
-                  // If canceling, re-fetch to discard unsaved local changes
-                  fetchData();
-                  setDeletedIds([]); // Also reset deletions
-                }
-                setIsEditMode(!isEditMode);
-              }}
-              disabled={!subjectInfo || saveLoading}
+              className="aic-add-btn"
+              onClick={() => setIsModalOpen(true)}
+              disabled={!subjectInfo}
             >
-              {isEditMode ? <X size={20} /> : <Edit3 size={20} />}
-              {isEditMode ? "Cancel Edit" : "Edit Marks"}
+              <UserPlus size={18} />
+              Add Students
             </button>
           </div>
-        </div>
+        </header>
 
-        {message.text && (
-          <div className={`aic-alert aic-alert--${message.type}`}>
-            {message.text}
+        {status.message && (
+          <div className={`as-alert as-alert--${status.type}`}>
+            {status.type === "success" ? <CheckCircle2 size={24} /> : <AlertCircle size={24} />}
+            <span>{status.message}</span>
           </div>
         )}
 
@@ -355,42 +250,37 @@ function AddIncourse() {
         <div className="aic-card">
           <div className="aic-card__header">
             <div className="aic-card__icon-wrap">
-              <Filter size={20} />
+              <Filter size={24} />
             </div>
-            <h3 className="aic-card__title">Selection Criteria</h3>
+            <h3 className="aic-card__title">Subject Selection</h3>
           </div>
 
           <div className="aic-filters">
             <div className="aic-field">
               <label className="aic-label">
-                <ClipboardCheck size={14} />
-                Course Code
+                <Database size={16} /> Course Code
               </label>
-              <select
-                value={selectedCourse}
-                onChange={(e) => setSelectedCourse(e.target.value)}
+              <select 
                 className="aic-select"
-                disabled={isEditMode}
+                value={selectedCourse} 
+                onChange={(e) => handleCourseChange(e.target.value)}
               >
                 <option value="">Select Course</option>
-                {courseCodes.map(item => (
-                  <option key={item.courseCode} value={item.courseCode}>
-                    {item.courseCode} - {item.courseName}
-                  </option>
+                {courseCodes.map(c => (
+                  <option key={c.courseCode} value={c.courseCode}>{c.courseCode} - {c.courseName}</option>
                 ))}
               </select>
             </div>
 
             <div className="aic-field">
               <label className="aic-label">
-                <GraduationCap size={14} />
-                Batch
+                <Calendar size={16} /> Batch
               </label>
-              <select
-                value={selectedBatch}
-                onChange={(e) => setSelectedBatch(e.target.value)}
+              <select 
                 className="aic-select"
-                disabled={!selectedCourse || isEditMode}
+                value={selectedBatch} 
+                onChange={(e) => setSelectedBatch(e.target.value)}
+                disabled={!selectedCourse}
               >
                 <option value="">Select Batch</option>
                 {batches.map(b => (
@@ -401,208 +291,153 @@ function AddIncourse() {
 
             <div className="aic-field">
               <label className="aic-label">
-                <Search size={14} />
-                Search E Number
+                <Info size={16} /> Semester
               </label>
-              <input
-                type="text"
-                placeholder="E/XX/XXX"
-                className="aic-input"
-                value={eNumberSearch}
-                onChange={(e) => setENumberSearch(e.target.value)}
-              />
-            </div>
-
-            {subjectInfo?.semester && (
-              <div className="aic-field">
-                <label className="aic-label">
-                  <Calendar size={14} />
-                  Semester
-                </label>
-                <div className="aic-read-only-box">
-                  {subjectInfo.semester}
-                </div>
+              <div className="aic-read-only-box">
+                {subjectInfo ? `Semester ${subjectInfo.semester}` : "N/A"}
               </div>
-            )}
+            </div>
           </div>
         </div>
 
-        {/* Entry Table Card */}
+        {/* Results Table Card */}
         <div className="aic-table-card">
-          <div className="aic-table-scroll">
-            {subjectInfo ? (
+          {results.length > 0 && subjectInfo ? (
+            <div className="aic-table-container">
               <table className="aic-table">
                 <thead>
                   <tr className="aic-thead-primary">
-                  <th rowSpan="2" className="aic-th aic-th--border-r">E.No</th>
-                    {structure.assignments > 0 && (
-                      <th colSpan={structure.assignments} className="aic-th aic-th--border-r aic-th--border-b">
-                        Assignments ({subjectInfo.assessments?.assignmentWeight || 0}%)
-                      </th>
+                    <th rowSpan="2" className="aic-th">E.No</th>
+                    {subjectInfo.assessments.assignmentCount > 0 && (
+                      <th colSpan={subjectInfo.assessments.assignmentCount} className="aic-th">Assignments</th>
                     )}
-                    {structure.quizzes > 0 && (
-                      <th colSpan={structure.quizzes} className="aic-th aic-th--border-r aic-th--border-b">
-                        Quizzes ({subjectInfo.assessments?.quizWeight || 0}%)
-                      </th>
+                    {subjectInfo.assessments.quizCount > 0 && (
+                      <th colSpan={subjectInfo.assessments.quizCount} className="aic-th">Quizzes</th>
                     )}
-                    {structure.labs > 0 && (
-                      <th colSpan={structure.labs} className="aic-th aic-th--border-r aic-th--border-b">
-                        Labs ({subjectInfo.assessments?.labWeight || 0}%)
-                      </th>
+                    {subjectInfo.assessments.labCount > 0 && (
+                      <th colSpan={subjectInfo.assessments.labCount} className="aic-th">Labs</th>
                     )}
-                    <th rowSpan="2" className="aic-th aic-th--border-r">
-                      MID ({subjectInfo.assessments?.midWeight || 0}%)
-                    </th>
-                    <th rowSpan="2" className="aic-th aic-th--border-r">INCR. TOTAL</th>
-                    <th rowSpan="2" className="aic-th">Actions</th>
+                    <th rowSpan="2" className="aic-th">Mid</th>
+                    <th rowSpan="2" className="aic-th">Total</th>
+                    <th rowSpan="2" className="aic-th">Action</th>
                   </tr>
                   <tr className="aic-thead-secondary">
-                    {structure.assignments > 0 && [...Array(structure.assignments)].map((_, i) => (
-                      <th key={i} className="aic-th-sm aic-th--border-r">A{i + 1}</th>
-                    ))}
-                    {structure.quizzes > 0 && [...Array(structure.quizzes)].map((_, i) => (
-                      <th key={i} className="aic-th-sm aic-th--border-r">Q{i + 1}</th>
-                    ))}
-                    {structure.labs > 0 && [...Array(structure.labs)].map((_, i) => (
-                      <th key={i} className="aic-th-sm aic-th--border-r">L{i + 1}</th>
-                    ))}
+                    {[...Array(subjectInfo.assessments.assignmentCount)].map((_, i) => <th key={i} className="aic-th-sm">A{i+1}</th>)}
+                    {[...Array(subjectInfo.assessments.quizCount)].map((_, i) => <th key={i} className="aic-th-sm">Q{i+1}</th>)}
+                    {[...Array(subjectInfo.assessments.labCount)].map((_, i) => <th key={i} className="aic-th-sm">L{i+1}</th>)}
                   </tr>
                 </thead>
-
                 <tbody className="aic-tbody">
-                  {results.length > 0 ? (
-                    filteredResults.map((r, rowIndex) => (
-                      <tr key={rowIndex} className="aic-row">
-                        <td className="aic-td aic-td--enumber">{r.studentENo}</td>
-
-                        {/* Assignments */}
-                        {structure.assignments > 0 && [...Array(structure.assignments)].map((_, i) => (
-                          <td key={`a-${i}`} className="aic-td aic-td--border-r">
-                            <input
-                              type="number"
-                              value={r.assignments?.[i] ?? ""}
-                              onChange={(e) => handleMarkChange(rowIndex, "assignments", e.target.value, i)}
-                              placeholder="-"
-                              className="aic-cell-input"
-                              min="0"
-                              max="100"
-                              disabled={!isEditMode}
-                            />
-                          </td>
-                        ))}
-
-                        {/* Quizzes */}
-                        {structure.quizzes > 0 && [...Array(structure.quizzes)].map((_, i) => (
-                          <td key={`q-${i}`} className="aic-td aic-td--border-r">
-                            <input
-                              type="number"
-                              value={r.quizzes?.[i] ?? ""}
-                              onChange={(e) => handleMarkChange(rowIndex, "quizzes", e.target.value, i)}
-                              placeholder="-"
-                              className="aic-cell-input"
-                              min="0"
-                              max="100"
-                              disabled={!isEditMode}
-                            />
-                          </td>
-                        ))}
-
-                        {/* Labs */}
-                        {structure.labs > 0 && [...Array(structure.labs)].map((_, i) => (
-                          <td key={`l-${i}`} className="aic-td aic-td--border-r">
-                            <input
-                              type="number"
-                              value={r.labs?.[i] ?? ""}
-                              onChange={(e) => handleMarkChange(rowIndex, "labs", e.target.value, i)}
-                              placeholder="-"
-                              className="aic-cell-input"
-                              min="0"
-                              max="100"
-                              disabled={!isEditMode}
-                            />
-                          </td>
-                        ))}
-
-                        <td className="aic-td aic-td--border-r">
-                          <input
-                            type="number"
-                            value={r.mid ?? ""}
-                            onChange={(e) => handleMarkChange(rowIndex, "mid", e.target.value)}
-                            placeholder="-"
-                            className="aic-cell-input aic-cell-input--mid"
-                            min="0"
-                            max="100"
-                            disabled={!isEditMode}
+                  {results.map((r, ri) => (
+                    <tr key={ri}>
+                      <td className="aic-td aic-td--enumber">{r.studentENo}</td>
+                      {[...Array(subjectInfo.assessments.assignmentCount)].map((_, i) => (
+                        <td key={i} className="aic-td">
+                          <input 
+                            type="number" 
+                            className="aic-cell-input"
+                            value={r.assignments?.[i] || 0}
+                            onChange={(e) => handleMarkChange(ri, "assignments", i, e.target.value)}
+                            disabled={!isEditing}
                           />
                         </td>
-
-                        <td className="aic-td aic-td--incourse aic-td--border-r">
-                          {r.incourseTotal?.toFixed(1) || "0.0"}
+                      ))}
+                      {[...Array(subjectInfo.assessments.quizCount)].map((_, i) => (
+                        <td key={i} className="aic-td">
+                          <input 
+                            type="number" 
+                            className="aic-cell-input"
+                            value={r.quizzes?.[i] || 0}
+                            onChange={(e) => handleMarkChange(ri, "quizzes", i, e.target.value)}
+                            disabled={!isEditing}
+                          />
                         </td>
-                        <td className="aic-td aic-td--actions">
-                          <button
-                            className="aic-row-delete"
-                            onClick={() => deleteResultRow(rowIndex)}
-                            title="Remove student from list"
-                            disabled={!isEditMode}
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                      ))}
+                      {[...Array(subjectInfo.assessments.labCount)].map((_, i) => (
+                        <td key={i} className="aic-td">
+                          <input 
+                            type="number" 
+                            className="aic-cell-input"
+                            value={r.labs?.[i] || 0}
+                            onChange={(e) => handleMarkChange(ri, "labs", i, e.target.value)}
+                            disabled={!isEditing}
+                          />
                         </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan={1 + structure.assignments + structure.quizzes + structure.labs + 3}
-                        className="aic-empty-td"
-                      >
-                        {loading ? "Loading record data..." : "No student records found for this selection."}
+                      ))}
+                      <td className="aic-td">
+                        <input 
+                          type="number" 
+                          className="aic-cell-input"
+                          value={r.mid || 0}
+                          onChange={(e) => handleMarkChange(ri, "mid", null, e.target.value)}
+                          disabled={!isEditing}
+                        />
+                      </td>
+                      <td className="aic-td aic-td--incourse">
+                        {r.incourseTotal?.toFixed(1) || "0.0"}
+                      </td>
+                      <td className="aic-td">
+                        <button 
+                          className="aic-row-delete"
+                          onClick={() => removeRow(ri)}
+                          disabled={!isEditing}
+                        >
+                          <Trash2 size={18} />
+                        </button>
                       </td>
                     </tr>
-                  )}
+                  ))}
                 </tbody>
               </table>
-            ) : (
-              <div className="aic-empty-state">
-                Select course and batch to enter marks.
-              </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="vr-empty-state">
+               <div className="vr-empty-icon-wrap">
+                 <TableIcon size={80} />
+               </div>
+               <h3>Mark Entry Interface</h3>
+               <p>
+                 {loading 
+                   ? "Preparing the grade sheet..." 
+                   : "Please select a course and batch to populate the student list and entry columns."}
+               </p>
+            </div>
+          )}
         </div>
 
-        {/* Footer Actions - Only visible in Edit Mode */}
-        {isEditMode && subjectInfo && results.length > 0 && (
-          <div className="aic-footer animate-slide-up">
+        {/* Sticky Footer */}
+        {results.length > 0 && (
+          <div className="aic-footer">
             <div className="aic-footer__info">
               <div className="aic-footer__icon-wrap">
-                <ClipboardCheck className="aic-footer__icon" size={24} />
+                <TableIcon size={24} />
               </div>
               <div>
-                <p className="aic-footer__label">Incourse Marks</p>
-                <p className="aic-footer__text">Review and finalize the entered marks</p>
+                <p className="aic-footer__label">Total Students</p>
+                <p className="aic-footer__text">{results.length} Recorded</p>
               </div>
             </div>
-            <button
+            <button 
               className="aic-finalize-btn"
-              onClick={handleSaveAll}
-              disabled={saveLoading}
+              onClick={handleSave}
+              disabled={loading}
             >
-              {saveLoading ? "Saving..." : "Finalize Marks"}
+              {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
+              {isEditing ? "Update Marks" : "Save All Marks"}
             </button>
           </div>
         )}
 
-        {/* Add Student Modal */}
-        {isAddModalOpen && (
+        {/* Add Students Modal */}
+        {isModalOpen && (
           <div className="st-modal-overlay">
             <div className="st-modal aic-entry-modal">
               <div className="st-modal-header">
                 <h3 className="st-modal-title">
-                  <UserPlus size={20} />
-                  Add Students to {selectedCourse}
+                  <UserPlus size={24} />
+                  Add Students to Roll
                 </h3>
-                <button className="st-modal-close" onClick={() => setIsAddModalOpen(false)}>
+                <button className="st-modal-close" onClick={() => setIsModalOpen(false)}>
                   <X size={20} />
                 </button>
               </div>
@@ -610,124 +445,88 @@ function AddIncourse() {
               <div className="st-modal-body">
                 <div className="aic-entry-modes">
                   <button 
-                    className={`aic-mode-tab ${inputType === 'bulk' ? 'active' : ''}`}
-                    onClick={() => setInputType('bulk')}
+                    className={`aic-mode-tab ${entryMode === 'range' ? 'active' : ''}`}
+                    onClick={() => setEntryMode("range")}
                   >
-                    <Users size={16} />
-                    Bulk Entry
+                    <ArrowRight size={18} /> Range
                   </button>
                   <button 
-                    className={`aic-mode-tab ${inputType === 'range' ? 'active' : ''}`}
-                    onClick={() => setInputType('range')}
+                    className={`aic-mode-tab ${entryMode === 'bulk' ? 'active' : ''}`}
+                    onClick={() => setEntryMode("bulk")}
                   >
-                    <ChevronRight size={16} />
-                    Range
-                  </button>
-                  <button 
-                    className={`aic-mode-tab ${inputType === 'individual' ? 'active' : ''}`}
-                    onClick={() => setInputType('individual')}
-                  >
-                    <User size={16} />
-                    Individual
+                    <FileUp size={18} /> Bulk List
                   </button>
                 </div>
 
-                <div className="aic-entry-input-wrap">
-                  {inputType === 'bulk' ? (
-                    <div className="st-modal-field">
-                      <label className="st-modal__label">Enter E-Numbers (One per line or comma separated)</label>
-                      <textarea 
-                        className="st-modal__input aic-textarea"
-                        placeholder="2020/E/001&#10;2020/E/002"
-                        value={studentInput}
-                        onChange={(e) => setStudentInput(e.target.value)}
-                        rows={5}
-                      />
-                    </div>
-                  ) : inputType === 'range' ? (
-                    <div className="st-modal-field">
-                      <label className="st-modal__label">Enter Range (e.g., 2020/E/001 to 2020/E/050)</label>
-                      <div className="aic-range-input-group">
-                        <input 
-                          className="st-modal__input"
-                          placeholder="From: 2020/E/001"
-                          value={rangeStart}
-                          onChange={(e) => setRangeStart(e.target.value)}
-                        />
-                        <span className="aic-range-sep">to</span>
-                        <input 
-                          className="st-modal__input"
-                          placeholder="To: 2020/E/050"
-                          value={rangeEnd}
-                          onChange={(e) => setRangeEnd(e.target.value)}
-                          onKeyPress={(e) => e.key === 'Enter' && handleAddRangeStudents()}
-                        />
-                        <button className="aic-add-btn-sm" onClick={handleAddRangeStudents}>
-                          Gen
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="st-modal-field">
-                      <label className="st-modal__label">Student E-Number</label>
-                      <div className="aic-single-add">
-                        <input 
-                          className="st-modal__input"
-                          placeholder="2020/E/001"
-                          value={studentInput}
-                          onChange={(e) => setStudentInput(e.target.value)}
-                          onKeyPress={(e) => e.key === 'Enter' && handleAddStudentsToList()}
-                        />
-                        <button className="aic-add-btn-sm" onClick={handleAddStudentsToList}>
-                          Add
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                  {inputType === 'bulk' && (
-                    <button className="aic-parse-btn" onClick={handleAddStudentsToList}>
-                      Parse & Add to List
-                    </button>
-                  )}
-                </div>
-
-                {/* Preview List */}
-                <div className="aic-preview-wrap">
-                  <h4 className="aic-preview-title">Preview List ({tempList.length})</h4>
-                  <div className="aic-preview-list">
-                    {tempList.length > 0 ? tempList.map((eno, i) => (
-                      <div key={i} className="aic-preview-item">
-                        <span>{eno}</span>
-                        <button onClick={() => removeFromTempList(eno)}>
-                          <X size={14} />
-                        </button>
-                      </div>
-                    )) : (
-                      <p className="aic-preview-empty">No students added to preview yet.</p>
-                    )}
+                {entryMode === "range" ? (
+                  <div className="aic-range-input-group">
+                    <input 
+                      type="number" 
+                      className="aic-input" 
+                      placeholder="Start No (e.g. 1)"
+                      value={rangeInput.start}
+                      onChange={(e) => setRangeInput({...rangeInput, start: e.target.value})}
+                    />
+                    <span className="aic-range-sep">to</span>
+                    <input 
+                      type="number" 
+                      className="aic-input" 
+                      placeholder="End No (e.g. 150)"
+                      value={rangeInput.end}
+                      onChange={(e) => setRangeInput({...rangeInput, end: e.target.value})}
+                    />
+                    <button className="aic-add-btn-sm" onClick={handleParse}>Generate</button>
                   </div>
-                </div>
+                ) : (
+                  <div>
+                    <textarea 
+                      className="as-input" 
+                      placeholder="Enter E-Numbers separated by commas or new lines..."
+                      rows={5}
+                      value={bulkInput}
+                      onChange={(e) => setBulkInput(e.target.value)}
+                    ></textarea>
+                    <button className="aic-parse-btn" onClick={handleParse}>Parse Selection</button>
+                  </div>
+                )}
+
+                {parsedStudents.length > 0 && (
+                  <div className="aic-preview-wrap">
+                    <p className="aic-preview-title">Student Preview ({parsedStudents.length})</p>
+                    <div className="aic-preview-list">
+                      {parsedStudents.map((eNo, i) => (
+                        <div key={i} className="aic-preview-item">
+                          {eNo}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="st-modal-footer">
-                <button className="aic-modal-cancel" onClick={() => setIsAddModalOpen(false)}>
-                  Cancel
-                </button>
+                <button className="aic-modal-cancel" onClick={() => setIsModalOpen(false)}>Cancel</button>
                 <button 
                   className="aic-modal-commit" 
                   onClick={commitStudents}
-                  disabled={tempList.length === 0}
+                  disabled={parsedStudents.length === 0}
                 >
-                  Confirm & Commit to Table
+                  Confirm & Add to Table
                 </button>
               </div>
             </div>
           </div>
         )}
-
       </div>
     </LecturerLayout>
   );
 }
 
-export default AddIncourse;
+// Helper Arrow icon
+const ArrowRight = ({ size }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 12h14m-7-7 7 7-7 7" />
+  </svg>
+);
+
+export default Addincourse;

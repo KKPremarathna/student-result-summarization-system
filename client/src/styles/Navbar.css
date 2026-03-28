@@ -13,9 +13,8 @@
   /* changed from fixed to relative to avoid hiding content */
 }
 
-/* Specific styling for student navbar to ensure consistency */
 .navbar.student-navbar {
-  border-bottom: 1px solid var(--primary-light);
+  border-bottom: 1px solid var(--admin-border);
 }
 
 .logo-container {
@@ -60,7 +59,7 @@
   text-decoration: none;
   font-size: 1.05rem;
   font-weight: 800;
-  color: #93B1B5;
+  color: var(--secondary);
   /* Arctic blue/grey from image links */
   transition: all var(--transition-fast);
   text-transform: uppercase;

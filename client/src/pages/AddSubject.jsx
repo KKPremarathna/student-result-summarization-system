@@ -1,86 +1,98 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import LecturerLayout from "../components/LecturerLayout.jsx";
-import { createSubject } from "../services/lecturerApi.js";
+import { createSubject } from "../services/lecturerApi";
 import "../styles/AddSubject.css";
 import {
-  PlusCircle,
   BookOpen,
-  Settings2,
+  PlusCircle,
+  Hash,
+  Type,
+  Users,
   Percent,
+  CheckCircle2,
+  AlertCircle,
   LayoutDashboard,
   ChevronRight,
-  ClipboardList
+  ClipboardList,
+  Target,
+  FlaskConical,
+  Activity,
+  Calendar,
+  Layers,
+  Loader2
 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
-function AddSubject() {
+const AddSubject = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ type: "", text: "" });
-  const [subjectDetails, setSubjectDetails] = useState({
+  const [status, setStatus] = useState({ type: null, message: "" });
+  const [formData, setFormData] = useState({
+    courseName: "",
     courseCode: "",
     batch: "",
-    courseName: "",
-    credit: "",
-    assignments: "0",
-    labs: "0",
-    quizzes: "0",
-    percentAssignments: "0",
-    percentLabs: "0",
-    percentQuizzes: "0",
-    percentMid: "0",
-    percentEndExam: "0",
     semester: "",
+    assessments: {
+      assignmentCount: 0,
+      assignmentWeight: 0,
+      quizCount: 0,
+      quizWeight: 0,
+      labCount: 0,
+      labWeight: 0,
+      midTermWeight: 0,
+      finalExamWeight: 0
+    }
   });
 
   const handleChange = (e) => {
-    setSubjectDetails({ ...subjectDetails, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name.includes(".")) {
+      const [parent, child] = name.split(".");
+      setFormData((prev) => ({
+        ...prev,
+        [parent]: {
+          ...prev[parent],
+          [child]: Number(value)
+        }
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage({ type: "", text: "" });
+    setStatus({ type: null, message: "" });
 
-    // Format data for backend
-    const formattedData = {
-      courseCode: subjectDetails.courseCode.toUpperCase(),
-      courseName: subjectDetails.courseName,
-      batch: subjectDetails.batch,
-      semester: subjectDetails.semester,
-      credit: Number(subjectDetails.credit),
-      assessments: {
-        assignmentCount: Number(subjectDetails.assignments),
-        labCount: Number(subjectDetails.labs),
-        quizCount: Number(subjectDetails.quizzes),
-        assignmentWeight: Number(subjectDetails.percentAssignments),
-        labWeight: Number(subjectDetails.percentLabs),
-        quizWeight: Number(subjectDetails.percentQuizzes),
-        midWeight: Number(subjectDetails.percentMid),
-        endExamWeight: Number(subjectDetails.percentEndExam)
-      }
-    };
+    // Weight validation
+    const totalWeight = 
+      formData.assessments.assignmentWeight +
+      formData.assessments.quizWeight +
+      formData.assessments.labWeight +
+      formData.assessments.midTermWeight +
+      formData.assessments.finalExamWeight;
+
+    if (totalWeight !== 100) {
+      setStatus({ 
+        type: "error", 
+        message: `Total weight must be 100%. Current total: ${totalWeight}%` 
+      });
+      setLoading(false);
+      return;
+    }
 
     try {
-      await createSubject(formattedData);
-      setMessage({ type: "success", text: "Subject registered successfully!" });
-      // Reset form
-      setSubjectDetails({
-        courseCode: "",
-        batch: "",
-        courseName: "",
-        credit: "",
-        assignments: "0",
-        labs: "0",
-        quizzes: "0",
-        percentAssignments: "0",
-        percentLabs: "0",
-        percentQuizzes: "0",
-        percentMid: "0",
-        percentEndExam: "0",
-        semester: "",
-      });
+      const res = await createSubject(formData);
+      if (res.data.success) {
+        setStatus({ type: "success", message: "Subject created successfully! Redirecting..." });
+        setTimeout(() => navigate("/lecturer/home"), 2000);
+      }
     } catch (err) {
-      const errorMsg = err.response?.data?.message || "Failed to register subject.";
-      setMessage({ type: "error", text: errorMsg });
+      setStatus({ 
+        type: "error", 
+        message: err.response?.data?.message || "Failed to create subject" 
+      });
     } finally {
       setLoading(false);
     }
@@ -89,101 +101,88 @@ function AddSubject() {
   return (
     <LecturerLayout>
       <div className="as-page">
-
-        {/* Page Header */}
-        <div className="as-header">
+        {/* Header */}
+        <header className="as-header">
           <div className="as-breadcrumb">
-            <LayoutDashboard size={14} />
-            <span>Lecturer Portal</span>
+            <Link to="/lecturer/home">Dashboard</Link>
             <ChevronRight size={14} />
-            <span className="as-breadcrumb__current">Course Management</span>
+            <span className="as-breadcrumb__current">Add Subject</span>
           </div>
           <h2 className="as-title">
-            <PlusCircle className="as-title__icon" size={32} />
-            Add New Subject
+            <PlusCircle size={32} className="as-title__icon" />
+            Create New Module
           </h2>
-        </div>
+        </header>
 
-        {message.text && (
-          <div className={`as-alert as-alert--${message.type}`}>
-            {message.text}
+        {status.message && (
+          <div className={`as-alert as-alert--${status.type}`}>
+            {status.type === "success" ? <CheckCircle2 size={24} /> : <AlertCircle size={24} />}
+            <span>{status.message}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="as-form">
-
-          {/* Section 1: Core Details */}
+        <form onSubmit={handleSubmit}>
+          {/* Module Basics Card */}
           <div className="as-card">
             <div className="as-card__header">
               <div className="as-card__icon-wrap">
                 <BookOpen size={24} />
               </div>
-              <h3 className="as-card__title">Course Information</h3>
+              <h3 className="as-card__title">Basic Configuration</h3>
             </div>
 
             <div className="as-grid as-grid--2col">
-              <div className="as-field">
-                <label className="as-label">Course Code</label>
-                <input
-                  type="text"
-                  name="courseCode"
-                  value={subjectDetails.courseCode}
-                  onChange={handleChange}
-                  placeholder="e.g. EC9630"
-                  className="as-input"
-                  required
-                />
-              </div>
-
-              <div className="as-field">
-                <label className="as-label">Batch</label>
-                <input
-                  type="text"
-                  name="batch"
-                  value={subjectDetails.batch}
-                  onChange={handleChange}
-                  placeholder="e.g. 2022"
-                  className="as-input"
-                  required
-                />
-              </div>
-
               <div className="as-field as-field--full">
-                <label className="as-label">Course Name</label>
+                <label className="as-label">
+                  <Type size={16} /> Module Name
+                </label>
                 <input
-                  type="text"
                   name="courseName"
-                  value={subjectDetails.courseName}
-                  onChange={handleChange}
                   placeholder="e.g. Advanced Software Engineering"
-                  className="as-input"
-                  required
-                />
-              </div>
-
-              <div className="as-field">
-                <label className="as-label">Credits</label>
-                <input
-                  type="number"
-                  name="credit"
-                  value={subjectDetails.credit}
+                  value={formData.courseName}
                   onChange={handleChange}
-                  placeholder="3"
                   className="as-input"
                   required
-                  min="0"
-                  step="0.5"
                 />
               </div>
 
               <div className="as-field">
-                <label className="as-label">Semester</label>
+                <label className="as-label">
+                  <Hash size={16} /> Course Code
+                </label>
                 <input
-                  type="text"
+                  name="courseCode"
+                  placeholder="e.g. EC6060"
+                  value={formData.courseCode}
+                  onChange={handleChange}
+                  className="as-input"
+                  required
+                />
+              </div>
+
+              <div className="as-field">
+                <label className="as-label">
+                  <Calendar size={16} /> Batch
+                </label>
+                <input
+                  name="batch"
+                  placeholder="e.g. E19"
+                  value={formData.batch}
+                  onChange={handleChange}
+                  className="as-input"
+                  required
+                />
+              </div>
+
+              <div className="as-field">
+                <label className="as-label">
+                  <Layers size={16} /> Semester
+                </label>
+                <input
                   name="semester"
-                  value={subjectDetails.semester}
+                  placeholder="e.g. 6"
+                  value={formData.semester}
                   onChange={handleChange}
-                  placeholder="e.g. Semester 1"
                   className="as-input"
                   required
                 />
@@ -191,113 +190,112 @@ function AddSubject() {
             </div>
           </div>
 
-          {/* Section 2: Component Structure */}
+          {/* Assessment Structure Card */}
           <div className="as-card">
             <div className="as-card__header">
               <div className="as-card__icon-wrap">
-                <Settings2 size={24} />
+                <ClipboardList size={24} />
               </div>
-              <h3 className="as-card__title">Component Structure</h3>
+              <h3 className="as-card__title">Assessment Strategy</h3>
             </div>
 
-            <div className="as-grid as-grid--3col">
-              <div className="as-field">
-                <label className="as-label">Assignments</label>
-                <input
-                  type="number"
-                  name="assignments"
-                  value={subjectDetails.assignments}
-                  onChange={handleChange}
-                  placeholder="No. of items"
-                  className="as-input"
-                  required
-                  min="0"
-                />
-              </div>
-
-              <div className="as-field">
-                <label className="as-label">Labs</label>
-                <input
-                  type="number"
-                  name="labs"
-                  value={subjectDetails.labs}
-                  onChange={handleChange}
-                  placeholder="No. of items"
-                  className="as-input"
-                  required
-                  min="0"
-                />
-              </div>
-
-              <div className="as-field">
-                <label className="as-label">Quizzes</label>
-                <input
-                  type="number"
-                  name="quizzes"
-                  value={subjectDetails.quizzes}
-                  onChange={handleChange}
-                  placeholder="No. of items"
-                  className="as-input"
-                  required
-                  min="0"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Section 3: Evaluation Percentages */}
-          <div className="as-card">
-            <div className="as-card__header">
-              <div className="as-card__icon-wrap">
-                <Percent size={24} />
-              </div>
-              <h3 className="as-card__title">Evaluation Weights</h3>
-            </div>
-
-            <div className="as-grid as-grid--5col">
-              {[
-                { name: "percentAssignments", label: "Assignments" },
-                { name: "percentLabs", label: "Labs" },
-                { name: "percentQuizzes", label: "Quizzes" },
-                { name: "percentMid", label: "Mid Exam" },
-                { name: "percentEndExam", label: "End Exam" }
-              ].map((field) => (
-                <div key={field.name} className="as-field">
-                  <label className="as-label as-label--small">{field.label}</label>
+            <div className="as-grid">
+              {/* Assignments Row */}
+              <div className="as-grid as-grid--2col">
+                <div className="as-field">
+                  <label className="as-label">
+                    <Target size={16} /> Assignment Count
+                  </label>
+                  <input
+                    type="number"
+                    name="assessments.assignmentCount"
+                    value={formData.assessments.assignmentCount}
+                    onChange={handleChange}
+                    className="as-input"
+                    min="0"
+                  />
+                </div>
+                <div className="as-field">
+                  <label className="as-label">
+                    <Percent size={16} /> Total Weight
+                  </label>
                   <div className="as-percent-wrap">
                     <input
                       type="number"
-                      name={field.name}
-                      value={subjectDetails[field.name]}
+                      name="assessments.assignmentWeight"
+                      value={formData.assessments.assignmentWeight}
                       onChange={handleChange}
-                      placeholder="0"
                       className="as-input as-input--percent"
-                      required
                       min="0"
-                      max="100"
                     />
                     <span className="as-percent-symbol">%</span>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          {/* Submit Button */}
-          <div className="as-submit-row">
-            <button
-              type="submit"
-              className="as-submit-btn"
-              disabled={loading}
-            >
-              <ClipboardList size={24} />
-              {loading ? "Registering..." : "Register Subject"}
-            </button>
+              <div className="as-section-divider"></div>
+
+              {/* Quizzes and Labs Row */}
+              <div className="as-grid as-grid--2col">
+                 <div className="as-field">
+                    <label className="as-label"><Activity size={16} /> Quiz Count</label>
+                    <input type="number" name="assessments.quizCount" value={formData.assessments.quizCount} onChange={handleChange} className="as-input" min="0" />
+                 </div>
+                 <div className="as-field">
+                    <label className="as-label"><Percent size={16} /> Quiz Weight</label>
+                    <div className="as-percent-wrap">
+                      <input type="number" name="assessments.quizWeight" value={formData.assessments.quizWeight} onChange={handleChange} className="as-input as-input--percent" min="0" />
+                      <span className="as-percent-symbol">%</span>
+                    </div>
+                 </div>
+              </div>
+
+              <div className="as-grid as-grid--2col">
+                 <div className="as-field">
+                    <label className="as-label"><FlaskConical size={16} /> Lab Count</label>
+                    <input type="number" name="assessments.labCount" value={formData.assessments.labCount} onChange={handleChange} className="as-input" min="0" />
+                 </div>
+                 <div className="as-field">
+                    <label className="as-label"><Percent size={16} /> Lab Weight</label>
+                    <div className="as-percent-wrap">
+                      <input type="number" name="assessments.labWeight" value={formData.assessments.labWeight} onChange={handleChange} className="as-input as-input--percent" min="0" />
+                      <span className="as-percent-symbol">%</span>
+                    </div>
+                 </div>
+              </div>
+
+              <div className="as-section-divider"></div>
+
+              {/* Major Exams Row */}
+              <div className="as-grid as-grid--2col">
+                 <div className="as-field">
+                    <label className="as-label"><Activity size={16} /> Mid-Term Weight</label>
+                    <div className="as-percent-wrap">
+                      <input type="number" name="assessments.midTermWeight" value={formData.assessments.midTermWeight} onChange={handleChange} className="as-input as-input--percent" min="0" />
+                      <span className="as-percent-symbol">%</span>
+                    </div>
+                 </div>
+                 <div className="as-field">
+                    <label className="as-label"><Target size={16} /> Final Exam Weight</label>
+                    <div className="as-percent-wrap">
+                      <input type="number" name="assessments.finalExamWeight" value={formData.assessments.finalExamWeight} onChange={handleChange} className="as-input as-input--percent" min="0" />
+                      <span className="as-percent-symbol">%</span>
+                    </div>
+                 </div>
+              </div>
+            </div>
+
+            <div className="as-submit-row">
+              <button type="submit" className="as-submit-btn" disabled={loading}>
+                {loading ? <Loader2 className="animate-spin" size={20} /> : <PlusCircle size={20} />}
+                Create Module Structure
+              </button>
+            </div>
           </div>
         </form>
       </div>
     </LecturerLayout>
   );
-}
+};
 
 export default AddSubject;

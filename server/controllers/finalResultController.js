@@ -1,6 +1,7 @@
 const Subject = require("../models/Subject");
 const IncourseResult = require("../models/IncourseResult");
 const FinalResult = require("../models/FinalResult");
+const AdminResult = require("../models/AdminResult");
 const { isValidRegNum } = require("../utils/regUtils");
 const PDFDocument = require("pdfkit-table");
 const { normalizeRegNo, extractRegNoFromEmail, generateRegNoRegex } = require("../utils/regUtils");
@@ -443,13 +444,39 @@ exports.getStudentFinalResults = async (req, res) => {
 
     let query = { studentENo: regNoRegex };
     
-    // Find all results first
+    // Find all lecturer results first
     let results = await FinalResult.find(query)
-      .populate("subject", "courseCode courseName batch semester credit");
+      .populate("subject", "courseCode courseName batch semester credit")
+      .lean(); // Use lean for easier modification
 
-    // Filter by semester if requested
+    // Fetch official Admin (Senate) results to populate the "After Senate" column
+    const adminResults = await AdminResult.find({ studentRegNum: regNoRegex });
+    const adminMap = {};
+    
+    // Helper to extract numbers for key matching (e.g., "Semester 01" -> "1", "E21" -> "21")
+    const getNumeric = (s) => (s ? s.toString().replace(/\D/g, '').replace(/^0+/, '') : "") || "";
+
+    adminResults.forEach(ar => {
+        const batchNum = getNumeric(ar.batch);
+        const key = `${ar.courseCode.toUpperCase()}-${batchNum}-${getNumeric(ar.semester)}`;
+        adminMap[key] = ar.grade;
+    });
+
+    // Merge Admin results into the lecturer's results
+    results = results.map(r => {
+        if (!r.subject) return r;
+        const batchNum = getNumeric(r.subject.batch);
+        const key = `${r.subject.courseCode.toUpperCase()}-${batchNum}-${getNumeric(r.subject.semester)}`;
+        return {
+            ...r,
+            afterSenateGrade: adminMap[key] || null
+        };
+    });
+
+    // Optional: Filter by semester if requested in the query
     if (semester) {
-        results = results.filter(r => r.subject && r.subject.semester === semester);
+        const targetSemNumeric = getNumeric(semester);
+        results = results.filter(r => r.subject && getNumeric(r.subject.semester) === targetSemNumeric);
     }
 
     // Calculate Summary and Distribution

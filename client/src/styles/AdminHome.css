@@ -16,7 +16,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -25,13 +25,13 @@
 }
 
 .ah-breadcrumb-current {
-  color: var(--admin-dark);
+  color: var(--text-main);
 }
 
 .ah-title {
   font-size: 2.25rem;
   font-weight: 900;
-  color: var(--admin-dark);
+  color: var(--text-main);
   letter-spacing: -0.5px;
 }
 
@@ -43,14 +43,14 @@
 
 .ah-date-chip {
   padding: 0.75rem 1.25rem;
-  background: white;
+  background: var(--bg-card);
   border-radius: 1rem;
   border: 1px solid var(--admin-border);
   display: flex;
   align-items: center;
   gap: 0.75rem;
   font-weight: 700;
-  color: #64748b;
+  color: var(--text-muted);
   box-shadow: var(--admin-shadow);
 }
 
@@ -58,9 +58,9 @@
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: white;
+  background: var(--bg-card);
   border: 1px solid var(--admin-border);
-  color: var(--admin-dark);
+  color: var(--text-main);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,7 +71,7 @@
 }
 
 .ah-notice-btn:hover {
-  background: #f1f5f9;
+  background: var(--bg-hover);
   transform: translateY(-2px);
 }
 
@@ -81,7 +81,7 @@
   right: -5px;
   width: 20px;
   height: 20px;
-  background: #ef4444;
+  background: var(--danger);
   color: white;
   border-radius: 50%;
   font-size: 0.65rem;
@@ -89,7 +89,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid white;
+  border: 3px solid var(--bg-card);
 }
 
 /* Grid Layout */
@@ -101,16 +101,17 @@
 
 /* Cards */
 .ah-card {
-  background: white;
+  background: var(--bg-card);
   border-radius: var(--admin-radius);
   padding: 2.5rem;
   border: 1px solid var(--admin-border);
   box-shadow: var(--admin-shadow);
+  transition: var(--theme-transition);
 }
 
 /* Welcome Card */
 .ah-welcome-card {
-  background: linear-gradient(135deg, var(--admin-dark), #1a454c);
+  background: linear-gradient(135deg, var(--bg-dark), var(--primary-light));
   color: white;
   border: none;
   position: relative;
@@ -141,7 +142,7 @@
   font-size: 0.7rem;
   font-weight: 900;
   letter-spacing: 2px;
-  color: var(--admin-primary);
+  color: var(--primary);
   margin-bottom: 0.75rem;
 }
 
@@ -166,7 +167,7 @@
 
 .ah-welcome-icon {
   opacity: 0.1;
-  color: white;
+  color: var(--text-light);
   transform: rotate(-10deg);
 }
 
@@ -182,8 +183,8 @@
 }
 
 .ah-btn-white {
-  background: white;
-  color: var(--admin-dark);
+  background: var(--bg-main);
+  color: var(--text-main);
 }
 
 .ah-btn-white:hover {
@@ -192,28 +193,28 @@
 }
 
 .ah-btn-glass {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
   color: white;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.1);
   backdrop-filter: blur(4px);
 }
 
 .ah-btn-glass:hover {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
 }
 
 .ah-btn-outline {
   width: 100%;
   background: transparent;
-  border: 2px solid #e2e8f0;
-  color: var(--admin-dark);
+  border: 2px solid var(--admin-border);
+  color: var(--text-main);
   font-weight: 800;
   margin-top: 1.5rem;
 }
 
 .ah-btn-outline:hover {
-  border-color: var(--admin-primary);
-  color: var(--admin-primary);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 /* Stats Cards */
@@ -224,7 +225,7 @@
 }
 
 .ah-stat-card {
-  background: white;
+  background: var(--bg-card);
   border-radius: var(--admin-radius);
   padding: 1.75rem;
   display: flex;
@@ -254,15 +255,15 @@
   transform: scale(1.1);
 }
 
-.ah-stat-card.primary .ah-stat-icon-wrap { background: #E3F2FD; color: #1976D2; }
-.ah-stat-card.indigo .ah-stat-icon-wrap { background: #E8EAF6; color: #3F51B5; }
-.ah-stat-card.teal .ah-stat-icon-wrap { background: #E0F2F1; color: #00897B; }
-.ah-stat-card.orange .ah-stat-icon-wrap { background: #FFF3E0; color: #F57C00; }
+.ah-stat-card.primary .ah-stat-icon-wrap { background: rgba(56, 189, 248, 0.1); color: #38bdf8; }
+.ah-stat-card.indigo .ah-stat-icon-wrap { background: rgba(99, 102, 241, 0.1); color: #6366f1; }
+.ah-stat-card.teal .ah-stat-icon-wrap { background: rgba(20, 184, 166, 0.1); color: #14b8a6; }
+.ah-stat-card.orange .ah-stat-icon-wrap { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
 
 .ah-stat-label {
   font-size: 0.7rem;
   font-weight: 800;
-  color: #64748b;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 0.25rem;
@@ -271,14 +272,14 @@
 .ah-stat-value {
   font-size: 1.75rem;
   font-weight: 900;
-  color: var(--admin-dark);
+  color: var(--text-main);
   margin-bottom: 0.25rem;
 }
 
 .ah-stat-trend {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 /* Main Content Layout */
@@ -308,13 +309,13 @@
 .ah-card-title {
   font-size: 1.25rem;
   font-weight: 800;
-  color: var(--admin-dark);
+  color: var(--text-main);
 }
 
 .ah-text-btn {
   background: none;
   border: none;
-  color: var(--admin-primary);
+  color: var(--primary);
   font-weight: 800;
   font-size: 0.85rem;
   cursor: pointer;
@@ -336,9 +337,9 @@
   align-items: center;
   gap: 1.25rem;
   padding: 1.25rem;
-  background: #f8fafc;
+  background: var(--bg-hover);
   border-radius: 1.25rem;
-  border: 1px solid #f1f5f9;
+  border: 1px solid var(--admin-border);
 }
 
 .ah-activity-indicator {
@@ -347,20 +348,20 @@
   border-radius: 50%;
 }
 
-.ah-activity-indicator.success { background: #10b981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1); }
-.ah-activity-indicator.warning { background: #f59e0b; box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1); }
-.ah-activity-indicator.primary { background: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+.ah-activity-indicator.success { background: var(--success); box-shadow: 0 0 0 4px rgba(var(--success-rgb, 16, 185, 129), 0.1); }
+.ah-activity-indicator.warning { background: var(--warning); box-shadow: 0 0 0 4px rgba(var(--warning-rgb, 245, 158, 11), 0.1); }
+.ah-activity-indicator.primary { background: var(--primary); box-shadow: 0 0 0 4px rgba(var(--primary-rgb, 33, 158, 188), 0.1); }
 
 .ah-activity-text {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--admin-dark);
+  color: var(--text-main);
 }
 
 .ah-activity-time {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 /* Side Card / Access Stats */
@@ -379,19 +380,19 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: #64748b;
+  color: var(--text-muted);
   font-weight: 700;
 }
 
 .ah-access-value {
   font-weight: 900;
   font-size: 1.25rem;
-  color: var(--admin-dark);
+  color: var(--text-main);
 }
 
 .ah-access-progress-wrap {
   height: 8px;
-  background: #f1f5f9;
+  background: var(--bg-main);
   border-radius: 10px;
   overflow: hidden;
   margin-bottom: 1rem;
@@ -399,13 +400,13 @@
 
 .ah-access-progress-bar {
   height: 100%;
-  background: var(--admin-primary);
+  background: var(--primary);
   border-radius: 10px;
 }
 
 .ah-access-hint {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--text-muted);
   font-weight: 600;
 }
 
