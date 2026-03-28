@@ -222,7 +222,7 @@ const SubjectWiseResult = () => {
 
               <div className="sw-chart-container">
                 <ResponsiveContainer width="100%" height={380}>
-                  <BarChart data={analyticsData.chart} margin={{ top: 20, right: 10, left: 0, bottom: 20 }}>
+                  <BarChart data={analyticsData.chart} margin={{ top: 40, right: 10, left: 0, bottom: 20 }}>
                     <defs>
                       {analyticsData.chart.map((entry, index) => (
                         <linearGradient key={`grad-${index}`} id={`colorGrad-${index}`} x1="0" y1="0" x2="0" y2="1">
@@ -244,6 +244,7 @@ const SubjectWiseResult = () => {
                       tickLine={false}
                       tick={{ fill: '#4F7C82', fontSize: 13, fontWeight: 600 }}
                       dx={-10}
+                      padding={{ top: 30 }}
                     />
                     <Tooltip
                       content={<CustomTooltip />}
@@ -337,14 +338,10 @@ const SubjectWiseResult = () => {
                   </div>
                 </div>
 
-                <div className="sw-card sw-about-box">
-                  <h3 className="sw-about-title">About Subject</h3>
-                  <p className="sw-about-text">{analyticsData.info.description || "No description available for this subject."}</p>
                 </div>
               </div>
             </div>
-          </div>
-        ) : (
+          ) : (
           !loading && subjectsList.length === 0 && (
             <div className="sh-empty-state" style={{ textAlign: 'center', padding: '4rem 0' }}>
                <AlertCircle size={48} style={{ opacity: 0.3, marginBottom: '1rem' }} />
