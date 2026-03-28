@@ -1,4 +1,3 @@
-import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -7,41 +6,56 @@ import {
   MessageSquare,
   FileText,
   User,
-  ChevronRight
+  ChevronRight,
+  ChevronLeft,
+  Menu,
+  ShieldCheck
 } from "lucide-react";
 import "../styles/AdminLayout.css";
 
-const AdminSidebar = () => {
+const AdminSidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
 
   const menuItems = [
-    { path: "/adminhome", icon: <LayoutDashboard size={20} />, label: "Dashboard" },
-    { path: "/adduser", icon: <UserPlus size={20} />, label: "Manage Access" },
-    { path: "/studentlist", icon: <Users size={20} />, label: "Students" },
-    { path: "/lecturelist", icon: <Users size={20} />, label: "Lecturers" },
-    { path: "/admincomplaint", icon: <MessageSquare size={20} />, label: "Complaints" },
-    { path: "/adminresults", icon: <FileText size={20} />, label: "Senate Submissions" },
-    { path: "/adminprofile", icon: <User size={20} />, label: "My Profile" },
+    { name: "Dashboard", path: "/adminhome", icon: LayoutDashboard },
+    { name: "Manage Access", path: "/adduser", icon: UserPlus },
+    { name: "Students", path: "/studentlist", icon: Users },
+    { name: "Lecturers", path: "/lecturelist", icon: Users },
+    { name: "Complaints", path: "/admincomplaint", icon: MessageSquare },
+    { name: "Senate Submissions", path: "/adminresults", icon: FileText },
+    { name: "My Profile", path: "/adminprofile", icon: User },
   ];
 
   return (
-    <div className="sb-container">
-      <nav className="sb-nav">
-        <div className="sb-nav-section">ADMINISTRATION</div>
-        {menuItems.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={`sb-item ${location.pathname === item.path ? "active" : ""}`}
-          >
-            <div className="sb-item-icon">{item.icon}</div>
-            <span className="sb-item-label">{item.label}</span>
-            {location.pathname === item.path && <ChevronRight size={16} className="sb-item-chevron" />}
-          </Link>
-        ))}
-      </nav>
+    <div className={`sb-container ${isOpen ? "open" : "closed"}`}>
+      <div className="sidebar-header">
+        <div className="sidebar-logo">
+          <ShieldCheck size={24} className="logo-icon" />
+          {isOpen && <span className="logo-text">Admin Portal</span>}
+        </div>
+        <button className="sidebar-toggle-btn" onClick={toggleSidebar}>
+          {isOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
+        </button>
+      </div>
 
-      {/* Footer and branding removed to match InnerNavbar style */}
+      <nav className="sb-nav">
+        {isOpen && <div className="sb-nav-section">ADMINISTRATION</div>}
+        {menuItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = location.pathname === item.path;
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`sb-item ${isActive ? "active" : ""}`}
+            >
+              <div className="sb-item-icon"><Icon size={20} /></div>
+              {isOpen && <span className="sb-item-label">{item.name}</span>}
+              {isOpen && isActive && <ChevronRight size={16} className="sb-item-chevron" />}
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 };
