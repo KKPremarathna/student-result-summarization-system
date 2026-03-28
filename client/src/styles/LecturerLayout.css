@@ -1,11 +1,21 @@
-/* LecturerLayout.css */
+/* LecturerLayout.css - Premium Winter Chill Layout Styling */
+
+:root {
+  --lp-bg: #f8fafc;
+  --lp-dark: #0B2E33;
+  --lp-primary: #219EBC;
+  --lp-border: rgba(226, 232, 240, 0.8);
+  --lp-shadow: 0 10px 30px rgba(11, 46, 51, 0.05);
+  --lp-radius: 2rem;
+}
 
 .lecturer-layout {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  width: 100vw;
   overflow: hidden;
-  background-color: #0a7f92;
+  background-color: var(--lp-bg);
 }
 
 .lecturer-layout__body {
@@ -21,14 +31,14 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: transparent; /* Removed the old dark overlay */
 }
 
 .lecturer-layout__inner {
   position: relative;
   z-index: 1;
-  padding: 40px;
-  max-width: 1400px;
+  padding: 2.5rem;
+  max-width: 1600px;
   margin: 0 auto;
   width: 100%;
   flex: 1;
