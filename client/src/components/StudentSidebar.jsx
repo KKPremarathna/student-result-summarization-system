@@ -49,11 +49,6 @@ function StudentSidebar({ isOpen, toggleSidebar }) {
         </ul>
       </nav>
       
-      {isOpen && (
-        <div className="sidebar-footer">
-          <p className="footer-version">v2.1.0-winter</p>
-        </div>
-      )}
     </aside>
   );
 }
