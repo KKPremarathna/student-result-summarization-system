@@ -8,7 +8,6 @@ import {
   BookOpen, 
   Mail, 
   MessageSquare, 
-  Bell,
   TrendingUp,
   LayoutDashboard,
   ChevronRight,
@@ -78,15 +77,11 @@ function AdminHome() {
             <h1 className="ah-title">System Overview</h1>
           </div>
           
-          <div className="ah-header-right">
+           <div className="ah-header-right">
              <div className="ah-date-chip">
                 <Clock size={16} />
                 <span>{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
              </div>
-             <button className="ah-notice-btn">
-                <Bell size={20} />
-                <span className="ah-badge">4</span>
-             </button>
           </div>
         </header>
 
