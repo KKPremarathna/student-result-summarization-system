@@ -8,19 +8,23 @@ import {
   Settings, 
   ChevronLeft, 
   Menu,
-  GraduationCap
+  GraduationCap,
+  Sun,
+  Moon
 } from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
 import "../styles/Sidebar.css";
 
 function StudentSidebar({ isOpen, toggleSidebar }) {
+  const { theme, toggleTheme } = useTheme();
   const location = useLocation();
 
   const menuItems = [
-    { path: "/student/home", label: "Dashboard", icon: <Home size={20} /> },
-    { path: "/student/subject-wise", label: "Subject Results", icon: <BookOpen size={20} /> },
-    { path: "/student/student-wise", label: "My Results", icon: <FileText size={20} /> },
-    { path: "/student/complaints", label: "Complaints", icon: <MessageSquare size={20} /> },
-    { path: "/student/profile", label: "Profile Settings", icon: <Settings size={20} /> },
+    { name: "Dashboard", path: "/student/home", icon: Home },
+    { name: "Subject Results", path: "/student/subject-wise", icon: BookOpen },
+    { name: "My Results", path: "/student/student-wise", icon: FileText },
+    { name: "Complaints", path: "/student/complaints", icon: MessageSquare },
+    { name: "Profile Settings", path: "/student/profile", icon: Settings },
   ];
 
   return (
@@ -30,30 +34,34 @@ function StudentSidebar({ isOpen, toggleSidebar }) {
           <GraduationCap size={24} className="logo-icon" />
           {isOpen && <span className="logo-text">Student Portal</span>}
         </div>
-        <button className="sidebar-toggle-btn" onClick={toggleSidebar}>
-          {isOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
-        </button>
+        <div className="sidebar-header-actions">
+           <button className="theme-toggle-btn" onClick={toggleTheme} title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
+              {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+           </button>
+          <button className="sidebar-toggle-btn" onClick={toggleSidebar}>
+            {isOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </div>
 
       <nav className="sidebar-nav">
         {isOpen && <div className="nav-label">Main Menu</div>}
         <ul className="nav-list">
-          {menuItems.map((item) => (
-            <li key={item.path} className={location.pathname === item.path ? "active" : ""}>
-              <Link to={item.path} className="nav-link">
-                <span className="nav-icon">{item.icon}</span>
-                {isOpen && <span className="nav-text">{item.label}</span>}
-              </Link>
-            </li>
-          ))}
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+            return (
+              <li key={item.path} className={isActive ? "active" : ""}>
+                <Link to={item.path} className="nav-link">
+                  <Icon size={20} className="nav-icon" />
+                  {isOpen && <span className="nav-text">{item.name}</span>}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </nav>
       
-      {isOpen && (
-        <div className="sidebar-footer">
-          <p className="footer-version">v2.1.0-winter</p>
-        </div>
-      )}
     </aside>
   );
 }

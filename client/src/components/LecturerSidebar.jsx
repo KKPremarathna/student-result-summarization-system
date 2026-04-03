@@ -10,10 +10,14 @@ import {
   CheckSquare, 
   Settings,
   Menu,
-  ChevronLeft
+  ChevronLeft,
+  Sun,
+  Moon
 } from 'lucide-react';
+import { useTheme } from "../context/ThemeContext";
 
 function Sidebar({ isOpen, toggleSidebar }) {
+  const { theme, toggleTheme } = useTheme();
   const location = useLocation();
 
   const menuItems = [
@@ -33,9 +37,14 @@ function Sidebar({ isOpen, toggleSidebar }) {
           <LayoutDashboard size={24} className="logo-icon" />
           {isOpen && <span className="logo-text">Lecturer Portal</span>}
         </div>
-        <button className="sidebar-toggle-btn" onClick={toggleSidebar}>
-          {isOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
-        </button>
+        <div className="sidebar-header-actions">
+           <button className="theme-toggle-btn" onClick={toggleTheme} title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
+              {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+           </button>
+          <button className="sidebar-toggle-btn" onClick={toggleSidebar}>
+            {isOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </div>
 
       <nav className="sidebar-nav">

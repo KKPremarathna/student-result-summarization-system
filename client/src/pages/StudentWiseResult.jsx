@@ -339,9 +339,13 @@ const StudentWiseResult = () => {
                             </span>
                           </td>
                           <td>
-                            <span className={`st-grade-badge st-grade--${(row.afterSenateGrade || row.grade)?.charAt(0) || 'E'}`}>
-                              {row.afterSenateGrade || row.grade || "-"}
-                            </span>
+                            {row.afterSenateGrade ? (
+                              <span className={`st-grade-badge st-grade--${row.afterSenateGrade.charAt(0)}`}>
+                                {row.afterSenateGrade}
+                              </span>
+                            ) : (
+                              <span className="st-grade-pending">-</span>
+                            )}
                           </td>
                           <td>{row.subject?.credit || 0}</td>
                         </tr>

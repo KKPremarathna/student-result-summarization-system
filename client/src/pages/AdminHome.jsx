@@ -93,10 +93,6 @@ function AdminHome() {
                 <div className="ah-welcome-tag">CORE ADMINISTRATION</div>
                 <h2>Good Day, {user.firstName}!</h2>
                 <p>The system is currently stable. You have {stats.totalComplaints} unresolved complaints needing attention.</p>
-                <div className="ah-welcome-actions">
-                  <button className="ah-btn ah-btn-white">System Logs</button>
-                  <button className="ah-btn ah-btn-glass">Manage Roles</button>
-                </div>
               </div>
               <div className="ah-welcome-icon">
                 <ShieldCheck size={120} />
@@ -197,7 +193,6 @@ function AdminHome() {
                    </div>
                    <p className="ah-access-hint">75% of allowed emails have registered</p>
                 </div>
-                <button className="ah-btn ah-btn-outline ah-full-width mt-1">Manage Whitelist</button>
              </div>
           </div>
         </div>

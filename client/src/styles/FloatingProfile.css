@@ -36,12 +36,12 @@
   top: calc(100% + 15px);
   right: 0;
   width: 260px;
-  background: rgba(20, 20, 20, 0.9);
+  background: var(--bg-card);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--admin-border);
   border-radius: 20px;
   padding: 1.25rem;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--admin-shadow);
   z-index: 10000;
   animation: floatIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   transform-origin: top right;
@@ -66,20 +66,20 @@
 .admin-profile-floating__name {
   font-size: 1.15rem;
   font-weight: 700;
-  color: white;
+  color: var(--text-main);
   margin: 0;
 }
 
 .admin-profile-floating__email {
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
   margin: 0.2rem 0 0 0;
   word-break: break-all;
 }
 
 .admin-profile-floating__divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--admin-border);
   margin: 1rem 0;
 }
 

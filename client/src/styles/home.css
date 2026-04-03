@@ -45,7 +45,7 @@
   font-family: var(--font-heading);
   letter-spacing: -2px;
   animation: fadeIn 1s ease-out;
-  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  text-shadow: var(--shadow-lg);
 }
 
 .hero-content h2 {

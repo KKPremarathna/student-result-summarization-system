@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import LecturerLayout from "../components/LecturerLayout.jsx";
 import { getSubjectById, updateSubject } from "../services/lecturerApi.js";
 import "../styles/AddSubject.css";
-import "../styles/Toast.css";
 import {
   Edit3,
   BookOpen,
@@ -14,7 +13,15 @@ import {
   ClipboardList,
   CheckCircle2,
   AlertCircle,
-  X
+  X,
+  Hash,
+  Type,
+  Calendar,
+  Layers,
+  Target,
+  FlaskConical,
+  Activity,
+  Loader2
 } from "lucide-react";
 
 function EditSubject() {
@@ -22,12 +29,8 @@ function EditSubject() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
-  const [toast, setToast] = useState({ visible: false, message: "", type: "" });
+  const [status, setStatus] = useState({ type: null, message: "" });
 
-  const showToast = (msg, type = "success") => {
-    setToast({ visible: true, message: msg, type });
-    setTimeout(() => setToast({ visible: false, message: "", type: "" }), 3000);
-  };
   const [subjectDetails, setSubjectDetails] = useState({
     courseCode: "",
     batch: "",
@@ -62,12 +65,12 @@ function EditSubject() {
           percentAssignments: assess.assignmentWeight !== undefined ? String(assess.assignmentWeight) : "0",
           percentLabs: assess.labWeight !== undefined ? String(assess.labWeight) : "0",
           percentQuizzes: assess.quizWeight !== undefined ? String(assess.quizWeight) : "0",
-          percentMid: assess.midWeight !== undefined ? String(assess.midWeight) : "0",
-          percentEndExam: assess.endExamWeight !== undefined ? String(assess.endExamWeight) : "0",
+          percentMid: assess.midTermWeight !== undefined ? String(assess.midTermWeight) : (assess.midWeight !== undefined ? String(assess.midWeight) : "0"),
+          percentEndExam: assess.finalExamWeight !== undefined ? String(assess.finalExamWeight) : (assess.endExamWeight !== undefined ? String(assess.endExamWeight) : "0"),
         });
       } catch (err) {
         console.error(err);
-        showToast("Failed to load subject details.", "error");
+        setStatus({ type: "error", message: "Failed to load subject details." });
       } finally {
         setFetching(false);
       }
@@ -82,6 +85,7 @@ function EditSubject() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setStatus({ type: null, message: "" });
 
     const totalWeight =
       Number(subjectDetails.percentAssignments || 0) +
@@ -91,7 +95,7 @@ function EditSubject() {
       Number(subjectDetails.percentEndExam || 0);
 
     if (totalWeight !== 100) {
-      showToast("Total evaluation weights must exactly equal 100%", "error");
+      setStatus({ type: "error", message: `Total weight must be 100%. Current total: ${totalWeight}%` });
       setLoading(false);
       return;
     }
@@ -109,18 +113,18 @@ function EditSubject() {
         assignmentWeight: Number(subjectDetails.percentAssignments),
         labWeight: Number(subjectDetails.percentLabs),
         quizWeight: Number(subjectDetails.percentQuizzes),
-        midWeight: Number(subjectDetails.percentMid),
-        endExamWeight: Number(subjectDetails.percentEndExam)
+        midTermWeight: Number(subjectDetails.percentMid),
+        finalExamWeight: Number(subjectDetails.percentEndExam)
       }
     };
 
     try {
       await updateSubject(id, formattedData);
-      showToast("Subject updated successfully!", "success");
-      setTimeout(() => navigate('/lecturer/home'), 1500);
+      setStatus({ type: "success", message: "Module configuration updated successfully!" });
+      setTimeout(() => navigate('/lecturer/home'), 2000);
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Failed to update subject.";
-      showToast(errorMsg, "error");
+      setStatus({ type: "error", message: errorMsg });
     } finally {
       setLoading(false);
     }
@@ -129,7 +133,9 @@ function EditSubject() {
   if (fetching) {
     return (
       <LecturerLayout>
-        <div style={{ padding: "3rem", textAlign: "center", fontStyle: "italic", opacity: 0.7 }}>Loading subject details...</div>
+        <div className="as-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+          <Loader2 className="animate-spin" size={48} color="#219EBC" />
+        </div>
       </LecturerLayout>
     );
   }
@@ -137,214 +143,172 @@ function EditSubject() {
   return (
     <LecturerLayout>
       <div className="as-page">
-        <div className="as-header">
+        {/* Header */}
+        <header className="as-header">
           <div className="as-breadcrumb">
-            <LayoutDashboard size={14} />
-            <span>Lecturer Portal</span>
+            <Link to="/lecturer/home">Dashboard</Link>
             <ChevronRight size={14} />
-            <span className="as-breadcrumb__current">Course Management</span>
+            <span className="as-breadcrumb__current">Edit Module</span>
           </div>
           <h2 className="as-title">
-            <Edit3 className="as-title__icon" size={32} />
-            Edit Subject
+            <Edit3 size={32} className="as-title__icon" />
+            Update Module: {subjectDetails.courseCode}
           </h2>
-        </div>
+        </header>
 
-        {toast.visible && (
-          <div className="toast-container">
-            <div className={`toast ${toast.type}`}>
-              <div className="toast-content">
-                {toast.type === "success" ? <CheckCircle2 className="toast-icon" /> : <AlertCircle className="toast-icon" />}
-                <span className="toast-message">{toast.message}</span>
-              </div>
-              <button 
-                className="toast-close" 
-                onClick={() => setToast({ visible: false, message: "", type: "" })}
-              >
-                <X size={18} />
-              </button>
-            </div>
+        {status.message && (
+          <div className={`as-alert as-alert--${status.type}`}>
+            {status.type === "success" ? <CheckCircle2 size={24} /> : <AlertCircle size={24} />}
+            <span>{status.message}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="as-form">
+        <form onSubmit={handleSubmit}>
+          {/* Module Basics Card */}
           <div className="as-card">
             <div className="as-card__header">
               <div className="as-card__icon-wrap">
                 <BookOpen size={24} />
               </div>
-              <h3 className="as-card__title">Course Information</h3>
+              <h3 className="as-card__title">Module Identity</h3>
             </div>
 
             <div className="as-grid as-grid--2col">
-              <div className="as-field">
-                <label className="as-label">Course Code</label>
-                <input
-                  type="text"
-                  name="courseCode"
-                  value={subjectDetails.courseCode}
-                  onChange={handleChange}
-                  placeholder="e.g. EC9630"
-                  className="as-input"
-                  required
-                />
-              </div>
-
-              <div className="as-field">
-                <label className="as-label">Batch</label>
-                <input
-                  type="text"
-                  name="batch"
-                  value={subjectDetails.batch}
-                  onChange={handleChange}
-                  placeholder="e.g. 2022"
-                  className="as-input"
-                  required
-                />
-              </div>
-
               <div className="as-field as-field--full">
-                <label className="as-label">Course Name</label>
+                <label className="as-label">
+                  <Type size={16} /> Module Name
+                </label>
                 <input
-                  type="text"
                   name="courseName"
                   value={subjectDetails.courseName}
                   onChange={handleChange}
-                  placeholder="e.g. Advanced Software Engineering"
                   className="as-input"
                   required
                 />
               </div>
 
               <div className="as-field">
-                <label className="as-label">Credits</label>
+                <label className="as-label">
+                  <Hash size={16} /> Course Code
+                </label>
+                <input
+                  name="courseCode"
+                  value={subjectDetails.courseCode}
+                  onChange={handleChange}
+                  className="as-input"
+                  required
+                />
+              </div>
+
+              <div className="as-field">
+                <label className="as-label">
+                  <Calendar size={16} /> Batch
+                </label>
+                <input
+                  name="batch"
+                  value={subjectDetails.batch}
+                  onChange={handleChange}
+                  className="as-input"
+                  required
+                />
+              </div>
+
+              <div className="as-field">
+                <label className="as-label">
+                  <Layers size={16} /> Semester
+                </label>
+                <input
+                  name="semester"
+                  value={subjectDetails.semester}
+                  onChange={handleChange}
+                  className="as-input"
+                  required
+                />
+              </div>
+
+              <div className="as-field">
+                <label className="as-label">
+                  <ClipboardList size={16} /> Credits
+                </label>
                 <input
                   type="number"
                   name="credit"
                   value={subjectDetails.credit}
                   onChange={handleChange}
-                  placeholder="3"
                   className="as-input"
                   required
                   min="0"
                   step="0.5"
                 />
               </div>
-
-              <div className="as-field">
-                <label className="as-label">Semester</label>
-                <input
-                  type="text"
-                  name="semester"
-                  value={subjectDetails.semester}
-                  onChange={handleChange}
-                  placeholder="e.g. Semester 1"
-                  className="as-input"
-                  required
-                />
-              </div>
             </div>
           </div>
 
+          {/* Assessment Strategy Card */}
           <div className="as-card">
             <div className="as-card__header">
               <div className="as-card__icon-wrap">
                 <Settings2 size={24} />
               </div>
-              <h3 className="as-card__title">Component Structure</h3>
+              <h3 className="as-card__title">Evaluation Strategy</h3>
             </div>
 
-            <div className="as-grid as-grid--3col">
-              <div className="as-field">
-                <label className="as-label">Compulsory Assignments</label>
-                <input
-                  type="number"
-                  name="assignments"
-                  value={subjectDetails.assignments}
-                  onChange={handleChange}
-                  placeholder="No. of items"
-                  className="as-input"
-                  required
-                  min="0"
-                />
-              </div>
-
-              <div className="as-field">
-                <label className="as-label">Compulsory Labs</label>
-                <input
-                  type="number"
-                  name="labs"
-                  value={subjectDetails.labs}
-                  onChange={handleChange}
-                  placeholder="No. of items"
-                  className="as-input"
-                  required
-                  min="0"
-                />
-              </div>
-
-              <div className="as-field">
-                <label className="as-label">Compulsory Quizzes</label>
-                <input
-                  type="number"
-                  name="quizzes"
-                  value={subjectDetails.quizzes}
-                  onChange={handleChange}
-                  placeholder="No. of items"
-                  className="as-input"
-                  required
-                  min="0"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="as-card">
-            <div className="as-card__header">
-              <div className="as-card__icon-wrap">
-                <Percent size={24} />
-              </div>
-              <h3 className="as-card__title">Evaluation Weights</h3>
-            </div>
-
-            <div className="as-grid as-grid--5col">
-              {[
-                { name: "percentAssignments", label: "Assignments" },
-                { name: "percentLabs", label: "Labs" },
-                { name: "percentQuizzes", label: "Quizzes" },
-                { name: "percentMid", label: "Mid Exam" },
-                { name: "percentEndExam", label: "End Exam" }
-              ].map((field) => (
-                <div key={field.name} className="as-field">
-                  <label className="as-label as-label--small">{field.label}</label>
-                  <div className="as-percent-wrap">
-                    <input
-                      type="number"
-                      name={field.name}
-                      value={subjectDetails[field.name]}
-                      onChange={handleChange}
-                      placeholder="0"
-                      className="as-input as-input--percent"
-                      required
-                      min="0"
-                      max="100"
-                    />
-                    <span className="as-percent-symbol">%</span>
+            <div className="as-grid">
+               <div className="as-grid as-grid--3col">
+                  <div className="as-field">
+                    <label className="as-label">Assignments</label>
+                    <input type="number" name="assignments" value={subjectDetails.assignments} onChange={handleChange} className="as-input" required min="0" />
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
+                  <div className="as-field">
+                    <label className="as-label">Labs</label>
+                    <input type="number" name="labs" value={subjectDetails.labs} onChange={handleChange} className="as-input" required min="0" />
+                  </div>
+                  <div className="as-field">
+                    <label className="as-label">Quizzes</label>
+                    <input type="number" name="quizzes" value={subjectDetails.quizzes} onChange={handleChange} className="as-input" required min="0" />
+                  </div>
+               </div>
 
-          <div className="as-submit-row">
-            <button
-              type="submit"
-              className="as-submit-btn"
-              disabled={loading}
-            >
-              <ClipboardList size={24} />
-              {loading ? "Updating..." : "Update Subject"}
-            </button>
+               <div className="as-section-divider"></div>
+
+               <div className="as-grid as-grid--5col">
+                  {[
+                    { name: "percentAssignments", label: "Assignment %", icon: <Target size={14} /> },
+                    { name: "percentLabs", label: "Lab %", icon: <FlaskConical size={14} /> },
+                    { name: "percentQuizzes", label: "Quiz %", icon: <Activity size={14} /> },
+                    { name: "percentMid", label: "Mid %", icon: <Activity size={14} /> },
+                    { name: "percentEndExam", label: "Final %", icon: <Target size={14} /> }
+                  ].map((field) => (
+                    <div key={field.name} className="as-field">
+                      <label className="as-label" style={{ fontSize: '0.7rem' }}>{field.label}</label>
+                      <div className="as-percent-wrap">
+                        <input
+                          type="number"
+                          name={field.name}
+                          value={subjectDetails[field.name]}
+                          onChange={handleChange}
+                          className="as-input as-input--percent"
+                          required
+                          min="0"
+                          max="100"
+                        />
+                        <span className="as-percent-symbol">%</span>
+                      </div>
+                    </div>
+                  ))}
+               </div>
+            </div>
+
+            <div className="as-submit-row">
+              <button
+                type="submit"
+                className="as-submit-btn"
+                disabled={loading}
+              >
+                {loading ? <Loader2 className="animate-spin" size={24} /> : <CheckCircle2 size={24} />}
+                Update Configuration
+              </button>
+            </div>
           </div>
         </form>
       </div>

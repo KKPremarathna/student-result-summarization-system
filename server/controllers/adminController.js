@@ -220,4 +220,38 @@ exports.getAdminSubjects = async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 };
+
+// Get subject by details (courseCode, batch, semester) for auto-fill
+exports.getSubjectByDetails = async (req, res) => {
+    try {
+        const { courseCode, batch, semester } = req.query;
+        
+        if (!courseCode || !batch || !semester) {
+            return res.status(400).json({ message: 'Missing required parameters' });
+        }
+
+        // Find subject and populate lecturer details
+        const subject = await Subject.findOne({ 
+            courseCode: courseCode.toUpperCase(), 
+            batch, 
+            semester 
+        }).populate('createdBy', 'firstName lastName email');
+
+        if (!subject) {
+            return res.status(404).json({ message: 'Subject not found' });
+        }
+
+        res.status(200).json({ 
+            success: true, 
+            data: {
+                courseName: subject.courseName,
+                lecturerEmail: subject.createdBy.email,
+                lecturerName: `${subject.createdBy.firstName} ${subject.createdBy.lastName}`
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
 
